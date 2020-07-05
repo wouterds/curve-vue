@@ -27,6 +27,15 @@
 	                	<a :href = "'https://etherscan.io/address/' + depositZaps[i].deposit" v-show="!['ren', 'sbtc'].includes(allPools[i])">
 	                		<img class='icon' :src="getTokenUrl(i)"> <span class='text'>deposit address</span>
 	                	</a>
+	                	<a :href = "'https://etherscan.io/address/' + depositZaps[i].deposit" v-show="!['ren', 'sbtc'].includes(allPools[i])">
+	                		<img class='icon' :src="getTokenUrl(i)"> <span class='text'>deposit address</span>
+	                	</a>
+	                	<a href="https://etherscan.io/address/0x9fe350DfA5F66bC086243F21A8F0932514316627" v-show="['ren'].includes(allPools[i])">
+	                		<img class='icon' :src="getTokenUrl(i)"> <span class='text'>old adapter address</span>
+	                	</a>
+	                	<a :href="'https://etherscan.io/address/' + adapterAddresses[allPools[i]]" v-show="['ren','sbtc'].includes(allPools[i])">
+	                		<img class='icon' :src="getTokenUrl(i)"> <span class='text'>adapter address</span>
+	                	</a>
 	            </fieldset>
 	        </fieldset>
 	    </div>
@@ -63,6 +72,12 @@
 			},
 			publicPath() {
 				return process.env.BASE_URL
+			},
+			adapterAddresses() {
+				return {
+					ren: '0x73aB2Bd10aD10F7174a1AD5AFAe3ce3D991C5047',
+					sbtc: '0xAEade605D01FE9a8e9C4B3AA0130A90d62167029',
+				}
 			},
 		},
 		methods: {
