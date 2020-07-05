@@ -433,7 +433,7 @@
 		      
                 if(+this.inputs[0] > 0) {
                     for(let i = 1; i < currentContract.N_COINS; i++) {
-                        await common.approveAmount(this.coins[i], BN(this.amounts[i]), currentContract.default_account, allabis[currentContract.currentContract].adapterBiconomyAddress)
+                        await common.approveAmount(this.coins[i], BN(this.amounts[i]), currentContract.default_account, allabis[currentContract.currentContract].adapterBiconomyAddress, this.inf_approval)
                     }
                 }
                 else {
