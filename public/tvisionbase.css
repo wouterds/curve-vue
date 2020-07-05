@@ -517,4 +517,11 @@ footer {
   background: silver;
   font-weight: bolder;
   text-align: center;
+  word-break: break-all;
+}
+
+@media only screen and (max-device-widtH: 730px) {
+  footer a {
+    display: block;
+  }
 }
