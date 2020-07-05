@@ -52,7 +52,7 @@
 					[CHI_address, currentContract.chi.methods.balanceOf(allabis[currentContract.currentContract].adapterBiconomyAddress).encodeABI()],
 					[CHI_address, currentContract.chi.methods.balanceOf(currentContract.default_account).encodeABI()],
 					[CHI_address, currentContract.chi.methods.allowance(currentContract.default_account, 
-						allabis[currentContract.currentContract].adapterAddress).encodeABI()]
+						allabis[currentContract.currentContract].adapterBiconomyAddress).encodeABI()]
 				]
 				let aggcalls = await currentContract.multicall.methods.aggregate(calls).call()
 				let decoded = aggcalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
@@ -63,7 +63,7 @@
 
 			async approveCHI() {
 				await common.approveAmount(currentContract.chi, currentContract.max_allowance, 
-											currentContract.default_account, allabis[currentContract.currentContract].adapterAddress, true)
+											currentContract.default_account, allabis[currentContract.currentContract].adapterBiconomyAddress, true)
 				this.showCHIbutton = false
 			},
 		}

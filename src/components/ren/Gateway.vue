@@ -490,7 +490,7 @@
 			async from_cur_handler() {
 				this.address = ''
 				if(this.from_currency == 0) this.address = contract.default_account
-                let currentAllowance = BN(await contract.coins[this.from_currency].methods.allowance(contract.default_account, allabis[contract.currentContract].adapterAddress).call())
+                let currentAllowance = BN(await contract.coins[this.from_currency].methods.allowance(contract.default_account, allabis[contract.currentContract].adapterBiconomyAddress).call())
                 let maxAllowance = contract.max_allowance.div(BN(2))
                 if (currentAllowance.gt(maxAllowance))
                     this.inf_approval = true;
