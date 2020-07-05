@@ -91,7 +91,7 @@
 	            </li>
         	</ul>
         </fieldset>
-        <div id='max_slippage' v-show='showWithdrawSlippage'><span>Max slippage:</span> 
+        <div id='max_slippage' v-show='showWithdrawSlippage'><span>Max slippage:</span>
             <input id="slippage02" type="radio" name="slippage" value='0.2' v-model='maxSlippage'>
             <label for="slippage02">0.2%</label>
 
@@ -281,8 +281,8 @@
          		return this.staked_balance && this.token_balance.plus(this.staked_balance).eq(BN(0))
          	},
             getMaxSlippage() {
-                let maxSlippage = this.maxSlippage;
-                if(this.maxInputSlippage) maxSlippage = this.maxInputSlippage;
+                let maxSlippage = +this.maxSlippage;
+                if(this.maxInputSlippage) maxSlippage = +this.maxInputSlippage;
                 return (100 + maxSlippage)/100
             },
             minAmount() {
