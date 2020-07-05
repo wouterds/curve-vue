@@ -380,7 +380,7 @@
                     else Vue.set(this.amounts, i+1, BN(this.inputs[i+1]).times(precisions).toFixed(0,1))
                 })
                 Vue.set(this.amounts, 0, BN(this.amountAfterBTC).times(1e8).toFixed(0,1))
-				let total_supply = +decoded[decoded.length-1];
+				let total_supply = +decoded[decoded.length-endOffset];
 				// /this.waitingMessage = 'Please approve spending your coins'
                 var token_amount = 0;
                 if(total_supply > 0) {
