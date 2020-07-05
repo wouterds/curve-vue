@@ -177,6 +177,21 @@
 		            </div>
 	            </div>
 
+	            <div :class="{selected: activeLink == 11}">
+	                <a href='https://etherscan.io/accounts/label/curve-fi'>
+	                	<div class='index'>11.</div>
+	                	<div class='icon-container'>
+	                		<img class='etherscan icon' :src="publicPath + 'icons/integrations/etherscan.png'" alt="etherscan explorer">
+					</div>
+            		<span class='text'>Etherscan</span></a>
+
+	                <div class='descriptionscontainer'>
+	                	<div class='descriptions'>
+		                	Ethereum Blockchain Explorer
+		                </div>
+		            </div>
+	            </div>
+
 	        </fieldset>
 	    </div>
 </template>
