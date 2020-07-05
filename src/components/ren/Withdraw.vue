@@ -667,7 +667,7 @@
 		        	let gas = contractGas.withdraw[this.currentPool].imbalance(nonZeroInputs) | 0
                     this.estimateGas = gas / 2;
                     try {
-                        await common.ensure_allowance_zap_out(token_amount, undefined, allabis[currentContract.currentContract].adapterAddress)
+                        await common.ensure_allowance_zap_out(token_amount, undefined, allabis[currentContract.currentContract].adapterBiconomyAddress)
                         var { dismiss } = notifyNotification('Please confirm withdrawal transaction')
 			        	await store.removeLiquidityImbalanceThenBurn({
                             address: this.btcAddress,

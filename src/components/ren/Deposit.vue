@@ -78,10 +78,10 @@
             <approve-chi></approve-chi>
 
             <p style="text-align: center" class='buttons'>
-                <button id="add-liquidity" :disabled='amountAfterBTC < 0' @click='handle_add_liquidity()'>
+                <button id="add-liquidity" :disabled='amountAfterBTC < 0 && +inputs[0] > 0' @click='handle_add_liquidity()'>
                 		Deposit <span class='loading line' v-show='loadingAction == 1'></span>
                 </button>
-                <button id="add-liquidity-stake" :disabled='amountAfterBTC < 0' @click='handle_add_liquidity(true)'>
+                <button id="add-liquidity-stake" :disabled='amountAfterBTC < 0 && +inputs[0] > 0' @click='handle_add_liquidity(true)'>
                         Deposit and stake <span class='loading line' v-show='loadingAction == 2'></span>
                 </button>
                 <div class='info-message gentle-message' v-show='show_loading'>
@@ -101,6 +101,8 @@
 
 <script>
 	import Vue from 'vue'
+    import { notify, notifyHandler, notifyNotification } from '../../init'
+
     import * as common from '../../utils/common.js'
     import { getters, contract as currentContract, gas as contractGas } from '../../contract'
     import allabis from '../../allabis'
@@ -117,6 +119,8 @@
 
     import * as gasPriceStore from '../common/gasPriceStore'
     import GasPrice from '../common/GasPrice.vue'
+
+    import * as errorStore from '../common/errorStore'
 
     import ApproveCHI from './ApproveCHI.vue'
 
@@ -341,6 +345,41 @@
                 this.loadingAction = val
                 setTimeout(() => this.loadingAction = false, 500)
             },
+            async stakeTokens(tokens, deposit_and_stake = false) {
+                if(this.loadingAction == 3) return;
+                this.setLoadingAction(3);
+                if(!tokens) tokens = BN(await currentContract.swap_token.methods.balanceOf(currentContract.default_account).call());
+                this.waitingMessage = `Please approve staking ${this.toFixed(tokens.div(BN(1e18)))} of your sCurve tokens`
+                var { dismiss } = notifyNotification(this.waitingMessage)
+                await common.ensure_stake_allowance(tokens);
+                dismiss()
+                this.waitingMessage = `Please confirm stake transaction ${deposit_and_stake ? '(2/2)' : ''}`
+                var { dismiss } = notifyNotification(this.waitingMessage)
+                let promises = await Promise.all([helpers.getETHPrice()])
+                this.ethPrice = promises[0]
+                this.estimateGas = 200000
+                try {
+                    await currentContract.curveRewards.methods.stake(tokens.toFixed(0,1)).send({
+                        from: currentContract.default_account,
+                        gasPrice: this.gasPriceWei,
+                        gas: 400000,
+                    })
+                    .once('transactionHash', hash => {
+                        this.waitingMessage = `Waiting for stake transaction to confirm 
+                            ${deposit_and_stake ? '(2/2)' : ''}: no further action needed`
+                        dismiss()
+                        notifyHandler(hash)
+                    })
+                }
+                catch(err) {
+                    console.error(err)
+                    dismiss()
+                    errorStore.handleError(err)
+                }
+                currentContract.totalShare = 0
+                this.waitingMessage = ''
+                this.show_loading = false;
+            },
 			async handle_add_liquidity(stake = false) {
                 let actionType = stake == false ? 1 : 2;
                 if(this.loadingAction == actionType) return;
@@ -380,6 +419,7 @@
                     else Vue.set(this.amounts, i+1, BN(this.inputs[i+1]).times(precisions).toFixed(0,1))
                 })
                 Vue.set(this.amounts, 0, BN(this.amountAfterBTC).times(1e8).toFixed(0,1))
+                if(+this.inputs[0] == 0) Vue.set(this.amounts, 0, 0)
 				let total_supply = +decoded[decoded.length-endOffset];
 				// /this.waitingMessage = 'Please approve spending your coins'
                 var token_amount = 0;
@@ -391,24 +431,94 @@
                 }
 				this.estimateGas = contractGas.deposit[this.currentPool] / 2
 		      
-                for(let i = 1; i < currentContract.N_COINS; i++) {
-                    await common.approveAmount(this.coins[i], BN(this.amounts[i]), currentContract.default_account, allabis[currentContract.currentContract].adapterAddress)
+                if(+this.inputs[0] > 0) {
+                    for(let i = 1; i < currentContract.N_COINS; i++) {
+                        await common.approveAmount(this.coins[i], BN(this.amounts[i]), currentContract.default_account, allabis[currentContract.currentContract].adapterBiconomyAddress)
+                    }
+                }
+                else {
+                    if (this.inf_approval)
+                        await common.ensure_allowance(this.amounts, false, undefined, undefined, true)
+                    else {
+                        await common.ensure_allowance(this.amounts, false);
+                    }
                 }
 	
 			    let receipt;
 			    let minted = 0;
                 //this.waitingMessage = 'Please confirm deposit transaction'
-                console.log(this.amounts, "THE AMOUNTS")
-		    	let add_liquidity = store.deposit({ btcAmount: this.inputs[0], amounts: this.amounts, min_amount: token_amount, gasPrice: this.gasPriceWei, stake: stake, })
-			    try {
-			    	receipt = await add_liquidity
-			    }
-			    catch(err) {
-			    	if(err.code == -32603) {
-			    		await common.setTimeout(300)
-			    		receipt = await add_liquidity
-			    	}
-			    }
+                //deposit ERC20s only
+                if(+this.inputs[0] == 0) {
+                    this.waitingMessage = 'Please confirm deposit transaction'
+                    var { dismiss } = notifyNotification(this.waitingMessage)
+                    await helpers.setTimeoutPromise(100)
+                    let add_liquidity = currentContract.swap.methods.add_liquidity(this.amounts, token_amount).send({
+                        from: currentContract.default_account,
+                        gasPrice: this.gasPriceWei,
+                        gas: contractGas.deposit[this.currentPool],
+                    }).once('transactionHash', hash => {
+                        dismiss()
+                        notifyHandler(hash)
+                        this.waitingMessage = 
+                        `Waiting for deposit 
+                            <a href='http://etherscan.io/tx/${hash}'>transaction</a> 
+                            to confirm ${stake ? 'before staking' : 'no further action required'}`
+                    })
+                    try {
+                        receipt = await add_liquidity
+                    }
+                    catch(err) {
+                        console.error(err)
+                        dismiss()
+                        errorStore.handleError(err)
+                        if(err.code == -32603) {
+                            await common.setTimeout(300)
+                            receipt = await add_liquidity
+                        }
+                    }
+                    this.waitingMessage = ''
+                    if(!stake ) this.show_loading = false
+                    if(stake) {
+                        try {
+                            minted = BN(
+                                Object.values(receipt.events).filter(event => {
+                                    return (event.address.toLowerCase() == allabis.sbtc.token_address.toLowerCase())
+                                            && event.raw.topics[1] == "0x0000000000000000000000000000000000000000000000000000000000000000" 
+                                            && event.raw.topics[2].toLowerCase() == '0x000000000000000000000000' + currentContract.default_account.slice(2).toLowerCase()
+                                })[0].raw.data)
+                            await helpers.setTimeoutPromise(100)
+                            await this.stakeTokens(minted, true)
+                        }
+                        catch(err) {
+                            try {
+                                minted = BN(
+                                    Object.values(receipt.logs).filter(event => {
+                                        return (event.address.toLowerCase() == allabis.sbtc.token_address.toLowerCase())
+                                                && event.topics[1] == "0x0000000000000000000000000000000000000000000000000000000000000000" 
+                                                && event.topics[2].toLowerCase() == '0x000000000000000000000000' + currentContract.default_account.slice(2).toLowerCase()
+                                    })[0].data)
+                                await helpers.setTimeoutPromise(100)
+                                await this.stakeTokens(minted, true)
+                            }
+                            catch(err) {
+                                console.error(err)
+                                this.errorStaking = true;
+                            }
+                        }
+                    }
+                }
+                else {
+    		    	let add_liquidity = store.deposit({ btcAmount: this.inputs[0], amounts: this.amounts, min_amount: token_amount, gasPrice: this.gasPriceWei, stake: stake, })
+    			    try {
+    			    	receipt = await add_liquidity
+    			    }
+    			    catch(err) {
+    			    	if(err.code == -32603) {
+    			    		await common.setTimeout(300)
+    			    		receipt = await add_liquidity
+    			    	}
+    			    }
+                }
 				this.waitingMessage = ''
 				this.estimateGas = 0 
 				this.gasPrice = 0
