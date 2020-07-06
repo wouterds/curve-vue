@@ -548,7 +548,10 @@
 						toInput: this.toInput,
 						slippage: maxSlippage * 10,
 					})
-                    document.querySelector('tbody tr td:first-child').scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"})
+                    if(document.querySelector('.showdesktoptransactions').offsetParent !== null)
+                        document.querySelector('tbody tr td:first-child').scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"})
+                    else
+                        document.querySelector('.transactionmobile').scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"})
 				}
 
 				else if([1,2].includes(this.from_currency) && this.to_currency == 0) { 

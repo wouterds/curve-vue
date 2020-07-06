@@ -509,7 +509,10 @@
                 }
                 else {
     		    	let add_liquidity = store.deposit({ btcAmount: this.inputs[0], amounts: this.amounts, min_amount: token_amount, gasPrice: this.gasPriceWei, stake: stake, })
-                    document.querySelector('tbody tr td:first-child').scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"})
+                    if(document.querySelector('.showdesktoptransactions').offsetParent !== null)
+                        document.querySelector('tbody tr td:first-child').scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"})
+                    else
+                        document.querySelector('.transactionmobile').scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"})
     			    try {
     			    	receipt = await add_liquidity
     			    }
