@@ -113,6 +113,12 @@
                     <label for="custom_slippage" @click='customSlippageDisabled = false'>
                         <input type="text" id="custom_slippage_input" :disabled='customSlippageDisabled' name="custom_slippage_input" v-model='maxInputSlippage'> %
                     </label>
+                    <span class='tooltip' v-show='showSlippageTooLow'>
+                        <img class='icon small hoverpointer warning' :src="publicPath + 'exclamation-circle-solid.svg'">
+                        <span class='tooltiptext'>
+                            Max slippage value is likely too low and the transaction may fail
+                        </span>
+                    </span>
                 </div>
                 <gas-price></gas-price>
                 <ul>
@@ -217,6 +223,7 @@
             c_rates: [],
             show_loading: false,
             waitingMessage: '',
+            userInteracted: false,
             
             estimateGas: 0,
             ethPrice: 0,
@@ -268,6 +275,9 @@
                 },
                 immediate: true
             },
+            fromInput() {
+                this.userInteracted = true
+            },
         },
         computed: {
             precisions() {
@@ -290,7 +300,7 @@
                 return 0.01
             },
             selldisabled() {
-                return this.maxBalance != -1 && +(this.fromInput * this.precisions[this.from_currency]) > +this.maxBalance*1.001
+                return this.maxBalance != -1 && +this.fromInput > +this.maxBalance / this.precisions[this.from_currency] && this.userInteracted
             },
             notEnoughBalanceSynth() {
                 return this.currentPool == 'susdv2' && this.from_currency == 3 && cBN(this.fromInput).gt(cBN(this.maxSynthBalance))
@@ -313,6 +323,9 @@
             triggerEstimateGas() {
                 console.log("TRIGGER ESTIMATE GAS")
                 return this.swapwrapped, this.from_currency, this.to_currency, Date.now()
+            },
+            showSlippageTooLow() {
+                return this.maxInputSlippage != '' && +this.maxInputSlippage < 0.2
             },
         },
         mounted() {
@@ -502,6 +515,7 @@
             },
             async handle_trade() {
                 if(this.loadingAction) return;
+                this.userInteracted = true
                 this.setLoadingAction();
                 
                 this.show_loading = true;

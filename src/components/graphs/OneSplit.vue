@@ -131,6 +131,12 @@
                     <label for="custom_slippage" @click='customSlippageDisabled = false'>
                         <input type="text" id="custom_slippage_input" :disabled='customSlippageDisabled' name="custom_slippage_input" v-model='maxInputSlippage'> %
                     </label>
+                    <span class='tooltip' v-show='showSlippageTooLow'>
+                        <img class='icon small hoverpointer warning' :src="publicPath + 'exclamation-circle-solid.svg'">
+                        <span class='tooltiptext'>
+                            Max slippage value is likely too low and the transaction may fail
+                        </span>
+                    </span>
             </div>
             <gas-price></gas-price>
             <ul>
@@ -168,7 +174,7 @@
             <div class='info-message gentle-message' v-show='estimateGas'>
                 Estimated tx cost: {{ (+estimateGas).toFixed(2) }}$
             </div>
-            <p class='simple-error' id='no-balance' v-show='maxBalance != -1 && +fromInput > +maxBalance*1.001'>
+            <p class='simple-error' id='no-balance' v-show='showNoBalanceWarning'>
                 Not enough balance for 
                 <span v-show='!swapwrapped'>{{Object.keys(currencies)[from_currency] | capitalize}}</span>
                 <span v-show='swapwrapped'>{{Object.values(currencies)[from_currency]}}</span>. <span>Swap is not available.</span>
@@ -254,6 +260,7 @@
             bestPool: null,
             show_loading: false,
             waitingMessage: '',
+            userInteracted: false,
             ethPrice: 0,
             estimateGas: 0,
             loadingAction: false,
@@ -441,6 +448,12 @@
             gasPriceWei() {
                 return gasPriceStore.state.gasPriceWei
             },
+            showNoBalanceWarning() {
+                return this.maxBalance != -1 && +this.fromInput > this.maxBalance / this.precisions(this.from_currency) && this.userInteracted
+            },
+            showSlippageTooLow() {
+                return this.maxInputSlippage != '' && +this.maxInputSlippage < 0.2
+            },
         },
         watch: {
             from_currency(val, oldval) {
@@ -477,6 +490,9 @@
             },
             gasPrice() {
                 this.set_to_amount()
+            },
+            fromInput() {
+                this.userInteracted = true
             },
         },
         async created() {
@@ -594,6 +610,7 @@
             },
             async handle_trade() {
                 if(this.loadingAction) return;
+                this.userInteracted = true
                 this.setLoadingAction();
                 this.show_loading = true;
                 //handle allowances

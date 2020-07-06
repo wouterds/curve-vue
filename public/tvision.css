@@ -395,7 +395,7 @@ label[for='gasinstant'] {
   margin-left: 0.5em;
 }
 
-.exchange label[for='inf-approval'] {
+.exchange label[for='inf-approval'], .exchange label[for='swapw'] {
   margin-left: -2px;
 }
 
@@ -779,4 +779,14 @@ li.coins label:hover {
 
 .vamiddle {
   vertical-align: middle;
+}
+
+.icon.cancel img, .icon.warning {
+  width: 1em;
+  margin-left: 0.8em;
+  filter: invert(13%) sepia(90%) saturate(4444%) hue-rotate(11deg) brightness(88%) contrast(97%);
+}
+.icon.warning {
+  margin-left: 0;
+  padding-left: 0;
 }
