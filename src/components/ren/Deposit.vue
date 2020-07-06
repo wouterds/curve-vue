@@ -379,7 +379,8 @@
                         dismiss()
                         notifyHandler(hash)
                     })
-                    currentContract.totalShare = 0
+                    currentContract.totalShare -= tokens
+                    common.update_fee_info()
                 }
                 catch(err) {
                     console.error(err)
