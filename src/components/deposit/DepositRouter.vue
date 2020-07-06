@@ -7,6 +7,7 @@
 	        <input id='swapbtc' type='checkbox' value='swapbtc' v-model='swapbtc'/>
 	        <label for='swapbtc'>Deposit 
 	        	<img :src="publicPath + 'tokens/btc.svg'" class='token-icon vamiddle'>
+	        	<a href='https://guides.curve.fi/how-to-swap-bitcoin-for-wbtc-or-renbtc/' rel='noopener norefferer'>[?]</a>
 	        	<span v-show='hasIncomplete > 0 && swapbtc == false'>
 	        		({{hasIncomplete}} incomplete tx)
 	        	</span>
