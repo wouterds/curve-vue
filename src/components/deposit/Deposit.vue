@@ -301,13 +301,13 @@
                         dismiss()
                         notifyHandler(hash)
                     })
+				    currentContract.totalShare = 0
                 }
                 catch(err) {
                     console.error(err)
                     dismiss()
                     errorStore.handleError(err)
                 }
-				currentContract.totalShare = 0
 				this.waitingMessage = ''
 				this.show_loading = false;
 			},

@@ -604,6 +604,11 @@
                                 notifyHandler(hash)
                                 resolve()
                             })
+                            .on('receipt', receipt => {
+                                this.staked_balance = this.staked_balance.minus(amount)
+                                currentContract.curveStakedBalance -= amount
+                                common.update_fee_info()
+                            })
                             .catch(err => {
                                 dismiss()
                                 reject(err)
