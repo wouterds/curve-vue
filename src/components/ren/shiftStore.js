@@ -1002,38 +1002,42 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
 		errorStore.handleError(err)
 
 		//biconomy returned an error - rate limit? retry with normal web3 adapter contract
-		receipt = await new Promise((resolve, reject) => {
-			return txs[1].send({
-				from: state.default_account,
-				gasPrice: gasPriceStore.state.gasPriceWei,
-				gas: gas.adapter[transaction.pool].mintThenDeposit,
-			})
-			.once('transactionHash', hash => {
-				subscriptionStore.removeTxNotification(transaction.btcTxHash)
+		if(adapterContract.length == 0) {
+			receipt = await new Promise((resolve, reject) => {
+				return txs[1].send({
+					from: state.default_account,
+					gasPrice: gasPriceStore.state.gasPriceWei,
+					gas: gas.adapter[transaction.pool].mintThenDeposit,
+				})
+				.once('transactionHash', hash => {
+					subscriptionStore.removeTxNotification(transaction.btcTxHash)
 
-				transaction.state = 12
-				transaction.ethTxHash = hash
+					transaction.state = 12
+					transaction.ethTxHash = hash
 
-				upsertTx(transaction)
+					upsertTx(transaction)
 
-				notifyHandler(hash)
-				//resolve(hash)
+					notifyHandler(hash)
+					//resolve(hash)
+				})
+				.once('receipt', receipt => {
+					//this.transactions = this.transactions.filter(t => t.id != id)
+					transaction.state = 14
+					transaction.ethTxHash = receipt.transactionHash
+					upsertTx(transaction)
+					resolve(receipt)
+				})
+				.on('error', err => {
+					transaction.state = 16;
+					upsertTx(transaction)
+					reject(err)
+				})
+				.catch(err => reject(err))
 			})
-			.once('receipt', receipt => {
-				//this.transactions = this.transactions.filter(t => t.id != id)
-				transaction.state = 14
-				transaction.ethTxHash = receipt.transactionHash
-				upsertTx(transaction)
-				resolve(receipt)
-			})
-			.on('error', err => {
-				transaction.state = 16;
-				upsertTx(transaction)
-				reject(err)
-			})
-			.catch(err => reject(err))
-		})
+		}
 	}
+
+	common.update_fee_info()
 
 	if(transaction.stake) {
 		//DepositMintedCurve
@@ -1062,6 +1066,8 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
         	dismiss()
         })
 	}
+
+	common.update_fee_info()
  
 	// subscriptionStore.removeTxNotification(transaction.btcTxHash)
 

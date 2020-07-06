@@ -88,6 +88,11 @@
                     @click='handle_add_liquidity(true)'>
                         Deposit and stake <span class='loading line' v-show='loadingAction == 2'></span>
                 </button>
+                <button id='stakeunstaked' 
+                    v-show="totalShare > 0 && ['sbtc'].includes(currentPool)" 
+                    @click='stakeTokens()'>
+                    Stake unstaked <span class='loading line' v-show='loadingAction == 3'></span>
+                </button>
                 <div class='info-message gentle-message' v-show='show_loading'>
                 	{{waitingMessage}} <span class='loading line'></span>
                 </div>
