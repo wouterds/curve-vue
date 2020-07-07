@@ -60,7 +60,7 @@
           <a href="https://explore.duneanalytics.com/public/dashboards/RTH47mNjQcoLv5oG0HMDdI0iDq7BHxk1PzCRdwQB" rel='noopener noreferrer'>Dune Analytics</a>
           <p>____________</p>
           <a href="https://github.com/curvefi/curve-contract">git@</a>
-          <a href="https://github.com/pengiundev/curve-vue">git@UI</a>
+          <a href="https://github.com/curvefi/curve-vue">git@UI</a>
         </div>
       </div>
       <router-link to="/combinedstats" class='showmobile'>Stats</router-link>
@@ -80,7 +80,7 @@
       <a href="https://discord.gg/9uEHakc" class='showmobile' rel='noopener noreferrer'>@Discord</a>
       <a href="https://explore.duneanalytics.com/public/dashboards/RTH47mNjQcoLv5oG0HMDdI0iDq7BHxk1PzCRdwQB" class='showmobile' rel='noopener noreferrer'>Dune Analytics</a>
       <a href="https://github.com/curvefi/curve-contract" class='showmobile'>git@</a>
-      <a href="https://github.com/pengiundev/curve-vue" class='showmobile'>git@UI</a>
+      <a href="https://github.com/curvefi/curve-vue" class='showmobile'>git@UI</a>
       <button class='simplebutton showmobile' @click = 'changeWallets'>Change wallet</button>
       <button id='changeAccounts' class='simplebutton showmobile' 
         v-show="['ledger', 'trezor'].includes(walletName)" 
@@ -101,7 +101,7 @@
       <a href="https://discord.gg/9uEHakc" rel='noopener noreferrer'>@Discord</a>
       <a href="https://explore.duneanalytics.com/public/dashboards/RTH47mNjQcoLv5oG0HMDdI0iDq7BHxk1PzCRdwQB" rel='noopener noreferrer'>Dune Analytics</a>
       <a href="https://github.com/curvefi/curve-contract">git@</a>
-      <a href="https://github.com/pengiundev/curve-vue">git@UI</a>
+      <a href="https://github.com/curvefi/curve-vue">git@UI</a>
     </footer>
   </div>
 </template>

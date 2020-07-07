@@ -359,8 +359,10 @@
                 this.setLoadingAction(3);
                 if(!tokens) tokens = BN(await currentContract.swap_token.methods.balanceOf(currentContract.default_account).call());
                 this.waitingMessage = `Please approve staking ${this.toFixed(tokens.div(BN(1e18)))} of your sCurve tokens`
+                let curveRewards = new contract.web3.eth.Contract(allabis.sbtc.sCurveRewards_abi, allabis.sbtc.sCurveRewards_address)
+
                 var { dismiss } = notifyNotification(this.waitingMessage)
-                await common.ensure_stake_allowance(tokens);
+                await common.ensure_stake_allowance(tokens, curveRewards);
                 dismiss()
                 this.waitingMessage = `Please confirm stake transaction ${deposit_and_stake ? '(2/2)' : ''}`
                 var { dismiss } = notifyNotification(this.waitingMessage)
@@ -368,7 +370,7 @@
                 this.ethPrice = promises[0]
                 this.estimateGas = 200000
                 try {
-                    await currentContract.curveRewards.methods.stake(tokens.toFixed(0,1)).send({
+                    await curveRewards.methods.stake(tokens.toFixed(0,1)).send({
                         from: currentContract.default_account,
                         gasPrice: this.gasPriceWei,
                         gas: 400000,
