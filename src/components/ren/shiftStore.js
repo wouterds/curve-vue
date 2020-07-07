@@ -1002,7 +1002,7 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
 		errorStore.handleError(err)
 
 		//biconomy returned an error - rate limit? retry with normal web3 adapter contract
-		if(adapterContract.length == 0) {
+		if(adapterContract.length == 2) {
 			receipt = await new Promise((resolve, reject) => {
 				return txs[1].send({
 					from: state.default_account,
