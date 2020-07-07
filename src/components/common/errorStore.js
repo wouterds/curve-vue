@@ -1,5 +1,7 @@
 import Vue from 'vue'
 
+import { notifyNotification } from '../../init'
+
 export let state = Vue.observable({
 	txError: null,
 })
@@ -7,4 +9,6 @@ export let state = Vue.observable({
 export function handleError(error) {
 	if(error && error.message && error.message.length < 100)
 		state.txError = error.message
+	if(error && error.name == 'EthAppPleaseEnableContractData')
+		notifyNotification(error.message, 'error')
 }

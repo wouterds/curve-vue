@@ -56,10 +56,10 @@ export function notifyHandler(hash) {
   )
 }
 
-export function notifyNotification(message) {
+export function notifyNotification(message, type = 'pending') {
   let notificationObject = {
     eventCode: 'notification',
-    type: 'pending',
+    type: type,
     message: message,
   }
 

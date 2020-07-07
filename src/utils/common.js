@@ -27,6 +27,10 @@ export function approve(contract, amount, account, toContract) {
                     notifyHandler(hash)
                     resolve(true)
                 })
+                .on('error', err => {
+                    errorStore.handleError(err)
+                    reject(err)
+                })
                 .catch(err => {
                     errorStore.handleError(err)
                     reject(err)
