@@ -809,6 +809,8 @@ export async function mintThenSwap({ id, amount, params, utxoAmount, renResponse
 			})
 			.once('transactionHash', hash => {
 				notifyHandler(hash)
+				transaction.state = 12
+				upsertTx(transaction)
 				resolve(hash)
 			})
 			.once('receipt', () => {
@@ -844,6 +846,8 @@ export async function mintThenSwap({ id, amount, params, utxoAmount, renResponse
 					})
 					.once('transactionHash', hash => {
 						notifyHandler(hash)
+						transaction.state = 12
+						upsertTx(transaction)
 						resolve(hash)
 					})
 					.once('receipt', () => {
