@@ -120,4 +120,8 @@
 		margin: 0 auto;
 		width: 80%;
 	}
+	.swapBTC-container.info-message {
+		padding-top: 0.4em;
+		padding-bottom: 0.4em;
+	}
 </style>

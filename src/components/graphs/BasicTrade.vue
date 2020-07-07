@@ -127,6 +127,8 @@
 		grid-template-columns: minmax(30px, 210px) minmax(30px, 210px);
 		grid-gap: 1em;
 	}
-	.swapBTC-container {
+	.swapBTC-container.info-message {
+		padding-top: 0.4em;
+		padding-bottom: 0.4em;
 	}
 </style>

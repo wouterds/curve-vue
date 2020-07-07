@@ -102,25 +102,6 @@
                         {{exchangeRateSwapped}}
                     </span>
                 </p>
-                <div id='max_slippage'><span>Max slippage:</span> 
-                    <input id="slippage05" type="radio" name="slippage" value='0.005' @click='maxSlippage = 0.5; customSlippageDisabled = true'>
-                    <label for="slippage05">0.5%</label>
-
-                    <input id="slippage1" type="radio" name="slippage" checked value='0.01' @click='maxSlippage = 1; customSlippageDisabled = true'>
-                    <label for="slippage1">1%</label>
-
-                    <input id="custom_slippage" type="radio" name="slippage" value='-' @click='customSlippageDisabled = false'>
-                    <label for="custom_slippage" @click='customSlippageDisabled = false'>
-                        <input type="text" id="custom_slippage_input" :disabled='customSlippageDisabled' name="custom_slippage_input" v-model='maxInputSlippage'> %
-                    </label>
-                    <span class='tooltip' v-show='showSlippageTooLow'>
-                        <img class='icon small hoverpointer warning' :src="publicPath + 'exclamation-circle-solid.svg'">
-                        <span class='tooltiptext'>
-                            Max slippage value is likely too low and the transaction may fail
-                        </span>
-                    </span>
-                </div>
-                <gas-price></gas-price>
                 <ul>
                     <li>
                         <input id="inf-approval" type="checkbox" name="inf-approval" v-model='inf_approval'>
@@ -137,6 +118,34 @@
                         <label for='swapw' v-show = "!['susdv2', 'tbtc', 'ren', 'sbtc'].includes(currentPool)">Swap wrapped</label>
                     </li>
                 </ul>
+                <div>
+                    <button class='simplebutton advancedoptions' @click='showadvancedoptions = !showadvancedoptions'>
+                        Advanced options
+                        <span v-show='!showadvancedoptions'>▼</span>
+                        <span v-show='showadvancedoptions'>▲</span>
+                    </button>
+                    <div v-show='showadvancedoptions'>
+                        <div id='max_slippage'><span>Max slippage:</span> 
+                            <input id="slippage05" type="radio" name="slippage" value='0.005' @click='maxSlippage = 0.5; customSlippageDisabled = true'>
+                            <label for="slippage05">0.5%</label>
+
+                            <input id="slippage1" type="radio" name="slippage" checked value='0.01' @click='maxSlippage = 1; customSlippageDisabled = true'>
+                            <label for="slippage1">1%</label>
+
+                            <input id="custom_slippage" type="radio" name="slippage" value='-' @click='customSlippageDisabled = false'>
+                            <label for="custom_slippage" @click='customSlippageDisabled = false'>
+                                <input type="text" id="custom_slippage_input" :disabled='customSlippageDisabled' name="custom_slippage_input" v-model='maxInputSlippage'> %
+                            </label>
+                            <span class='tooltip' v-show='showSlippageTooLow'>
+                                <img class='icon small hoverpointer warning' :src="publicPath + 'exclamation-circle-solid.svg'">
+                                <span class='tooltiptext'>
+                                    Max slippage value is likely too low and the transaction may fail
+                                </span>
+                            </span>
+                        </div>
+                        <gas-price></gas-price>
+                    </div>
+                </div>
                 <p class='simple-error' v-show='exchangeRate<=0.98'>
                     Warning! Exchange rate is too low!
                 </p>
@@ -221,6 +230,7 @@
             swapwrapped: false,
             coins: [],
             c_rates: [],
+            showadvancedoptions: false,
             show_loading: false,
             waitingMessage: '',
             userInteracted: false,
@@ -621,5 +631,11 @@
     .pulse {
         animation: pulse 1s 3;
         margin-bottom: 8px;
+    }
+    .advancedoptions {
+        margin-top: 1em;
+    }
+    #max_slippage {
+        margin-top: 1em;
     }
 </style>
