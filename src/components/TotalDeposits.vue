@@ -46,6 +46,8 @@
 
 	import { contract } from '../contract'
 
+	import * as priceStore from './common/priceStore'
+
 	export default {
 		components: {
 			highcharts: Chart,
@@ -394,15 +396,16 @@
 				calls.push([allabis.sbtc.sCurveRewards_address, '0x70a08231000000000000000000000000' + contract.default_account.slice(2)])
 				let aggcalls = await contract.multicall.methods.aggregate(calls).call()
 				let decoded = aggcalls[1].map(hex => web3.eth.abi.decodeParameter('uint256', hex))
+				let btcPrice = await helpers.retry(priceStore.getBTCPrice())
 				//this.balances = []
 				helpers.chunkArr(decoded, 2).slice(0,pools.length).map((v, i) => {
 					let key = pools[i]
 					Vue.set(this.balances, key, +v[0] * (+v[1]) / 1e36);
-					if(['tbtc', 'ren', 'sbtc'].includes(key)) Vue.set(this.balances, key, this.balances[key] * this.btcPrice)
+					if(['tbtc', 'ren', 'sbtc'].includes(key)) Vue.set(this.balances, key, this.balances[key] * btcPrice)
 				})
 				let len = decoded.length
 				Vue.set(this.balances, 'susdv2', this.balances.susdv2 + (+decoded[len-2] * decoded[9]) / 1e36)
-				Vue.set(this.balances, 'sbtc', this.balances.sbtc + ((+decoded[len-1] * decoded[15]) / 1e36) * this.btcPrice)
+				Vue.set(this.balances, 'sbtc', this.balances.sbtc + ((+decoded[len-1] * decoded[15]) / 1e36) * btcPrice)
 
 				let deposits = Object.fromEntries(Object.entries(this.balances).map(([k, v]) => [k, v > 0 ? v : 0]))
 				this.totalDeposits = Object.values(deposits).reduce((a, b) => a + b, 0)
