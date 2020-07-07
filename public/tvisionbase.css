@@ -522,13 +522,18 @@ input[type=range]:focus::-ms-fill-upper {
 
 footer {
   flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
   background: silver;
   font-weight: bolder;
   text-align: center;
-  word-break: break-all;
 }
 
 @media only screen and (max-device-widtH: 730px) {
+  footer {
+    display: block;
+  }
   footer a {
     display: block;
   }
