@@ -1296,6 +1296,7 @@ export async function listenForReplacement(txhash) {
 	emitter.on('txSpeedUp', async transaction => {
 		console.log("SPEED UP", transaction)
 		console.log(transaction.originalHash, "ORIGINAL HASH", transaction.hash, "NEW HASH")
+		notifyHandler(transaction.hash)
 		let tx = state.transactions.find(t => t.ethTxHash == transaction.originalHash)
 		await removeTx(tx)
 		tx.removed = false
