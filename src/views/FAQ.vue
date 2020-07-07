@@ -36,6 +36,14 @@
             <p>
                 <a href='https://www.youtube.com/watch?v=1SN7zKlb5pk' rel='noopener noreferrer'>How Curve.fi works</a>
             </p>
+
+            <p>
+                <a href='https://www.youtube.com/watch?v=4zxgQZclYPo' rel='noopener noreferrer'>How to deposit BTC to sBTC pool</a>
+            </p>
+
+            <p>
+                <a href='https://www.youtube.com/watch?v=8Z0PmN0F0vQ' rel='noopener noreferrer'>Deposit BTC into Curve pools</a>
+            </p>
         </p>
 
         <h3>Has Curve been audited?</h3>
