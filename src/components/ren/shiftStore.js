@@ -983,7 +983,7 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
 				notifyHandler(hash)
 				//resolve(hash)
 			})
-			.once('receipt', receipt => {
+			.on('receipt', receipt => {
 				//this.transactions = this.transactions.filter(t => t.id != id)
 				transaction.state = 14
 				transaction.ethTxHash = receipt.transactionHash
@@ -1020,7 +1020,7 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
 					notifyHandler(hash)
 					//resolve(hash)
 				})
-				.once('receipt', receipt => {
+				.on('receipt', receipt => {
 					//this.transactions = this.transactions.filter(t => t.id != id)
 					transaction.state = 14
 					transaction.ethTxHash = receipt.transactionHash
@@ -1041,9 +1041,17 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
 
 	if(transaction.stake) {
 		//DepositMintedCurve
-		let mintData = Object.values(receipt.logs)
+		let mintData
+		try {
+			mintData = Object.values(receipt.events)
+					.filter(event => event.raw.topics[0] == '0x0882f81e7e1d407c41100a8a53cd546a2f6ffff18d00dc1268ee70f1640932cc')[0].raw.data
+		}
+		catch(err) {
+			console.error(err)
+			mintData = Object.values(receipt.logs)
 					.filter(event => event.topics[0] == '0x0882f81e7e1d407c41100a8a53cd546a2f6ffff18d00dc1268ee70f1640932cc')[0].data
-		let tokens = contract.web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256'], mintData)[1]
+		}
+		let tokens = BN(contract.web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256'], mintData)[1])
         await helpers.setTimeoutPromise(100)
 		let waitingMessage = `Please approve staking ${tokens.div(BN(1e18)).toFixed(8)} of your sCurve tokens`
         var { dismiss } = notifyNotification(waitingMessage)
@@ -1054,7 +1062,7 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
         await contract.curveRewards.methods.stake(tokens.toFixed(0,1)).send({
             from: state.default_account,
             gasPrice: gasPriceStore.state.gasPriceWei,
-            gas: 800000,
+            gas: 400000,
         })
         .once('transactionHash', hash => {
 	        this.waitingMessage = 'Waiting for stake transaction to confirm: no further action needed'
