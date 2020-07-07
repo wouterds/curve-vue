@@ -125,25 +125,28 @@
                         <span v-show='showadvancedoptions'>▲</span>
                     </button>
                     <div v-show='showadvancedoptions'>
-                        <div id='max_slippage'><span>Max slippage:</span> 
-                            <input id="slippage05" type="radio" name="slippage" value='0.005' @click='maxSlippage = 0.5; customSlippageDisabled = true'>
-                            <label for="slippage05">0.5%</label>
+                        <fieldset>
+                            <legend>Advanced options:</legend>
+                            <div id='max_slippage'><span>Max slippage:</span> 
+                                <input id="slippage05" type="radio" name="slippage" value='0.005' @click='maxSlippage = 0.5; customSlippageDisabled = true'>
+                                <label for="slippage05">0.5%</label>
 
-                            <input id="slippage1" type="radio" name="slippage" checked value='0.01' @click='maxSlippage = 1; customSlippageDisabled = true'>
-                            <label for="slippage1">1%</label>
+                                <input id="slippage1" type="radio" name="slippage" checked value='0.01' @click='maxSlippage = 1; customSlippageDisabled = true'>
+                                <label for="slippage1">1%</label>
 
-                            <input id="custom_slippage" type="radio" name="slippage" value='-' @click='customSlippageDisabled = false'>
-                            <label for="custom_slippage" @click='customSlippageDisabled = false'>
-                                <input type="text" id="custom_slippage_input" :disabled='customSlippageDisabled' name="custom_slippage_input" v-model='maxInputSlippage'> %
-                            </label>
-                            <span class='tooltip' v-show='showSlippageTooLow'>
-                                <img class='icon small hoverpointer warning' :src="publicPath + 'exclamation-circle-solid.svg'">
-                                <span class='tooltiptext'>
-                                    Max slippage value is likely too low and the transaction may fail
+                                <input id="custom_slippage" type="radio" name="slippage" value='-' @click='customSlippageDisabled = false'>
+                                <label for="custom_slippage" @click='customSlippageDisabled = false'>
+                                    <input type="text" id="custom_slippage_input" :disabled='customSlippageDisabled' name="custom_slippage_input" v-model='maxInputSlippage'> %
+                                </label>
+                                <span class='tooltip' v-show='showSlippageTooLow'>
+                                    <img class='icon small hoverpointer warning' :src="publicPath + 'exclamation-circle-solid.svg'">
+                                    <span class='tooltiptext'>
+                                        Max slippage value is likely too low and the transaction may fail
+                                    </span>
                                 </span>
-                            </span>
-                        </div>
-                        <gas-price></gas-price>
+                            </div>
+                            <gas-price></gas-price>
+                        </fieldset>
                     </div>
                 </div>
                 <p class='simple-error' v-show='exchangeRate<=0.98'>
@@ -230,7 +233,14 @@
             swapwrapped: false,
             coins: [],
             c_rates: [],
-            showadvancedoptions: false,
+            get showadvancedoptions() {
+                return localStorage.getItem('advancedoptions') === 'true' 
+                    || +this.fromInput > 5000 || (['ren', 'sbtc'].includes(currentContract.currentContract) && +this.fromInput > 0.5)
+            },
+            set showadvancedoptions(val) {
+                console.log(val, "VAL TO SET")
+                localStorage.setItem('advancedoptions', val)
+            },
             show_loading: false,
             waitingMessage: '',
             userInteracted: false,
@@ -635,7 +645,7 @@
     .advancedoptions {
         margin-top: 1em;
     }
-    #max_slippage {
-        margin-top: 1em;
+    .advancedoptions + div legend {
+        text-align: center;
     }
 </style>

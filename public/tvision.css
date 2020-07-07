@@ -359,7 +359,7 @@ fieldset:nth-child(1) .maxbalance:hover {
 }
 
 #custom_slippage_input, #custom_gas_input {
-  width: 2.5em;
+  width: 2.1em;
 }
 
 #max_slippage span:first-of-type {

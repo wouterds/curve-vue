@@ -119,47 +119,50 @@
                     <span v-show='showadvancedoptions'>▲</span>
                 </button>
                 <div v-show='showadvancedoptions'>
-                    <div id='poolselect'>
-                        <input id='compoundpool1' type='checkbox' value='compound' v-model='pools'/>
-                        <label for='compoundpool1'>Compound</label>
+                    <fieldset>
+                        <legend>Advanced options:</legend>
+                        <div id='poolselect'>
+                            <input id='compoundpool1' type='checkbox' value='compound' v-model='pools'/>
+                            <label for='compoundpool1'>Compound</label>
 
-                        <input id='ypool1' type='checkbox' value='y' v-model='pools'/>
-                        <label for='ypool1'>Y</label>
+                            <input id='ypool1' type='checkbox' value='y' v-model='pools'/>
+                            <label for='ypool1'>Y</label>
 
-                        <input id='busdpool1' type='checkbox' value='busd' v-model='pools'/>
-                        <label for='busdpool1'>bUSD</label>
+                            <input id='busdpool1' type='checkbox' value='busd' v-model='pools'/>
+                            <label for='busdpool1'>bUSD</label>
 
-                        <input id='susdpool1' type='checkbox' value='susdv2' v-model='pools'/>
-                        <label for='susdpool1'>sUSD</label>
+                            <input id='susdpool1' type='checkbox' value='susdv2' v-model='pools'/>
+                            <label for='susdpool1'>sUSD</label>
 
-                        <input id='paxpool1' type='checkbox' value='pax' v-model='pools'/>
-                        <label for='paxpool1'>PAX</label>
+                            <input id='paxpool1' type='checkbox' value='pax' v-model='pools'/>
+                            <label for='paxpool1'>PAX</label>
 
-                        <input id='renpool1' type='checkbox' value='ren' v-model='pools'/>
-                        <label for='renpool1'>ren</label>
+                            <input id='renpool1' type='checkbox' value='ren' v-model='pools'/>
+                            <label for='renpool1'>ren</label>
 
-                        <input id='sbtcpool' type='checkbox' value='sbtc' v-model='pools'/>
-                        <label for='sbtcpool'>sBTC</label>
-                    </div>
-                    <div v-show='fromInput > 0' id='max_slippage'><span>Max slippage:</span> 
-                        <input id="slippage05" type="radio" name="slippage" value='0.005' @click='maxSlippage = 0.5; customSlippageDisabled = true'>
-                        <label for="slippage05">0.5%</label>
+                            <input id='sbtcpool' type='checkbox' value='sbtc' v-model='pools'/>
+                            <label for='sbtcpool'>sBTC</label>
+                        </div>
+                        <div v-show='fromInput > 0' id='max_slippage'><span>Max slippage:</span> 
+                            <input id="slippage05" type="radio" name="slippage" value='0.005' @click='maxSlippage = 0.5; customSlippageDisabled = true'>
+                            <label for="slippage05">0.5%</label>
 
-                        <input id="slippage1" type="radio" name="slippage" checked value='0.01' @click='maxSlippage = 1; customSlippageDisabled = true'>
-                        <label for="slippage1">1%</label>
+                            <input id="slippage1" type="radio" name="slippage" checked value='0.01' @click='maxSlippage = 1; customSlippageDisabled = true'>
+                            <label for="slippage1">1%</label>
 
-                        <input id="custom_slippage" type="radio" name="slippage" value='-' @click='customippageDisabled = false'>
-                        <label for="custom_slippage" @click='customSlippageDisabled = false'>
-                            <input type="text" id="custom_slippage_input" :disabled='customSlippageDisabled' name="custom_slippage_input" v-model='maxInputSlippage'> %
-                        </label>
-                        <span class='tooltip' v-show='showSlippageTooLow'>
-                            <img class='icon small hoverpointer warning' :src="publicPath + 'exclamation-circle-solid.svg'">
-                            <span class='tooltiptext'>
-                                Max slippage value is likely too low and the transaction may fail
+                            <input id="custom_slippage" type="radio" name="slippage" value='-' @click='customippageDisabled = false'>
+                            <label for="custom_slippage" @click='customSlippageDisabled = false'>
+                                <input type="text" id="custom_slippage_input" :disabled='customSlippageDisabled' name="custom_slippage_input" v-model='maxInputSlippage'> %
+                            </label>
+                            <span class='tooltip' v-show='showSlippageTooLow'>
+                                <img class='icon small hoverpointer warning' :src="publicPath + 'exclamation-circle-solid.svg'">
+                                <span class='tooltiptext'>
+                                    Max slippage value is likely too low and the transaction may fail
+                                </span>
                             </span>
-                        </span>
-                    </div>
-                    <gas-price></gas-price>
+                        </div>
+                        <gas-price></gas-price>
+                    </fieldset>
                 </div>
             </div>
             <p class='simple-error' v-show='exchangeRate<=0.98'>
@@ -267,7 +270,14 @@
             multipath: 0,
             swapwrapped: false,
             bestPool: null,
-            showadvancedoptions: false,
+            get showadvancedoptions() {
+                return localStorage.getItem('advancedoptions') === 'true' 
+                    || +this.fromInput > 5000 || ([7,8,9].includes(this.from_currency) && +this.fromInput > 0.5)
+            },
+            set showadvancedoptions(val) {
+                console.log(val, "VAL TO SET")
+                localStorage.setItem('advancedoptions', val)
+            },
             show_loading: false,
             waitingMessage: '',
             userInteracted: false,
@@ -1143,8 +1153,11 @@
     .advancedoptions {
         margin-top: 1em;
     }
-    #poolselect {
+    .advancedoptions + div fieldset {
         margin-top: 1em;
+    }
+    .advancedoptions + div legend {
+        text-align: center;
     }
     label[for='compoundpool1'] {
         margin-left: -2px;
