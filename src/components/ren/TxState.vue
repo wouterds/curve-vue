@@ -28,8 +28,13 @@
 			<span v-show='state == 12'>
 				Waiting for swap confirmation
 			</span>
-			<span v-show='state == 14'>
+			<span v-show='state == 14 && transaction.type == 0'>
 				Swap done <button @click="$emit('resubmit', transaction)">resubmit</button>
+			</span>
+			<span v-show='state == 14 && transaction.type == 3'>
+				Deposit<span v-show='transaction.state == 17'>& stake</span> done
+				<span v-show='transaction.state != 17' @click="$emit('stakeTokens', transaction)">stake</span>
+				<button @click="$emit('resubmit', transaction)">resubmit</button>
 			</span>
 			<span v-show='state == 15'>
 				Got {{ (transaction.utxoAmount / 1e8).toFixed(8) }} renBTC, do you want to 
@@ -42,12 +47,18 @@
 			</span>
 			<span v-show='state == 13 && transaction.type == 3 && !transaction.lessSent'>
 				Minimum token receive amount expired, you got {{ (transaction.utxoAmount / 1e8).toFixed(8) }} deposited
-				Do you want to <button @click="$emit('depositNow', transaction)">deposit now</button> or
+				Do you want to 
+				<button @click="$emit('depositNow', transaction)">
+					deposit<span v-show='transaction.stake'> &stake</span> now
+				</button> or
 				<button @click="$emit('receiveRenDeposit', transaction)">receive renBTC</button>
 			</span>
 			<span v-show='state == 13 && transaction.type == 3 && transaction.lessSent'>
 				You sent less than specified amount in BTC. You'll receive min {{ transaction.renCRVmin }}
-				Do you want to <button @click="$emit('depositNow', transaction)">deposit now</button> or
+				Do you want to 
+				<button @click="$emit('depositNow', transaction)">
+					deposit<span v-show='transaction.stake'> &stake</span> now
+				</button> or
 				<button @click="$emit('receiveRenDeposit', transaction)">receive renBTC</button>
 			</span>
 			<span v-show='state == 16'>

@@ -77,6 +77,7 @@ const txObject = () => ({
 	lessSent: false,
 	renCRVmin: null,
 	stake: false,
+	mintedTokens: null,
 
 	removed: false,
 
@@ -1059,7 +1060,23 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
 	common.update_fee_info()
 
 	if(transaction.stake) {
-		//DepositMintedCurve
+		stakeTokens(transaction, receipt)
+	}
+
+	common.update_fee_info()
+ 
+	// subscriptionStore.removeTxNotification(transaction.btcTxHash)
+
+	// transaction.state = 12
+	// transaction.ethTxHash = txhash
+
+	upsertTx(transaction)
+}
+
+export async function stakeTokens(transaction, receipt) {
+	//DepositMintedCurve
+	let tokens
+	if(!transaction.mintedTokens) {
 		let mintData
 		try {
 			mintData = Object.values(receipt.events)
@@ -1071,37 +1088,37 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
 					.filter(event => event.topics[0] == '0x0882f81e7e1d407c41100a8a53cd546a2f6ffff18d00dc1268ee70f1640932cc')[0].data
 		}
 		let tokens = BN(contract.web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256'], mintData)[1])
-        await helpers.setTimeoutPromise(100)
-		let waitingMessage = `Please approve staking ${tokens.div(BN(1e18)).toFixed(8)} of your sCurve tokens`
-        var { dismiss } = notifyNotification(waitingMessage)
-		await common.ensure_stake_allowance(tokens);
-        dismiss()
-        waitingMessage = 'Please confirm stake transaction'
-        var { dismiss } = notifyNotification(waitingMessage)
-        await contract.curveRewards.methods.stake(tokens.toFixed(0,1)).send({
-            from: state.default_account,
-            gasPrice: gasPriceStore.state.gasPriceWei,
-            gas: 400000,
-        })
-        .once('transactionHash', hash => {
-	        this.waitingMessage = 'Waiting for stake transaction to confirm: no further action needed'
-            dismiss()
-            notifyHandler(hash)
-        })
-        .on('error', err => {
-        	console.error(err)
-        	dismiss()
-        })
+		transaction.mintedTokens = tokens
 	}
-
-	common.update_fee_info()
- 
-	// subscriptionStore.removeTxNotification(transaction.btcTxHash)
-
-	// transaction.state = 12
-	// transaction.ethTxHash = txhash
-
-	upsertTx(transaction)
+	else {
+		tokens = transaction.mintedTokens
+	}
+    await helpers.setTimeoutPromise(100)
+	let waitingMessage = `Please approve staking ${tokens.div(BN(1e18)).toFixed(8)} of your sCurve tokens`
+    var { dismiss } = notifyNotification(waitingMessage)
+	await common.ensure_stake_allowance(tokens);
+    dismiss()
+    waitingMessage = 'Please confirm stake transaction'
+    var { dismiss } = notifyNotification(waitingMessage)
+    await contract.curveRewards.methods.stake(tokens.toFixed(0,1)).send({
+        from: state.default_account,
+        gasPrice: gasPriceStore.state.gasPriceWei,
+        gas: 400000,
+    })
+    .once('transactionHash', hash => {
+        this.waitingMessage = 'Waiting for stake transaction to confirm: no further action needed'
+        dismiss()
+        notifyHandler(hash)
+    })
+    .on('receipt', receipt => {
+    	transaction.state = 17
+    	upsertTx(transaction)
+    })
+    .on('error', err => {
+    	console.error(err)
+    	notifyNotification('Staking failed, please stake manually')
+    	dismiss()
+    })
 }
 
 export async function burnSwap(data) {

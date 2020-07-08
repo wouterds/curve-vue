@@ -292,6 +292,7 @@
 						@receiveRenDeposit='receiveRenDeposit'
 						@mint='mintThenSwap'
 						@resubmit='resubmit'
+						@stakeTokens='stakeTokens'
 						/>
 				</div>
 				<div class='nowrap'>
@@ -413,7 +414,10 @@
         		if([0,3].includes(transaction.type)) {
         			let progress = transaction.state / 14 * 100 | 0
         			if(progress > 100) progress = 100
-        			return [14, 15].includes(transaction.state) ? 100 : progress
+        			if(!transaction.stake)
+        				return [14, 15].includes(transaction.state) ? 100 : progress
+        			progress -= 5
+        			return [15, 17].includes(transaction.state) ? 100 : progress
         		}
         		if(transaction.type == 1) {
         			let progress = ((transaction.state - 30) / 35) * 100 | 0
@@ -448,6 +452,10 @@
 
 			resubmit(transaction) {
 				store.resubmit(transaction)
+			},
+
+			stakeTokens(transaction) {
+				state.stakeTokens(transaction)
 			},
 
 			receiveRenDeposit(transaction) {
