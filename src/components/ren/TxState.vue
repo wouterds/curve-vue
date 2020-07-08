@@ -33,7 +33,7 @@
 			</span>
 			<span v-show='state == 14 && transaction.type == 3'>
 				Deposit<span v-show='transaction.state == 17'>& stake</span> done
-				<span v-show='transaction.state != 17' @click="$emit('stakeTokens', transaction)">stake</span>
+				<button v-show='transaction.state != 17' @click="$emit('stakeTokens', transaction)">stake</button> 
 				<button @click="$emit('resubmit', transaction)">resubmit</button>
 			</span>
 			<span v-show='state == 15'>

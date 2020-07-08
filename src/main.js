@@ -39,6 +39,7 @@ Vue.config.productionTip = false
 //     /.*property '_address' of undefined.*/gm,	
 //     /.*TypeError: Cannot read property 'chart' of undefined.*/gm,	
 //     /.*Cannot read property '0' of undefined.*/gm,
+//	   /.*Non-Error promise rejection captured with keys.*/gm,
 //   ],	
 //   integrations: [	
 //     new CaptureConsole({	

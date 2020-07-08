@@ -1087,7 +1087,7 @@ export async function stakeTokens(transaction, receipt) {
 			mintData = Object.values(receipt.logs)
 					.filter(event => event.topics[0] == '0x0882f81e7e1d407c41100a8a53cd546a2f6ffff18d00dc1268ee70f1640932cc')[0].data
 		}
-		let tokens = BN(contract.web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256'], mintData)[1])
+		tokens = BN(contract.web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256'], mintData)[1])
 		transaction.mintedTokens = tokens
 	}
 	else {
