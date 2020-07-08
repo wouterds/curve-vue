@@ -8,7 +8,7 @@
 			<a href = "https://github.com/curvefi/curve-pool-registry/blob/b17/doc/notebook/playbook.ipynb">
 				<img class='icon' :src="publicPath + 'curveIcons/curve-registry.svg'"> <span class='text'>Curve Registry Docs</span>
 			</a>
-			<a href = "https://github.com/pengiundev/curve-vue/blob/master/src/docs/README.md#calculating-volume-balances-and-prices">
+			<a href = "https://github.com/curvefi/curve-vue/blob/master/src/docs/README.md#calculating-volume-balances-and-prices">
 				<img class='icon' :src="publicPath + 'curveIcons/curve-registry.svg'"> <span class='text'>Stats Docs</span>
 			</a>
 		</fieldset>
