@@ -575,11 +575,11 @@
 			async unstake(amount, exit = false, unstake_only = false) {
                 if(unstake_only)
                     this.waitingMessage = `
-                        Please confirm unstaking ${this.toFixed(amount.div(BN(1e18)))} tokens from Mintr
+                        Please confirm unstaking ${this.toFixed(amount.div(BN(1e18)))} tokens
                     `
                 else 
                     this.waitingMessage = `
-                    Need to unstake ${this.toFixed(amount.div(BN(1e18)))} tokens from Mintr for withdrawal.
+                    Unstaking ${this.toFixed(amount.div(BN(1e18)))} tokens for withdrawal.
                     <br>
                     A bit more tokens are needed to unstake to ensure that withdrawal is successful.
                     You'll see them in your unstaked balance afterwards.
