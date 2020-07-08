@@ -21,7 +21,7 @@
     color: #c0c0c0;
 }
 
-.top-menu-bar a.selected, .top-menu-bar a.router-link-exact-active, .poolsdialog div:hover, .poolsdialog div:hover a, .poolsdialog div:hover a:visited {
+.top-menu-bar a.selected, .top-menu-bar a.router-link-exact-active, .poolsdialog div:hover, .poolsdialog div:hover a, .poolsdialog div:hover a:visited, footer a.router-link-exact-active {
     background-color: blue;
     color: white;
 }

@@ -34,6 +34,7 @@ const Integrations = () => import('../views/Integrations.vue')
 const Risks = () => import('../views/Risks.vue')
 const BugBounty = () => import('../views/BugBounty.vue')
 const PoolRisks = () => import('../views/PoolRisks.vue')
+const DeveloperDocs = () => import('../views/DeveloperDocs.vue')
 
 const ycTokens = () => import('../components/ycTokens/Index.vue')
 
@@ -159,6 +160,11 @@ let routes = [
         path: 'bugbounty',
         name: 'BugBounty',
         component: BugBounty,
+      },
+      {
+        path: 'devdocs',
+        name: 'DeveloperDocs',
+        component: DeveloperDocs,
       },
     ]
   },

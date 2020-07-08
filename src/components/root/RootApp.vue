@@ -52,6 +52,7 @@
           <router-link to="/rootfaq">FAQ</router-link>
           <router-link to="/integrations">Integrations</router-link>
           <router-link to="/donate">Donate</router-link>
+          <router-link to="/devdocs">Developer Docs</router-link>
           <a href='https://guides.curve.fi' rel='noopener noreferrer'>Guides</a>
           <p>____________</p>
           <a href="https://twitter.com/CurveFinance" rel='noopener noreferrer'>#Twitter</a>
@@ -74,6 +75,7 @@
       <router-link to="/rootfaq" class='showmobile'>FAQ</router-link>
       <router-link to="/integrations" class='showmobile'>Integrations</router-link>
       <router-link to="/donate" class='showmobile'>Donate</router-link>
+      <router-link to="/devdocs" class='showmobile'>Developer Docs</router-link>
       <a href='https://guides.curve.fi' rel='noopener noreferrer' class='showmobile'>Guides</a>
       <a href="https://twitter.com/CurveFinance" class='showmobile' rel='noopener noreferrer'>#Twitter</a>
       <a href="https://t.me/curvefi" class='showmobile' rel='noopener noreferrer'>@Telegram</a>
@@ -102,6 +104,7 @@
       <a href="https://explore.duneanalytics.com/public/dashboards/RTH47mNjQcoLv5oG0HMDdI0iDq7BHxk1PzCRdwQB" rel='noopener noreferrer'>Dune Analytics</a>
       <a href="https://github.com/curvefi/curve-contract">git@</a>
       <a href="https://github.com/curvefi/curve-vue">git@UI</a>
+      <router-link to="/devdocs">Developer Docs</router-link>
     </footer>
   </div>
 </template>
