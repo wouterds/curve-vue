@@ -241,7 +241,8 @@
 		        		let virtual_price = this.data[i].virtual_price
 		        		let SNXprice = this.findClosestPrice(this.data[i].timestamp, SNXprices)
 		        		let reward = 64000
-		        		if(timestamp > 1590705735) reward = decoded[0] * decoded[1] / 1e18
+		        		if(timestamp > 1590705735 && timestamp < 1594256015) reward = 48000
+		        		if(timestamp > 1594256015) reward = decoded[0] * decoded[1] / 1e18
 		        		let SNXapy = 356 * reward / 7 * SNXprice / (0.98 * total_supply * virtual_price / 1e36) * 100
 		        		SNXapys.push([timestamp * 1000, SNXapy])
 		        	}
