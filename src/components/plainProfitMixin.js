@@ -111,6 +111,8 @@ export default {
                     [balancerPool._address, balancerPool.methods.getBalance('0x408e41876cccdc0f92210600ef50372656052a38').encodeABI()],
                 )
 			}
+			calls.push([curveRewards._address, curveRewards.methods.DURATION().encodeABI()],
+					[curveRewards._address, curveRewards.methods.rewardRate().encodeABI()])
 			let aggcalls = await currentContract.multicall.methods.aggregate(calls).call()
 			let decoded = aggcalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
 			if(currentContract.currentContract == 'susdv2') {
@@ -131,7 +133,8 @@ export default {
 				})
 				let rewards = rewardLogs.map(log=>currentContract.web3.eth.abi.decodeParameter('uint256', log.data) / 1e18).reduce((a, b) => a + b, 0)
 				this.paidRewardsSNX = rewards
-				this.weeklyEstimateSNX = 48000 * currentContract.curveStakedBalance  / decoded[3]
+				let len = decoded.length
+				this.weeklyEstimateSNX = (decoded[len-2] * decoded[len-1] / 1e18) * currentContract.curveStakedBalance  / decoded[3]
 			}
 			if(currentContract.currentContract == 'sbtc') {
 				this.earnedSNX = decoded[0] * decoded[5] / decoded[4] / 1e18
