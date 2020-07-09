@@ -1,5 +1,6 @@
 <template>
   <div id="app" :class="{'root': true, [$route.name]: true}">
+    <div class='screencontainer'>
      <div class="top-menu-bar">
       <label for="hamburger" class='border-menu'></label>
       <input type="checkbox" id="hamburger"/>
@@ -96,6 +97,7 @@
           You haven't connected a wallet. <button @click='changeWallets'>Connect wallet</button>
         </div>
         <router-view/>
+    </div>
     </div>
     <footer>
       <a href="https://twitter.com/CurveFinance" rel='noopener noreferrer'>#Twitter</a>

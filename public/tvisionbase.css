@@ -15,12 +15,8 @@ body {
   flex-direction: column;
 }
 
-#screen {
+.screencontainer {
   flex: 1 0 auto;
-}
-
-#screen + .blue.window.half-width.info {
-  margin-top: 0;
 }
 
 @font-face {

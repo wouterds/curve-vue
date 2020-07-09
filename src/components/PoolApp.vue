@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <div class='screencontainer'>
      <div class="top-menu-bar">
       <label for="hamburger" class='border-menu'></label>
       <input type="checkbox" id="hamburger"/>
@@ -107,6 +108,7 @@
     :admin_fee = 'admin_fee'
     :currencies = 'currencies'
     v-if="!['Stats', 'FAQ', 'Donate', 'Root', 'CombinedStats'].includes($route.name)"/>
+    </div>
     <footer>
       <a :href="'https://etherscan.io/address/' + this.poolAddress" rel='noopener noreferrer'>Pool contract</a>
       <a :href="'https://etherscan.io/address/' + this.tokenAddress" rel='noopener noreferrer'>Token contract</a>
