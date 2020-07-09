@@ -1332,7 +1332,7 @@ async function checkForFailed(transactions) {
 }
 
 async function checkForFailedStake(transactions) {
-	transactions = transactions.filter(t => t.stakeTxHash && ![14, 15, 17].includes(t.state))
+	transactions = transactions.filter(t => t.stakeTxHash && t.state != 17)
 	let receipts = await Promise.all(transactions.map(t => contract.web3.eth.getTransactionReceipt(t.stakeTxHash)))
 	receipts = receipts.filter(receipt => receipt && receipt.blockNumber !== null)
 	for(let receipt of receipts) {
