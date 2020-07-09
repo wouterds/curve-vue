@@ -404,10 +404,10 @@ export default {
 		          		usd = tokens * exchangeRate
 		          	}
 		          	else if(currentContract.currentContract == 'susdv2' || (currentContract.currentContract == 'pax' && i == 3)) {
-		            	usd = this.fromNativeCurrent(curr, this.BN(exchangeRate).mul(this.BN(tokens)))	
+		            	usd = this.fromNativeCurrent(curr, this.BN(exchangeRate).mul(this.BN(tokens | 0)))	
 		          	}
 		          	else {
-		            	usd = this.fromNative(curr, this.BN(exchangeRate).mul(this.BN(tokens)))
+		            	usd = this.fromNative(curr, this.BN(exchangeRate | 0).mul(this.BN(tokens | 0)))
 		          	}
 		            amount += usd;
 		    }
