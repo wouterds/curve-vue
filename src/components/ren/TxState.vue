@@ -8,7 +8,7 @@
 				</span>
 			</span>
 		</span>
-		<span v-show='transaction.fromAddress == default_account || [14, 65].includes(state)'>
+		<span v-show='transaction.fromAddress && transaction.fromAddress.toLowerCase() == default_account.toLowerCase() || [14, 65].includes(state)'>
 			<span v-show='state == 0'>
 				Waiting for renVM BTC deposit address
 			</span>
