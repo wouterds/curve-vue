@@ -292,7 +292,6 @@
 						@receiveRenDeposit='receiveRenDeposit'
 						@mint='mintThenSwap'
 						@resubmit='resubmit'
-						@stakeTokens='stakeTokens'
 						/>
 				</div>
 				<div class='nowrap'>
@@ -452,10 +451,6 @@
 
 			resubmit(transaction) {
 				store.resubmit(transaction)
-			},
-
-			stakeTokens(transaction) {
-				state.stakeTokens(transaction)
 			},
 
 			receiveRenDeposit(transaction) {

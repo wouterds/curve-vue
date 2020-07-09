@@ -31,9 +31,13 @@
 			<span v-show='state == 14 && transaction.type == 0'>
 				Swap done <button @click="$emit('resubmit', transaction)">resubmit</button>
 			</span>
-			<span v-show='state == 14 && transaction.type == 3'>
-				Deposit<span v-show='transaction.state == 17'>& stake</span> done
-				<button v-show='transaction.state != 17' @click="$emit('stakeTokens', transaction)">stake</button> 
+			<span v-show='[14,17].includes(state) && transaction.type == 3'>
+				Deposit<span v-show='transaction.state == 17'> & stake</span> done
+				<button 
+					v-show='transaction.state != 17' 
+					@click="$emit('resubmit', transaction)">
+					stake
+				</button> 
 				<button @click="$emit('resubmit', transaction)">resubmit</button>
 			</span>
 			<span v-show='state == 15'>

@@ -78,6 +78,7 @@ const txObject = () => ({
 	renCRVmin: null,
 	stake: false,
 	mintedTokens: null,
+	stakeTxHash: null,
 
 	removed: false,
 
@@ -170,6 +171,7 @@ export async function loadTransactions() {
 	state.transactions = Object.values(items).filter(t=>t.state).sort((a, b) => b.timestamp - a.timestamp)
 	let transactions = state.transactions.filter(t => !t.removed)
 	await checkForFailed(transactions)
+	await checkForFailedStake(transactions.filter(t => t.stakeTxHash))
 	//send all txs so case is handled when user goes to submit 
 	let mints = transactions.filter(t => [0,3].includes(t.type) && ![14,15].includes(t.state)).map(t=>sendMint(t))
 	console.log(mints, "MINTS")
@@ -180,6 +182,10 @@ export async function loadTransactions() {
 								.filter(t => (!t.btcTxHash && t.ethTxHash && t.state && t.state != 65) || t.btcTxHash && t.ethTxHash && t.state && t.state != 14)
 	for(let transaction of listenTransactions) {
 		listenForReplacement(transaction.ethTxHash)
+	}
+	let stakeTransactions = transactions.filter(t => t.stakeTxHash && t.state != 17)
+	for(let transaction of stakeTransactions) {
+		listenForReplacementStake(transaction.stakeTxHash)
 	}
 	for(let transaction of transactions.filter(t => !t.btcTxHash && t.ethTxHash && t.state && t.state != 65)) {
 		let receipt = await contract.web3.eth.getTransactionReceipt(transaction.ethTxHash)
@@ -682,7 +688,7 @@ export async function sendMint(transfer) {
 				}
 			})
 		}
-		//trasaction not submitted to btc network
+		//transaction not submitted to btc network
 		else {
 			deposit = await mint.wait(state.confirmations)
 							.on('deposit', deposit => {
@@ -979,6 +985,7 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
 	//refactor
 
 	let receipt
+	let dismissWaitStake
 	try {
 		receipt = await new Promise((resolve, reject) => {
 			return txs[0].send({
@@ -995,6 +1002,10 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
 				upsertTx(transaction)
 
 				notifyHandler(hash)
+				if(transaction.stake) {
+					var { dismiss } = notifyNotification('Please wait for deposit transaction to confirm in order to stake')
+					dismissWaitStake = dismiss
+				}
 				//resolve(hash)
 			})
 			.on('receipt', receipt => {
@@ -1033,6 +1044,10 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
 						upsertTx(transaction)
 
 						notifyHandler(hash)
+						if(transaction.stake) {
+							var { dismiss } = notifyNotification('Please wait for deposit transaction to confirm in order to stake')
+							dismissWaitStake = dismiss
+						}
 						//resolve(hash)
 					})
 					.on('receipt', receipt => {
@@ -1060,7 +1075,7 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
 	common.update_fee_info()
 
 	if(transaction.stake) {
-		stakeTokens(transaction, receipt)
+		stakeTokens(transaction, receipt, dismissWaitStake)
 	}
 
 	common.update_fee_info()
@@ -1073,9 +1088,10 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
 	upsertTx(transaction)
 }
 
-export async function stakeTokens(transaction, receipt) {
+export async function stakeTokens(transaction, receipt, dismissWaitStake) {
 	//DepositMintedCurve
 	let tokens
+	if(dismissWaitStake) dismissWaitStake()
 	if(!transaction.mintedTokens) {
 		let mintData
 		try {
@@ -1093,6 +1109,7 @@ export async function stakeTokens(transaction, receipt) {
 	else {
 		tokens = transaction.mintedTokens
 	}
+	tokens = BN(tokens)
     await helpers.setTimeoutPromise(100)
 	let waitingMessage = `Please approve staking ${tokens.div(BN(1e18)).toFixed(8)} of your sCurve tokens`
     var { dismiss } = notifyNotification(waitingMessage)
@@ -1106,9 +1123,14 @@ export async function stakeTokens(transaction, receipt) {
         gas: 400000,
     })
     .once('transactionHash', hash => {
-        this.waitingMessage = 'Waiting for stake transaction to confirm: no further action needed'
+    	dismiss()
+        var { dismiss } = notifyNotification('Waiting for stake transaction to confirm: no further action needed')
         dismiss()
         notifyHandler(hash)
+
+        transaction.stakeTxHash = hash
+        listenForReplacementStake(hash)
+
     })
     .on('receipt', receipt => {
     	transaction.state = 17
@@ -1116,6 +1138,7 @@ export async function stakeTokens(transaction, receipt) {
     })
     .on('error', err => {
     	console.error(err)
+    	errorStore.handleError(err)
     	notifyNotification('Staking failed, please stake manually')
     	dismiss()
     })
@@ -1292,13 +1315,35 @@ export async function burn(burn, address, renBTCAmount, burnType, data) {
 }
 
 async function checkForFailed(transactions) {
-	transactions = transactions.filter(t => t.ethTxHash)
+	transactions = transactions.filter(t => t.ethTxHash && ![14, 15, 17, 65].includes(t.state))
 	let receipts = await Promise.all(transactions.map(t => contract.web3.eth.getTransactionReceipt(t.ethTxHash)))
 	receipts = receipts.filter(receipt => receipt && receipt.blockNumber !== null)
 	for(let receipt of receipts) {
 		if(receipt.status === false) {
 			txFailed(receipt.transactionHash)
 		}
+		else {
+			let transaction = state.transactions.find(t => t.ethTxHash == receipt.transactionHash)
+			if([0,3].includes(transaction)) transaction.state = 14
+			else transaction.state = 61
+			upsertTx(transaction)
+		}
+	}
+}
+
+async function checkForFailedStake(transactions) {
+	transactions = transactions.filter(t => t.stakeTxHash && ![14, 15, 17].includes(t.state))
+	let receipts = await Promise.all(transactions.map(t => contract.web3.eth.getTransactionReceipt(t.stakeTxHash)))
+	receipts = receipts.filter(receipt => receipt && receipt.blockNumber !== null)
+	for(let receipt of receipts) {
+		let transaction = state.transactions.find(t => t.stakeTxHash == receipt.transactionHash)
+		if(receipt.status === false) {
+			transaction.state = 14
+		}
+		else {
+			transaction.state = 17
+		}
+		upsertTx(transaction)
 	}
 }
 
@@ -1310,7 +1355,8 @@ async function txFailed(txhash) {
 
 export async function resubmit(transaction) {
 	if(transaction.type == 0) mintThenSwap(transaction)
-	if(transaction.type == 3) mintThenDeposit(transaction)
+	if(transaction.type == 3 && transaction.mintedTokens) stakeTokens(transaction)
+	if(transaction.type == 3 && !transaction.mintedTokens) mintThenDeposit(transaction)
 	if(transaction.type == 1 && transaction.burnType == 1) removeLiquidityThenBurn(transaction)
 	if(transaction.type == 1 && transaction.burnType == 2) removeLiquidityImbalanceThenBurn(transaction)
 	if(transaction.type == 1 && transaction.burnType == 3) removeLiquidityOneCoinThenBurn(transaction)
@@ -1344,6 +1390,22 @@ export async function listenForReplacement(txhash) {
 		upsertTx(tx)
 	})
 	emitter.on('txFailed', transaction => txFailed(transaction.hash))
+}
+
+export function listenForReplacementStake(txhash) {
+	let { emitter } = blocknative.transaction(txhash)
+	emitter.on('txSpeedUp', async transaction => {
+		notifyHandler(transaction.hash)
+		let tx = state.transactions.find(t => t.stakeTxHash == transaction.originalHash)
+		tx.stakeTxHash = transaction.hash
+		upsertTx(tx)
+	})
+	emitter.on('txConfirmed', async transaction => {
+		common.update_fee_info()
+		let tx = state.transactions.find(t => t.stakeTxHash == transaction.hash)
+		tx.state = 17
+		upsertTx(tx)
+	})
 }
 
 export async function listenForBurn(id) {
