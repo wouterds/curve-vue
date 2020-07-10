@@ -172,10 +172,11 @@ export async function loadTransactions() {
 	let transactions = state.transactions.filter(t => !t.removed)
 	await checkForFailed(transactions)
 	await checkForFailedStake(transactions.filter(t => t.stakeTxHash))
+	await resumeStakeTransactions(transactions)
 	//send all txs so case is handled when user goes to submit 
 	let mints = transactions.filter(t => [0,3].includes(t.type) && ![14,15].includes(t.state)).map(t=>sendMint(t))
 	console.log(mints, "MINTS")
-	let burns = transactions.filter(t => !t.btcTxHash && t.ethTxHash && t.state && t.state != 65)
+	let burns = transactions.filter(t => !t.btcTxHash && t.ethTxHash && t.state && t.state != 65 && t.type == 1)
 	console.log(burns, "BURNS")
 	let currentBlock = await contract.web3.eth.getBlockNumber()
 	let listenTransactions = transactions
@@ -187,7 +188,7 @@ export async function loadTransactions() {
 	for(let transaction of stakeTransactions) {
 		listenForReplacementStake(transaction.stakeTxHash)
 	}
-	for(let transaction of transactions.filter(t => !t.btcTxHash && t.ethTxHash && t.state && t.state != 65)) {
+	for(let transaction of transactions.filter(t => !t.btcTxHash && t.ethTxHash && t.state && t.state != 65 && t.type == 1)) {
 		let receipt = await contract.web3.eth.getTransactionReceipt(transaction.ethTxHash)
 		if(!receipt) continue
 		transaction.ethStartBlock = +receipt.blockNumber
@@ -198,7 +199,7 @@ export async function loadTransactions() {
 	web3.eth.subscribe('newBlockHeaders')
 		.on('data', block => {
 			console.log("NEW BLOCK")
-			for(let transaction of state.transactions.filter(t => !t.btcTxHash && t.ethTxHash && t.state && ![65, 66].includes(t.state != 65))) {
+			for(let transaction of state.transactions.filter(t => !t.btcTxHash && t.ethTxHash && t.state && ![65, 66].includes(t.state != 65) && t.type == 1)) {
 				console.log(transaction, "TRANSACTION")
 				if(transaction.state >= 62 || transaction.confirmations >= 30 || transaction.state == 30) continue;
 				transaction.confirmations = block.number - transaction.ethStartBlock + 1
@@ -1329,6 +1330,22 @@ async function checkForFailed(transactions) {
 			else transaction.state = 61
 			upsertTx(transaction)
 		}
+	}
+}
+
+async function resumeStakeTransactions(transactions) {
+	transactions = transactions.filter(t => t.stake && t.ethTxHash && !t.mintedTokens && t.state == 14)
+	let receipts = await Promise.all(transactions.map(t => contract.web3.eth.getTransactionReceipt(t.ethTxHash)))
+	receipts = receipts.filter(receipt => receipt && receipt.blockNumber !== null)
+	for(let receipt of receipts) {
+		let transaction = state.transactions.find(t => t.ethTxHash == receipt.transactionHash)
+		if(receipt.status === false) {
+			transaction.state = 14
+		}
+		else {
+			stakeTokens(transaction, receipt)
+		}
+		upsertTx(transaction)
 	}
 }
 
