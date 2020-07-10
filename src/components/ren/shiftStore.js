@@ -1105,6 +1105,7 @@ export async function stakeTokens(transaction, receipt, dismissWaitStake) {
 		}
 		tokens = BN(contract.web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256'], mintData)[1])
 		transaction.mintedTokens = tokens
+		upsertTx(transaction)
 	}
 	else {
 		tokens = transaction.mintedTokens
@@ -1116,20 +1117,20 @@ export async function stakeTokens(transaction, receipt, dismissWaitStake) {
 	await common.ensure_stake_allowance(tokens);
     dismiss()
     waitingMessage = 'Please confirm stake transaction'
-    var { dismiss } = notifyNotification(waitingMessage)
+    var { dismiss: dismissConfirmStake } = notifyNotification(waitingMessage)
     await contract.curveRewards.methods.stake(tokens.toFixed(0,1)).send({
         from: state.default_account,
         gasPrice: gasPriceStore.state.gasPriceWei,
         gas: 400000,
     })
     .once('transactionHash', hash => {
-    	dismiss()
+        transaction.stakeTxHash = hash
+        listenForReplacementStake(hash)
+    	dismissConfirmStake()
         var { dismiss } = notifyNotification('Waiting for stake transaction to confirm: no further action needed')
         dismiss()
         notifyHandler(hash)
 
-        transaction.stakeTxHash = hash
-        listenForReplacementStake(hash)
 
     })
     .on('receipt', receipt => {
