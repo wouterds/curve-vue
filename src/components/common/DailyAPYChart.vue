@@ -287,7 +287,7 @@
 		        		let RENprice = this.findClosestPrice(this.data[i].timestamp, RENprices)
 		        		let SNXreward = 10000
 		        		let RENreward = 25000
-		        		let SNXapy = 356 * (10000 * SNXprice + 25000 * RENprice) / 7 * SNXprice / (0.98 * btcPrice * total_supply * virtual_price / 1e36) * 100
+		        		let SNXapy = 356 * (10000 * SNXprice + 25000 * RENprice) / 7  / (0.98 * btcPrice * total_supply * virtual_price / 1e36) * 100
 		        		SNXapys.push([timestamp * 1000, SNXapy])
 		        	}
 

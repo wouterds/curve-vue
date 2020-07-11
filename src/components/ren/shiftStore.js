@@ -641,7 +641,7 @@ export async function sendMint(transfer) {
 			if(transaction.type == 0) await mintThenSwap(transfer)
 			if(transaction.type == 3) await mintThenDeposit(transaction)
 		}
-		else {
+		else if(transaction.state != 17) {
 			transaction.state = 14
 			upsertTx(transaction)
 		}
