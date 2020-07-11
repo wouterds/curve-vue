@@ -733,7 +733,7 @@ export async function receiveRen(transaction) {
 
 export async function mintThenSwap({ id, amount, params, utxoAmount, renResponse, signature }, swapNow = false, receiveRen = false) {
 	let transaction = state.transactions.find(t => t.id == id);
-	if(transaction.state == 14) return
+	if(transaction.state == 14 && transaction.ethTxHash) return
 	if(transaction.state == 16 && (!swapNow || !receiveRen)) return
 	let exchangeAmount = BN(utxoAmount).times(10000 - state.mintFee).div(10000)
 	let get_dy = BN(await swaps[transaction.pool].methods.get_dy(0, transaction.to_currency, exchangeAmount.toFixed(0, 1)).call())
@@ -910,7 +910,7 @@ function calcFee() {
 export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmount, renResponse, signature }, depositNow = false, receiveRen = false) {
 	//handle change calc_token_amount like in mintThenSwap
 	let transaction = state.transactions.find(t => t.id == id);
-	if(transaction.state == 14) return
+	if(transaction.state == 14 && transaction.ethTxHash) return
 	if(transaction.state == 16 && (!swapNow || !receiveRen)) return
 	let renAmount = BN(utxoAmount).times(10000 - state.mintFee).div(10000)
 	if(BN(transaction.amounts[0]).lt(utxoAmount)) {
