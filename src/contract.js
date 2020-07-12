@@ -127,8 +127,8 @@ export const gas = {
 			exchange_underlying: (i, j) => 300000,
 		},
 		sbtc: {
-			exchange: (i, j) => (i == 2 || j == 2) ? 600000 : 300000,
-			exchange_underlying: (i, j) => (i == 2 || j == 2) ? 600000 : 300000,
+			exchange: (i, j) => (i == 2 || j == 2) ? 1000000 : 300000,
+			exchange_underlying: (i, j) => (i == 2 || j == 2) ? 1000000 : 300000,
 		},
 	},
 	deposit: {
