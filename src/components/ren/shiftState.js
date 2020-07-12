@@ -10,7 +10,7 @@ export const state = Vue.observable({
 	address: null,
 	default_account: null,
 
-	minersFee: 35000,
+	minersFee: 17000,
 	minersLockFee: 0,
 	minersReleaseFee: 0,
 	mintFee: 0,
@@ -22,6 +22,7 @@ export const state = Vue.observable({
 	box: null,
 
 	showModal: false,
+	showModal1: false,
 
 	msg_signature: null,
 	password: null,

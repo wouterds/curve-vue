@@ -80,6 +80,7 @@ const txObject = () => ({
 	mintedTokens: null,
 	stakeTxHash: null,
 
+	modalConfirmed: false,
 	removed: false,
 
 })
@@ -470,6 +471,7 @@ export async function mint(data) {
 	transaction.slippage = data.slippage
 	upsertTx(transaction)
 	state.transactions.unshift(transaction)
+	state.showModal1 = true;
 
 	await sendMint(transaction)
 }
@@ -553,6 +555,7 @@ export async function deposit(data) {
 	transaction.stake = data.stake
 	upsertTx(transaction)
 	state.transactions.unshift(transaction)
+	state.showModal1 = true
 
 	await sendMint(transaction)
 }

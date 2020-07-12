@@ -29,6 +29,73 @@
 			</div>
 		</div>
 
+		<div id='modalinit' class='modal' v-show='showModal1'>
+			<div class='modal-content window white'>
+				<fieldset>
+					<div class='legend2 hoverpointer' @click='removeTx(lastTransaction)'>
+						[<span class='greentext'>■</span>]
+					</div>
+					<legend>Initiate transaction</legend>
+					<div class='content'>
+						<div>
+							<b>BTC deposit address: </b>
+							<span id='btcaddress'>{{ lastTransaction.gatewayAddress}}</span>
+							<span class='hoverpointer' v-show='[0,3].includes(lastTransaction.type)' @click='copy(lastTransaction)'>
+								<span class='tooltip'>
+									<img class='icon small' :src="publicPath + 'copy-solid.svg'">
+									<span class='tooltiptext small'>{{ copied == false ? 'Copy' : 'Copied' }}</span>
+								</span>
+							</span>
+						</div>
+						<div>
+							<b>Bitcoin to be sent: </b>
+							<span>{{ lastTransaction.fromInput }}</span>
+						</div>
+						<div>
+							<b>renVM fee: </b>
+							<span>{{ renVMfee }}%</span>
+						</div>
+						<div>
+							<b>BTC miner's fee: </b> 
+							<span>{{ minersFee }} BTC</span>
+						</div>
+						<div>
+							<b>Amount to be received:</b> 
+							<span v-show='lastTransaction.type == 0'>
+								{{ lastTransaction.toInput }}
+								<span v-show='lastTransaction.to_currency == 1'>WBTC</span>
+								<span v-show='lastTransaction.to_currency == 2'>sBTC</span>
+							</span>
+							<span v-show='lastTransaction.type == 3'>
+								{{ (lastTransaction.min_amount / 1e18).toFixed(8) }} 
+								Curve {{ lastTransaction.amounts.length == 2 ? 'ren' : 'sbtc' }} LP tokens
+							</span>
+						</div>
+						<div v-show='lastTransaction.type == 0'>
+							<b>Exchange rate: </b>
+							<span>{{ lastTransaction.newMinExchangeRate / 1e8 }}</span>
+						</div>
+						<div class='ethaddress'>
+							<b>ETH address: </b>
+							<span id='ethaddress'>{{ lastTransaction.fromAddress }}</span>
+							<div class='warningethaddress'>
+								<img class='icon small hoverpointer warning' :src="publicPath + 'exclamation-circle-solid.svg'">
+								This is the ETH address you need to finish the deposit with
+							</div>
+						</div>
+						<div class='confirm-wrapper info-message'>
+							<input id='confirmCheckbox' type='checkbox' v-model='confirmCheckbox'>
+							<label for='confirmCheckbox'>
+								Confirm: I have access to this ETH address
+							</label>
+						</div>
+					</div>
+					<button @click='proceedTx' :disabled='!confirmCheckbox'> OK </button>
+					<button @click='removeTx(lastTransaction); showModal1 = false' class='buttoncancel'>Cancel</button>
+				</fieldset>
+			</div>
+		</div>
+
 		<span class='notification tooltip' v-show='!hasSubscription' @click='subscribeNotifications'>
 			<img :src="publicPath + 'bell-solid.svg'" class='bell notification icon hoverpointer'>
 			<span class='tooltiptext'>
@@ -344,6 +411,7 @@
 				}
         	},
         	copied: false,
+        	confirmCheckbox: false,
         	showRemoved: false,
 		}),
 
@@ -354,6 +422,15 @@
 			filteredTransactions() {
 				if(this.showRemoved) return state.transactions
 				return state.transactions.filter(t => !t.removed)
+			},
+			lastTransaction() {
+				return this.filteredTransactions[0]
+			},
+			renVMfee() {
+				return state.mintFee / 100
+			},
+			minersFee() {
+				return state.minersLockFee / 1e8
 			},
 			showCompleted() {
         		let tx = state.transactions[0]
@@ -380,6 +457,14 @@
         			state.showModal = value
         		},
         	},
+        	showModal1: {
+        		get() {
+        			return state.showModal1
+        		},
+        		set(value) {
+        			state.showModal1 = value
+        		},
+        	},
         	default_account() {
         		return state.default_account
         	},
@@ -390,6 +475,11 @@
 			showQR({ fromInput, gatewayAddress }) {
 				this.showModal = true
 				this.qrValue = `bitcoin:${gatewayAddress}?amount=${fromInput}`
+			},
+
+			proceedTx() {
+				if(this.confirmCheckbox)
+					this.showModal1 =false
 			},
 
 			copy(transaction) {
@@ -427,6 +517,7 @@
 
         	removeTx(transaction) {
         		store.removeTx(transaction)
+        		this.showModal1 = false
 			},
 
 			mintThenSwap(transaction) {
@@ -599,5 +690,36 @@
 		.shifttype {
 			white-space: pre-line;
 		}
+	}
+	#modalinit .modal-content {
+		width: 500px;
+	}
+	#modalinit .content {
+		text-align: left;
+	}
+	.modal-content b {
+		color: black;
+	}
+	.modal-content div:not(.ethaddress) b ~ span {
+		color: black;
+	}
+	.content > div {
+		margin-top: 0.5em;
+	}
+	.buttoncancel {
+		margin-left: 1em;
+		background: gray;
+		box-shadow: none;
+		border: none;
+	}
+	.confirm-wrapper {
+		background: darkred;
+	}
+	#ethaddress, #btcaddress {
+		color: darkred;
+	}
+	.warningethaddress {
+		color: black;
+		padding-top: 1em;
 	}
 </style>
