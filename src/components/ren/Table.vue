@@ -39,6 +39,7 @@
 					<div class='content'>
 						<div>
 							<b>BTC deposit address: </b>
+							<span :class="{'loading line': !lastTransaction.gatewayAddress }"></span>
 							<span id='btcaddress'>{{ lastTransaction.gatewayAddress}}</span>
 							<div>
 								<span class='hoverpointer' v-show='[0,3].includes(lastTransaction.type)' @click='copy(lastTransaction)'>
