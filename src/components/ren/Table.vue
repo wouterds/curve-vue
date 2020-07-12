@@ -40,12 +40,24 @@
 						<div>
 							<b>BTC deposit address: </b>
 							<span id='btcaddress'>{{ lastTransaction.gatewayAddress}}</span>
-							<span class='hoverpointer' v-show='[0,3].includes(lastTransaction.type)' @click='copy(lastTransaction)'>
-								<span class='tooltip'>
-									<img class='icon small' :src="publicPath + 'copy-solid.svg'">
-									<span class='tooltiptext small'>{{ copied == false ? 'Copy' : 'Copied' }}</span>
+							<div>
+								<span class='hoverpointer' v-show='[0,3].includes(lastTransaction.type)' @click='copy(lastTransaction)'>
+									<span class='tooltip'>
+										<img class='icon small' :src="publicPath + 'copy-solid.svg'">
+										<span class='tooltiptext small'>{{ copied == false ? 'Copy' : 'Copied' }}</span>
+									</span>
 								</span>
-							</span>
+								<span class='tooltip'>
+									<img class='icon small hoverpointer qrcode' v-show='[0,3].includes(lastTransaction.type)'
+										@click='showQRinModal(lastTransaction)' :src="publicPath + 'qrcode-solid.svg'">
+									<span class='tooltiptext'>
+										Show QR code
+									</span>
+								</span>
+							</div>
+							<div v-show='showQRinside' class='showQRinside'>
+								<vue-qrcode :value="qrValue" :options="qrOptions"></vue-qrcode>
+							</div>
 						</div>
 						<div>
 							<b>Bitcoin to be sent: </b>
@@ -197,8 +209,13 @@
 									<span class='tooltiptext small'>{{ copied == false ? 'Copy' : 'Copied' }}</span>
 								</span>
 							</span>
-							<img class='icon small hoverpointer qrcode' v-show='[0,3].includes(transaction.type)'
+							<span class='tooltip'>
+								<img class='icon small hoverpointer qrcode' v-show='[0,3].includes(transaction.type)'
 								@click='showQR(transaction)' :src="publicPath + 'qrcode-solid.svg'">
+								<span class='tooltiptext'>
+									Show QR code
+								</span>
+							</span>
 							<span class='tooltip'>
 								<img class='icon small hoverpointer' :src="publicPath + 'ethereum-brands_optimized.svg'">
 								<span class='tooltiptext long'>
@@ -410,6 +427,7 @@
 					light: '#0000'
 				}
         	},
+        	showQRinside: false,
         	copied: false,
         	confirmCheckbox: false,
         	showRemoved: false,
@@ -474,6 +492,11 @@
 		methods: {
 			showQR({ fromInput, gatewayAddress }) {
 				this.showModal = true
+				this.qrValue = `bitcoin:${gatewayAddress}?amount=${fromInput}`
+			},
+
+			showQRinModal({ fromInput, gatewayAddress }) {
+				this.showQRinside = !this.showQRinside
 				this.qrValue = `bitcoin:${gatewayAddress}?amount=${fromInput}`
 			},
 
@@ -721,5 +744,13 @@
 	.warningethaddress {
 		color: black;
 		padding-top: 1em;
+	}
+	.showQRinside {
+		text-align: center;
+		margin-top: 1em;
+		margin-bottom: 1em;
+	}
+	.tooltip .icon.qrcode {
+		margin-left: 0;
 	}
 </style>
