@@ -511,7 +511,7 @@
                     }
                 })
                 this.amounts = this.amounts.map(v => v || 0)
-				let total_supply = +decoded[decoded.length-1];
+				let total_supply = +decoded[decoded.length-endOffset];
 				this.waitingMessage = 'Please approve spending your coins'
 			    let nonZeroInputs = this.inputs.filter(Number).length
                 let amounts = this.inputs.map((v, i)=>{
