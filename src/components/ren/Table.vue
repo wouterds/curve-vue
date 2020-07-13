@@ -151,7 +151,8 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for='transaction in filteredTransactions'>
+				<tr v-for='transaction in filteredTransactions' 
+					:class="{ completed: isCompletedMintTx(transaction) }">
 					<td class='shifttype'>
 						{{ transaction.fromInput }}
 						<span v-show='[0, 3].includes(transaction.type)' class='tooltip'>
@@ -197,7 +198,7 @@
 					</td>
 					<td>
 						<span :class="{'loading line': !transaction.gatewayAddress }"></span>
-						<span class='nowrap' v-show='transaction.gatewayAddress'>
+						<span class='nowrap btcaddress' v-show='transaction.gatewayAddress'>
 							<span class='hoverpointer tooltip' @click='copy(transaction)'>
 								{{shortenAddress(transaction.gatewayAddress)}}
 								<span class='tooltiptext long'>
@@ -281,10 +282,11 @@
 			</tbody>
 		</table>
 		<div class='showmobiletransactions'>
-			<div v-for='transaction in filteredTransactions' class='transactionmobile'>
+			<div v-for='transaction in filteredTransactions' 
+				class='transactionmobile' :class="{ completed: isCompletedMintTx(transaction) }">
 				<div class='shifttype'>
 					<b>Type: </b>
-					{{ transaction.fromInput }}
+					<span>{{ transaction.fromInput }}</span>
 					<span v-show='[0, 3].includes(transaction.type)' class='tooltip'>
 						<span v-show='transaction.type == 0'> BTC->wBTC </span>
 						<span v-show='transaction.type == 3'> BTC->renBTC </span>
@@ -325,7 +327,7 @@
 				<div>
 					<b>BTC address: </b>
 					<span :class="{'loading line': !transaction.gatewayAddress }"></span>
-					<span class='nowrap' v-show='transaction.gatewayAddress'>
+					<span class='nowrap btcaddress' v-show='transaction.gatewayAddress'>
 						<span class='hoverpointer tooltip' @click='copy(transaction)'>
 							{{shortenAddress(transaction.gatewayAddress)}}
 							<span class='tooltiptext long'>
@@ -537,6 +539,11 @@
         			if(progress > 100) progress = 100
         			return transaction.state == 65 ? 100 : progress
         		}
+        	},
+
+        	isCompletedMintTx(transaction) {
+        		if([0, 3].includes(transaction.type))
+        			return transaction.stake ? transaction.state == 17 : transaction.state == 14
         	},
 
         	removeTx(transaction) {
@@ -753,5 +760,11 @@
 	}
 	.tooltip .icon.qrcode {
 		margin-left: 0;
+	}
+	tr.completed td, .transactionmobile.completed div span {
+		color: gray;
+	}
+	tr.completed .btcaddress span, .transactionmobile.completed .btcaddress span {
+		text-decoration: line-through;
 	}
 </style>
