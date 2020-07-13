@@ -137,7 +137,7 @@
 		</div>
 
 		<div class='simple-error'>
-			Please don't reuse generated BTC deposit addresses for swapping or depositing BTC.
+			Please don't reuse previously generated BTC deposit addresses.
 		</div>
 
 		<table class='tui-table showdesktoptransactions'>
