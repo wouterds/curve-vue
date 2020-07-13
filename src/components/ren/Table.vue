@@ -29,7 +29,7 @@
 			</div>
 		</div>
 
-		<div id='modalinit' class='modal' v-show='showModal1'>
+		<div id='modalinit' class='modal' v-show='showModal1' v-if='lastTransaction'>
 			<div class='modal-content window white'>
 				<fieldset>
 					<div class='legend2 hoverpointer' @click='removeTx(lastTransaction)'>
