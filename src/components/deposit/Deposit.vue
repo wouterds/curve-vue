@@ -105,7 +105,7 @@
                     Stake unstaked <span class='loading line' v-show='loadingAction == 3'></span>
                 </button>
                 <p class='info-message gentle-message' v-show="lpCrvReceived > 0">
-                    You'll receive min {{ lpCrvReceivedText }} Curve {{currentPool}} LP tokens
+                    You'll receive minimum {{ lpCrvReceivedText }} Curve {{currentPool}} LP tokens
                     
                     <span class='curvelpusd'> 
                         1 Curve {{currentPool}} LP token = {{ (1 * virtual_price).toFixed(6) }} 
