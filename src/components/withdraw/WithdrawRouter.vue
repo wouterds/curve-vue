@@ -94,6 +94,8 @@
 	.swapBTC-container {
 		margin-top: 1em;
 		margin-bottom: 1em;
+		padding-top: 0.4em;
+		padding-bottom: 0.4em;
 	}
 	.loading.line {
 		margin-left: 1em;
