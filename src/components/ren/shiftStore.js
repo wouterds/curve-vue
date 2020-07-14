@@ -1129,6 +1129,7 @@ export async function stakeTokens(transaction, receipt, dismissWaitStake) {
     })
     .once('transactionHash', hash => {
         transaction.stakeTxHash = hash
+        upsertTx(transaction)
         listenForReplacementStake(hash)
     	dismissConfirmStake()
         var { dismiss } = notifyNotification('Waiting for stake transaction to confirm: no further action needed')
