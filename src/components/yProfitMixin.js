@@ -1,8 +1,7 @@
 import * as common from '../utils/common.js'
 import { getters, contract as currentContract } from '../contract'
 
-import BigNumber from 'bignumber.js'
-var cBN = (val) => new BigNumber(val);
+import BN from 'bignumber.js'
 
 export default {
 	data: () => ({
@@ -25,8 +24,8 @@ export default {
 	            });
 
 	            available += this.fromNativeCurrent(curr,
-	                cBN(getPricePerFullShare)
-	                .multipliedBy(cBN(prices[i].toString())
+	                BN(getPricePerFullShare)
+	                .multipliedBy(BN(prices[i].toString())
 	                .div(1e18))
 	            );
 	        }

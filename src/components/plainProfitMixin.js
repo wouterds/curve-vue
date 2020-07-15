@@ -3,7 +3,6 @@ import { getters, contract as currentContract } from '../contract'
 import allabis, { balancer_ABI, balancer_address } from '../allabis'
 
 import BigNumber from 'bignumber.js'
-var cBN = (val) => new BigNumber(val);
 
 export default {
 	data: () => ({

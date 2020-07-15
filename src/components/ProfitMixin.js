@@ -4,8 +4,7 @@ import { makeCancelable, interpolate } from '../utils/helpers'
 
 import allabis from '../allabis'
 
-import BigNumber from 'bignumber.js'
-var cBN = (val) => new BigNumber(val);
+import BN from 'bignumber.js'
 
 export default {
 	data: () => ({
@@ -161,9 +160,9 @@ export default {
 		            available += this.fromNativeCurrent(curr,
 
 
-		                this.BN(exchangeRate)
-		                .mul(this.BN(prices[i]))
-		                .div(this.BN(1e8))
+		                BN(exchangeRate)
+		                .times(BN(prices[i]))
+		                .div(BN(1e8))
 		            );
 	        	}
 	        }
@@ -173,28 +172,28 @@ export default {
 	    convertValues(curr, exchangeRate, value) {
 		    if(curr == 'cDAI') exchangeRate*=1e8
 		    if(curr == 'cUSDC') exchangeRate*=1e20
-		    return this.BN(exchangeRate).mul(BN(value))
+		    return BN(exchangeRate).times(BN(value))
 		},
 
 		fromNativeCurrent(curr, value) {
-		    if(curr == 'cDAI') return value.div(this.BN(1e10)).div(this.BN(1e16)).toNumber();
+		    if(curr == 'cDAI') return value.div(BN(1e10)).div(BN(1e16));
 		    if(curr == 'cUSDC') {
-		        return value.div(this.BN(1e14)).toNumber();
+		        return value.div(BN(1e14));
 		    }
 			if(curr == 'DAI' || curr == 'PAX') {
-				return value.divRound(this.BN(1e16)).toNumber()
+				return value.div(BN(1e16))
 			}
 			if(curr == 'USDC' || curr == 'USDT') {
-				return value.divRound(this.BN(1e4)).toNumber()
+				return value.div(BN(1e4))
 			}
 			if(curr == 'sUSD') {
-				return value.divRound(this.BN(1e16)).toNumber();
+				return value.div(BN(1e16));
 			}
 			const decimals = ['yUSDC', 'yUSDT'].includes(curr) ? 6 : 18;
 		    if (decimals === 18) {
 		        return Number(currentContract.web3.utils.fromWei(value.toString(0)));
 		    }
-		    return value.toNumber() / 10 ** decimals;
+		    return value / 10 ** decimals;
 		},
 		async convertValuesCurrent(curr) {
 		    const usdPool = await currentContract.web3.eth.call({
@@ -208,10 +207,10 @@ export default {
 		    return value => {
 		        return this.fromNativeCurrent(
 		            curr,
-		            this.BN(usdPool)
-		                .mul(BN(value))
+		            BN(usdPool)
+		                .times(BN(value))
 		                .div(BN(tokensSupply))
-		                .mul(BN(100))
+		                .times(BN(100))
 		        );
 		    };
 		},
@@ -289,7 +288,7 @@ export default {
 
 		},
 	    fromNative(curr, value) {
-		    return value.divRound(this.BN(1e16)).toNumber()
+		    return value.div(BN(1e16))
 		},
 	    async checkExchangeRateBlocks(block, address, direction) {
 		    let fromBlock = '0x'+parseInt(block-100).toString(16)
@@ -316,9 +315,9 @@ export default {
 		        let mintevent = currentContract.web3.eth.abi.decodeParameters(['address','uint256','uint256'], mint.data)
 		        let exchangeRate;
 		        if(mintevent[1] == 0 || mintevent[2] == 0) return -1
-		        exchangeRate = this.BN(mintevent[1]).div(this.BN(mintevent[2]));
+		        exchangeRate = BN(mintevent[1]).div(BN(mintevent[2]));
 		        if(address == currentContract.coins[1]._address) {
-		            exchangeRate = this.BN(mintevent[1]).mul(this.BN(1e12)).div(this.BN(mintevent[2]))
+		            exchangeRate = BN(mintevent[1]).times(BN(1e12)).div(BN(mintevent[2]))
 		        }
 		        if(direction == 0) return exchangeRate
 		        return {blockNumber: mint.blockNumber, exchangeRate: exchangeRate};
@@ -367,9 +366,9 @@ export default {
 		            return exchangeRatePast.exchangeRate;
 		        }
 
-		        if(currentContract.web3.utils.isBN(exchangeRateFuture.exchangeRate)) {
-		        	exchangeRateFuture.exchangeRate = exchangeRateFuture.exchangeRate.toNumber()
-		        	exchangeRatePast.exchangeRate = exchangeRatePast.exchangeRate.toNumber()
+		        if(BN.isBigNumber(exchangeRateFuture.exchangeRate)) {
+		        	exchangeRateFuture.exchangeRate = exchangeRateFuture.exchangeRate
+		        	exchangeRatePast.exchangeRate = exchangeRatePast.exchangeRate
 		        }
 	        	if(exchangeRatePast.exchangeRate === undefined || exchangeRateFuture.exchangeRate === undefined) return -1;
 	        	exchangeRate = interpolate(blockNumber, exchangeRatePast.blockNumber, exchangeRateFuture.blockNumber)( 
@@ -386,7 +385,7 @@ export default {
 			if(this.cancel) throw new Error('cancel');
 		    let amount = 0;
 		    for(let i = 0; i < currentContract.N_COINS; i++) {
-		            const tokens = this.BN(cTokens[i]);
+		            const tokens = BN(cTokens[i]);
 		            if(tokens == 0) continue;
 		            const tokenIndex = Object.values(this.ADDRESSES)[i]
 		            let curr = Object.keys(this.ADDRESSES)[i]
@@ -404,10 +403,10 @@ export default {
 		          		usd = tokens * exchangeRate
 		          	}
 		          	else if(currentContract.currentContract == 'susdv2' || (currentContract.currentContract == 'pax' && i == 3)) {
-		            	usd = this.fromNativeCurrent(curr, this.BN(exchangeRate).mul(this.BN(tokens)))	
+		            	usd = this.fromNativeCurrent(curr, BN(exchangeRate).times(BN(tokens)))	
 		          	}
 		          	else {
-		            	usd = this.fromNative(curr, this.BN(exchangeRate).mul(this.BN(tokens)))
+		            	usd = this.fromNative(curr, BN(exchangeRate).times(BN(tokens)))
 		          	}
 		            amount += usd;
 		    }
@@ -651,9 +650,9 @@ export default {
 		    	data: '0xbb7b8b80'
 		    })
 
-		    return this.BN(balanceOfCurveContract)
-		        .mul(this.BN(poolTokensBalance))
-		        .div(this.BN(poolTokensSupply));
+		    return BN(balanceOfCurveContract)
+		        .times(BN(poolTokensBalance))
+		        .div(BN(poolTokensSupply));
 		},
 	},
 
