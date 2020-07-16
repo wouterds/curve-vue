@@ -115,9 +115,9 @@
             </span>
           </li>
           <li v-show='isBTC'>
-            <b>Daily BTC volume: </b>
+            <b>Daily ₿ volume: </b>
             <span :class="{'loading line': poolVolumeUSD == -1}">
-              <span v-show='poolVolumeUSD > -1'> {{ poolVolume && toFixed(poolVolume) }} BTC </span>
+              <span v-show='poolVolumeUSD > -1'> {{ poolVolume && toFixed(poolVolume) }} ₿ </span>
             </span>
           </li>
         </ul>

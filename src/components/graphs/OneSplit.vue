@@ -1159,6 +1159,9 @@
     .advancedoptions + div legend {
         text-align: center;
     }
+    #trade {
+        margin-top: 1em;
+    }
     label[for='compoundpool1'] {
         margin-left: -2px;
     }

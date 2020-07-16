@@ -8,9 +8,9 @@
     			<span v-show='volume && volume[0] != -1'> {{ (volume && volume[0] || 0) | formatNumber(0) }}$</span>	
     		</span>
     		<div v-show="['tbtc', 'ren', 'sbtc'].includes(pool)">
-	    		<span>Daily BTC trading volume:</span>
+	    		<span>Daily ₿ trading volume:</span>
 	    		<span>
-	    			<span v-show='volume && volume[1] != -1'> {{ (volume && volume[1] || 0) | formatNumber(8) }} BTC </span>
+	    			<span v-show='volume && volume[1] != -1'> {{ (volume && volume[1] || 0) | formatNumber(8) }} ₿ </span>
 	    		</span>
     		</div>
     	</p>
