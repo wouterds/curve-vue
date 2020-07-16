@@ -178,22 +178,22 @@ export default {
 		fromNativeCurrent(curr, value) {
 		    if(curr == 'cDAI') return value.div(BN(1e10)).div(BN(1e16));
 		    if(curr == 'cUSDC') {
-		        return value.div(BN(1e14));
+		        return +value.div(BN(1e14));
 		    }
 			if(curr == 'DAI' || curr == 'PAX') {
-				return value.div(BN(1e16))
+				return +value.div(BN(1e16))
 			}
 			if(curr == 'USDC' || curr == 'USDT') {
-				return value.div(BN(1e4))
+				return +value.div(BN(1e4))
 			}
 			if(curr == 'sUSD') {
-				return value.div(BN(1e16));
+				return +value.div(BN(1e16));
 			}
 			const decimals = ['yUSDC', 'yUSDT'].includes(curr) ? 6 : 18;
 		    if (decimals === 18) {
 		        return Number(currentContract.web3.utils.fromWei(value.toString(0)));
 		    }
-		    return value / 10 ** decimals;
+		    return +value / 10 ** decimals;
 		},
 		async convertValuesCurrent(curr) {
 		    const usdPool = await currentContract.web3.eth.call({
