@@ -1391,13 +1391,14 @@ export async function listenForReplacement(txhash) {
 		console.log(transaction.originalHash, "ORIGINAL HASH", transaction.hash, "NEW HASH")
 		notifyHandler(transaction.hash)
 		let tx = state.transactions.find(t => t.ethTxHash == transaction.originalHash)
-		await removeTx(tx)
-		tx.removed = false
+		// await removeTx(tx)
+		// tx.removed = false
 		tx.ethTxHash = transaction.hash
 		tx.ethStartBlock = +transaction.blockNumber
 		if(tx.type == 1) tx.state = 30
 		else tx.state = 12
 		tx.confirmations = 0
+		resumeStakeTransactions([tx])
 		console.log(tx.confirmations, "THE SPEED UP CONFIRMATIONS")
 		upsertTx(tx)
 		state.transactions.unshift(tx)
