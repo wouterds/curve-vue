@@ -27,8 +27,8 @@
 	                	<a :href = "'https://etherscan.io/address/' + depositZaps[i].deposit" v-show="!['ren', 'sbtc'].includes(allPools[i])">
 	                		<img class='icon' :src="getTokenUrl(i)"> <span class='text'>deposit address</span>
 	                	</a>
-	                	<a :href = "'https://etherscan.io/address/' + depositZaps[i].deposit" v-show="!['ren', 'sbtc'].includes(allPools[i])">
-	                		<img class='icon' :src="getTokenUrl(i)"> <span class='text'>deposit address</span>
+	                	<a :href= "'https://etherscan.io/address/' + rewardsAddresses[allPools[i]]" v-show="['susdv2', 'sbtc'].includes(allPools[i])">
+	                		<img class='icon' :src="getTokenUrl(i)"> <span class='text'>staking rewards address</span>
 	                	</a>
 	                	<a href="https://etherscan.io/address/0x9fe350DfA5F66bC086243F21A8F0932514316627" v-show="['ren'].includes(allPools[i])">
 	                		<img class='icon' :src="getTokenUrl(i)"> <span class='text'>old adapter address</span>
@@ -77,6 +77,12 @@
 				return {
 					ren: '0x73aB2Bd10aD10F7174a1AD5AFAe3ce3D991C5047',
 					sbtc: '0xAEade605D01FE9a8e9C4B3AA0130A90d62167029',
+				}
+			},
+			rewardsAddresses() {
+				return {
+					susdv2: '0xdcb6a51ea3ca5d3fd898fd6564757c7aaec3ca92',
+					sbtc: '0x13C1542A468319688B89E323fe9A3Be3A90EBb27',
 				}
 			},
 		},

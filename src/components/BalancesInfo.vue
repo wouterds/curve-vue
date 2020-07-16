@@ -39,7 +39,15 @@
           <b>
             Virtual price: 
           </b>
-          <span :class="{'loading line': virtualPrice1 === null}"> {{ (virtualPrice1).toFixed(4) }} </span>
+          <span :class="{'loading line': virtualPrice1 === null}"> 
+            <span class='tooltip'>
+              {{ (virtualPrice1).toFixed(4) }}
+              <span class='tooltiptext'>
+                {{ virtualPrice1 }}
+              </span>
+            </span>
+          </span>
+          &nbsp;
           <span class='tooltip'>[?]
             <span class='tooltiptext'>
               Average dollar value of pool token {{(usdShare1 + usdStake1).toFixed(2)}}

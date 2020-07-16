@@ -132,6 +132,8 @@
         DAI, ...), having the exchange happening for you, if you type amounts in
         lower fields. You'll get charge with the exchange fee in the latter
         case.</p>
+
+        <a href='https://curve-debug.now.sh' class='debugserver'>Debug site</a>
     </div>
 
 </template>
@@ -142,5 +144,10 @@
     }
     .window.white a:hover {
         border-bottom: none;
+    }
+    .window.white .debugserver {
+        font-size: 0.8em;
+        border-bottom: none;
+        opacity: 0.2;
     }
 </style>

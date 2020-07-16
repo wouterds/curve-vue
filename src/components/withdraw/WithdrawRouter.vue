@@ -96,6 +96,10 @@
 		margin-bottom: 1em;
 		padding-top: 0.4em;
 		padding-bottom: 0.4em;
+		cursor: pointer;
+	}
+	.swapBTC-container label {
+		cursor: pointer;
 	}
 	.loading.line {
 		margin-left: 1em;
