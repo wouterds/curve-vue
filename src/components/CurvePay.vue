@@ -9,7 +9,7 @@
 					</div>
 					<select class='tvision' v-model = 'token' >
 						<option v-for = '(v, i) in tokenNames' :value='v'>{{v}} 
-							{{balances[i] && (['renCrv', 'sbtcCrv'].includes(v) ? '฿' : '$') + toFixed(balances[i] * virtual_prices[i] / 1e36, v)}}
+							{{balances[i] && (['renCrv', 'sbtcCrv'].includes(v) ? '₿' : '$') + toFixed(balances[i] * virtual_prices[i] / 1e36, v)}}
 						</option>
 					</select>
 					<div id='balance' @click='setMaxBalance'>
