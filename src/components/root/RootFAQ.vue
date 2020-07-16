@@ -133,7 +133,7 @@
         lower fields. You'll get charge with the exchange fee in the latter
         case.</p>
 
-        <a href='https://curve-debug.now.sh' class='debugserver'>Debug site</a>
+        <a href='https://curve-dev.now.sh' class='devserver'>Development environment</a>
     </div>
 
 </template>
@@ -145,7 +145,7 @@
     .window.white a:hover {
         border-bottom: none;
     }
-    .window.white .debugserver {
+    .window.white .devserver {
         font-size: 0.8em;
         border-bottom: none;
         opacity: 0.2;
