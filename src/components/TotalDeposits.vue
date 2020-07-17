@@ -12,6 +12,10 @@
 		</div>
 
 		<div class='window white'>
+			<highcharts :constructor-type="'stockChart'" :options='coinchartdata' ref='coincharts'></highcharts>
+		</div>
+
+		<div class='window white'>
 			<highcharts :options="piechartdata" ref='piecharts'></highcharts>
 		</div>
 
@@ -226,9 +230,105 @@
 			    },
 			    series: [],
 			},
+			coinchartdata: {
+				chart: {
+					panning: true,
+					zoomType: 'x',
+			        panKey: 'ctrl',
+			        type: 'column',
+			        height: 600,
+				},
+		        title: {
+		        	text: 'Coin USD Deposits', 
+		        },
+                rangeSelector: {
+		            selected: 1
+		        },
+		        plotOptions: {
+					series: {
+						dataGrouping: {
+						  forced: true,
+						  units: [
+						    ['day', [1]]
+						  ]
+						},
+						point: {
+							events: {
+								click: (function(self) {
+									return function() {
+										let index = this.dataGroup ? this.dataGroup.start : this.index
+										console.log(this, index, "INDEX")
+									}
+								})(this)
+							}
+						},
+					},
+					column: {
+						stacking: 'normal',
+						dataLabels: {
+							enabled: false
+						}
+					},
+				},
+		        exporting: {
+					buttons: {
+						contextButton: {
+							menuItems: ["printChart",
+					                    "separator",
+					                    "downloadPNG",
+					                    "downloadJPEG",
+					                    "downloadPDF",
+					                    "downloadSVG",
+					                    "separator",
+					                    "downloadCSV",
+					                    "downloadXLS",
+					                    //"viewData",
+					                    "openInCloud"]
+						}
+					}
+				},
+	            yAxis: {
+	            	opposite: false,
+	            	title: {
+	            		text: 'Total coin deposits',
+	            		style: {
+	            			color: 'black'
+	            		},
+	            	},
+            		stackLabels: {
+			            enabled: false,
+			            style: {
+			                fontWeight: 'bold',
+			                color: ( // theme
+			                    Highcharts.defaultOptions.title.style &&
+			                    Highcharts.defaultOptions.title.style.color
+			                ) || 'gray'
+			            }
+			        },
+	            	tickPixelInterval: 10,
+	            },
+	            xAxis: {
+	            	labels: {	
+		            	style: {
+		            		color: 'black'
+		            	}
+	            	},
+	            },
+		        series: [],
+		        tooltip: {
+	                valueDecimals: 5,
+	                pointFormatter() {
+	                	return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${this.y.toFixed(2)}</b><br/>`
+	                },
+	            },
+	            legend: {
+	            	enabled: true,
+	            },
+			},
 			chart: null,
 			piechart: null,
 			mypiechart: null,
+			coinchart: null,
 			showbars: true,
 			showline: true,
 			allPools: null,
@@ -279,9 +379,11 @@
 			this.chart = this.$refs.highcharts.chart;
 			this.piechart = this.$refs.piecharts.chart;
 			this.mypiechart = this.$refs.mypiecharts.chart;
+			this.coinchart = this.$refs.coincharts.chart;
 			this.chart.showLoading()
 			this.piechart.showLoading()
 			this.mypiechart.showLoading()
+			this.coinchart.showLoading()
 			let pools = Object.keys(allabis).filter(pool => pool != 'susd' && pool != 'y' && pool != 'tbtc')
 			await volumeStore.fetchVolumeData(pools, true, 1440)
 			let data = volumeStore.state.volumeData[1440]
@@ -299,18 +401,21 @@
 
 			let volumes = {}
 
+
 			for(let [pool, points] of Object.entries(data)) {
 				volumes[pool] = []
 				for(let point of points) {
-				if(!point.timestamp) continue
+					if(!point.timestamp) continue
+					let coinBalances = point.balances.map((bal, i) => {
+						return bal * point.rates[i] / 1e18 / allabis[pool == 'susd' ? 'susdv2' : pool].coin_precisions[i]
+					})
 					volumes[pool].push([
 						point.timestamp * 1000,
-						point.balances.map((bal, i) => {
-							return bal * point.rates[i] / 1e18 / allabis[pool == 'susd' ? 'susdv2' : pool].coin_precisions[i]
-						}).reduce((a, b) => a + b, 0)
+						coinBalances.reduce((a, b) => a + b, 0)
 					])
 				}
 			}
+
 
 
 			for(let [pool, volume] of Object.entries(volumes)) {
@@ -322,8 +427,47 @@
 				}, false, false)
 			}
 
+			let coins = ['DAI', 'USDC', 'USDT', 'TUSD', 'BUSD', 'SUSD', 'PAX', 'renBTC', 'WBTC', 'sBTC']
+			let coinbalances = coins.reduce((a,b)=> (a[b]=[],a),{});
+
+
+			for(let [pool, points] of Object.entries(data)) {
+				if(pool == 'tbtc') continue
+				for(let point of points) {
+					if(!point.timestamp) continue
+					let coinBalances = point.balances.map((bal, i) => {
+						return bal * point.rates[i] / 1e18 / allabis[pool == 'susd' ? 'susdv2' : pool].coin_precisions[i]
+					})
+					for(let [i, balance] of coinBalances.entries()) {
+						if(pool == 'busd' && i == 3) i = 4
+						if(pool == 'susd' && i == 3) i = 5
+						if(pool == 'pax' && i == 3) i = 6
+						if(['ren', 'sbtc'].includes(pool)) i += 7
+						let hasPoint = coinbalances[coins[i]].find(p => p[0] == point.timestamp*1000)
+						if(hasPoint !== undefined) {
+							hasPoint[1] += balance
+						}
+						else
+							coinbalances[coins[i]].push([point.timestamp*1000, balance])
+					}
+				}
+			}
+
+			for(let [coin, balance] of Object.entries(coinbalances)) {
+				balance.sort((a,b) => a[0] - b[0])
+				this.coinchart.addSeries({
+					type: 'column',
+					name: coin,
+					data: balance,
+				}, false, false)
+			}
+
+
 			this.chart.hideLoading()
 			this.chart.redraw()
+
+			this.coinchart.hideLoading()
+			this.coinchart.redraw()
 
 			let balances = Object.keys(volumes).reduce((obj, key) => {
 				return {...obj, [key]: (new Array(Math.max(...Object.values(volumes).map(arr=>arr.length))-volumes[key].length).fill({})).concat(volumes[key])}
