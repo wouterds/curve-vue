@@ -101,6 +101,7 @@
                     let gasPriceInfo = await retry(fetch('https://fees.upvest.co/estimate_eth_fees'))
                     gasPriceInfo = await gasPriceInfo.json()
                     state.gasPriceInfo = gasPriceInfo.estimates
+                    if(state.gasPriceInfo.fast > 1000) throw new Error('too high!')
                 }
                 catch(err) {
                     let gasPrice = (await web3.eth.getGasPrice()) / 1e9;
