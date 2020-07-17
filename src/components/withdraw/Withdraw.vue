@@ -144,6 +144,12 @@
             >
                 Withdraw {{(withdrawSNXPool / 1e18).toFixed(0)}} SNX + {{(withdrawRENPool / 1e18).toFixed(0)}} REN
             </button>
+            <button id='claim-adai' 
+                @click='claim_SNX(true, false)'
+                v-show="['y','iearn'].includes(currentPool) && withdrawADAI > 0"
+            >
+                Withdraw {{(withdrawADAI / 1e18).toFixed(2)}} aDAI
+            </button>
             <button id='unstake-snx'
                 @click='handle_remove_liquidity(true, true)'
                 v-show="['susdv2', 'sbtc','y','iearn'].includes(currentPool) && staked_balance > 0"
@@ -226,6 +232,7 @@
             withdrawBALPool: 0,
             withdrawSNXPool: 0,
             withdrawRENPool: 0,
+            withdrawADAI: 0,
             show_loading: false,
             waitingMessage: '',
             showWithdrawSlippage: false,
@@ -343,6 +350,9 @@
                     this.withdrawSNXPool = decoded[4] * decoded[2] / decoded[1]
                     this.withdrawRENPool = decoded[4] * decoded[3] / decoded[1]
 
+                }
+                if(['y','iearn'].includes(this.currentPool)) {
+                    this.withdrawADAI = await currentContract.aRewards.methods.claimable(currentContract.default_account).call()
                 }
 
                 await common.update_fee_info();
@@ -548,6 +558,29 @@
                 }
 
                 if(this.currentPool == 'sbtc' && !claim_bpt_only || !unstake) {
+                    this.estimateGas = 300000
+
+                    try {
+                        let balance = await currentContract.aRewards.methods.claimable(currentContract.default_account).call()
+                        await currentContract.aRewards.methods.claim(balance)
+                        .send({
+                            from: currentContract.default_account,
+                            gasPrice: this.gasPriceWei,
+                            gas: 600000,
+                        })
+                        .once('transactionHash', hash => {
+                            dismiss()
+                            notifyHandler(hash)
+                        })
+                    }
+                    catch(err) {
+                        console.log(err)
+                        dismiss()
+                        errorStore.handleError(err)
+                    }
+                }
+
+                if(['y', 'iearn'].includes(this.currentPool) && !claim_bpt_only || !unstake) {
                     this.estimateGas = 300000
 
                     try {

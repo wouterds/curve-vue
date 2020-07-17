@@ -288,6 +288,7 @@ const state = Vue.observable({
 		},
 		iearn: {
 			currentContract: 'iearn',
+			aRewards: null,
 			...initState(),
 		},
 		busd: {
@@ -396,6 +397,8 @@ const state = Vue.observable({
 
 	chi: null,
 
+	aRewards: null,
+
 })
 
 export let contract = state
@@ -494,6 +497,7 @@ export async function init(contract, refresh = false) {
     	contract.snxExchanger = new state.web3.eth.Contract(synthetixExchanger_ABI, synthetixExchanger_address)
     }
     if(['iearn','y'].includes(contract.currentContract)) {
+    	contract.aRewards = new state.web3.eth.Contract(allabis.iearn.aRewards_abi, allabis.iearn.aRewards_address)
     	contract.curveRewards = new state.web3.eth.Contract(allabis.iearn.sCurveRewards_abi, allabis.iearn.sCurveRewards_address)
 		calls.push([contract.curveRewards._address, contract.curveRewards.methods.balanceOf(state.default_account || '0x0000000000000000000000000000000000000000').encodeABI()])
     }

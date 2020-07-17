@@ -11,6 +11,7 @@ export default {
 		earnedYFI: null,
 		paidRewardsYFI: null,
 		weeklyEstimateYFI: null,
+		claimableADAI: null,
 	}),
 
 	async mounted() {
@@ -40,14 +41,16 @@ export default {
 
 		async getPrices() {
 			let curveRewards = currentContract.curveRewards
+			let aRewards = currentContract.aRewards
 			let calls = [
 				[curveRewards._address, curveRewards.methods.earned(this.account).encodeABI()],
 				[curveRewards._address, curveRewards.methods.balanceOf(this.account).encodeABI()],
 				[curveRewards._address, curveRewards.methods.userRewardPerTokenPaid(this.account).encodeABI()],
 				[curveRewards._address, curveRewards.methods.totalSupply().encodeABI()],
+				[curveRewards._address, curveRewards.methods.DURATION().encodeABI()],
+				[curveRewards._address, curveRewards.methods.rewardRate().encodeABI()],
+				[aRewards._address, aRewards.methods.claimable(this.account).encodeABI()],
 			]
-			calls.push([curveRewards._address, curveRewards.methods.DURATION().encodeABI()],
-					[curveRewards._address, curveRewards.methods.rewardRate().encodeABI()])
 			let aggcalls = await currentContract.multicall.methods.aggregate(calls).call()
 			let decoded = aggcalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
 			this.earnedYFI = +decoded[0] / 1e18
@@ -68,7 +71,8 @@ export default {
 			let rewards = rewardLogs.map(log=>currentContract.web3.eth.abi.decodeParameter('uint256', log.data) / 1e18).reduce((a, b) => a + b, 0)
 			this.paidRewardsYFI = rewards
 			let len = decoded.length
-			this.weeklyEstimateYFI = (decoded[len-2] * decoded[len-1] / 1e18) * currentContract.curveStakedBalance  / decoded[3]
+			this.weeklyEstimateYFI = (decoded[len-3] * decoded[len-2] / 1e18) * currentContract.curveStakedBalance  / decoded[3]
+			this.claimableADAI = decoded[len-1] / 1e18
 		},
 
 	    async calculateAvailable(prices) {
