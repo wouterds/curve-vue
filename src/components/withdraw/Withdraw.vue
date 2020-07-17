@@ -146,9 +146,9 @@
             </button>
             <button id='claim-adai' 
                 @click='claim_SNX(true, false)'
-                v-show="['y','iearn'].includes(currentPool) && withdrawADAI > 0"
+                v-show="['y', 'iearn'].includes(currentPool) && withdrawADAI > 0"
             >
-                Withdraw {{(withdrawADAI / 1e18).toFixed(2)}} aDAI
+                {{(pendingSNXRewards / 1e18).toFixed(2)}} YFI -> {{(withdrawADAI / 1e18).toFixed(2)}} aDAI
             </button>
             <button id='unstake-snx'
                 @click='handle_remove_liquidity(true, true)'
@@ -185,7 +185,7 @@
     import { notify, notifyHandler, notifyNotification } from '../../init'
     import * as common from '../../utils/common.js'
     import { getters, contract as currentContract, gas as contractGas, init } from '../../contract'
-    import allabis, { balancer_ABI, balancer_address } from '../../allabis'
+    import allabis, { balancer_ABI, balancer_address, ERC20_abi } from '../../allabis'
     const compound = allabis.compound
     import * as helpers from '../../utils/helpers'
 
@@ -524,7 +524,8 @@
 			},
             async claim_SNX(claim_bpt_only = false, unstake = true) {
                 this.show_loading = true
-                this.waitingMessage = `Please confirm claiming ${(this.pendingSNXRewards / 1e18).toFixed(2)} SNX`
+                this.waitingMessage = `Please confirm claiming ${(this.pendingSNXRewards / 1e18).toFixed(2)} 
+                    ${['y', 'iearn'].includes(this.currentPool) ? 'YFI' : 'SNX'}`
                 if(this.currentPool == 'sbtc')
                     this.waitingMessage += ` and ${(this.pendingRENRewards / 1e18).toFixed(2)} REN`
                 
@@ -557,12 +558,12 @@
                     })
                 }
 
-                if(this.currentPool == 'sbtc' && !claim_bpt_only || !unstake) {
+                if(this.currentPool == 'sbtc' && (!claim_bpt_only || !unstake)) {
                     this.estimateGas = 300000
 
                     try {
-                        let balance = await currentContract.aRewards.methods.claimable(currentContract.default_account).call()
-                        await currentContract.aRewards.methods.claim(balance)
+                        let balancerBalance = BN(await this.balancerPool.methods.balanceOf(currentContract.default_account).call())
+                        await this.balancerPool.methods.exitPool(balancerBalance.toFixed(0,1), ['0', '0'])
                         .send({
                             from: currentContract.default_account,
                             gasPrice: this.gasPriceWei,
@@ -581,15 +582,17 @@
                 }
 
                 if(['y', 'iearn'].includes(this.currentPool) && !claim_bpt_only || !unstake) {
-                    this.estimateGas = 300000
+                    this.estimateGas = 50000
 
                     try {
-                        let balancerBalance = BN(await this.balancerPool.methods.balanceOf(currentContract.default_account).call())
-                        await this.balancerPool.methods.exitPool(balancerBalance.toFixed(0,1), ['0', '0'])
+                        let balance = BN(await currentContract.aRewards.methods.claimable(currentContract.default_account).call())
+                        let yFI = new currentContract.web3.eth.Contract(ERC20_abi, '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e')
+                        await common.approveAmount(yFI, balance, currentContract.default_account, currentContract.aRewards._address)
+                        await currentContract.aRewards.methods.claim(balance.toFixed(0,1))
                         .send({
                             from: currentContract.default_account,
                             gasPrice: this.gasPriceWei,
-                            gas: 600000,
+                            gas: 125000,
                         })
                         .once('transactionHash', hash => {
                             dismiss()
@@ -1069,7 +1072,7 @@
 </script>
 
 <style>
-	#remove-liquidity, #remove-liquidity-unstake, #claim-snx, #claim-bpt, #claim-snxbpt {
+	#remove-liquidity, #remove-liquidity-unstake, #claim-snx, #claim-bpt, #claim-snxbpt, #claim-adai {
 		margin-right: 1em;
 	}
 	#withdrawold {
