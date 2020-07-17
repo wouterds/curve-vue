@@ -85,7 +85,7 @@
                     <b>Estimated weekly YFI LP rewards:</b> <span v-show='weeklyEstimateYFI !== null'> {{showWeeklyYFI}} YFI</span>
                 </li>
                 <li :class="{'loading line': claimableADAI === null}">
-                    <b>Claimable aDAI:</b> <span v-show='claimableADAI !== null'> {{claimableADAI.toFixed(2)}} aDAI</span>
+                    <b>Claimable aDAI:</b> <span v-show='claimableADAI !== null'> {{claimableADAI && claimableADAI.toFixed(2)}} aDAI</span>
                 </li>
 
                 <!-- 
