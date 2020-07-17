@@ -75,6 +75,9 @@
                 </li>
             </ul>
             <ul v-if="['y', 'iearn'].includes(currentPool)" class='snxrewards'>
+
+                <a href='https://medium.com/iearn/earning-yfi-y-curve-fi-53b5fd347f0f' class='tooltip'>[?]</a>
+                
                 <li :class="{'loading line': earnedYFI === null}">
                     <b>Pending YFI LP rewards:</b> <span v-show='earnedYFI !== null'> {{showEarnedYFI}} YFI</span>
                 </li>
