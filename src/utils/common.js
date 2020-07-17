@@ -272,7 +272,7 @@ export async function update_fee_info(version = 'new', contract, update = true) 
         calls.push([swap_address_stats, swap.methods.balances(i).encodeABI()])
     }
     calls.push(...rates_calls)
-    if(['susdv2','sbtc'].includes(contract.currentContract) && update)
+    if(['susdv2','sbtc', 'iearn', 'y'].includes(contract.currentContract) && update)
         calls.push([allabis[contract.currentContract].sCurveRewards_address, contract.curveRewards.methods.balanceOf(default_account).encodeABI()])
     if(update)
         await multiInitState(calls, contract)
@@ -321,7 +321,7 @@ export async function multiInitState(calls, contract, initContracts = false) {
         contract.curveStakedBalance = decoded[1]
         decoded = decoded.slice(2);
     }
-    if(initContracts && contract.currentContract == 'sbtc') {
+    if(initContracts && ['sbtc', 'iearn', 'y'].includes(contract.currentContract)) {
         contract.curveStakedBalance = decoded[0]
         decoded = decoded.slice(1);
     }
@@ -397,7 +397,7 @@ export async function multiInitState(calls, contract, initContracts = false) {
         contract.total += balances[i] * contract.c_rates[i];
     })
 
-    if(!initContracts && ['susdv2', 'sbtc'].includes(contract.currentContract))
+    if(!initContracts && ['susdv2', 'sbtc', 'iearn', 'y'].includes(contract.currentContract))
         contract.curveStakedBalance = decoded[decoded.length-1]
 
     if (default_account) {

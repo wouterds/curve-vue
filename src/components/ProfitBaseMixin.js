@@ -78,7 +78,7 @@ export default {
         return (this.available / 100)
       },
       showStakedBalance() {
-      if(!['susdv2', 'sbtc'].includes(this.currentPool)) return 0
+      if(!['susdv2', 'sbtc', 'y', 'iearn'].includes(this.currentPool)) return 0
       if(this.showinUSD) return this.getStakedBalanceUSD;
         return (this.getStakedBalance / 100); 
       },

@@ -498,8 +498,10 @@
 					]})
 				calls.push([allabis.susdv2.sCurveRewards_address, '0x70a08231000000000000000000000000' + contract.default_account.slice(2)])
 				calls.push([allabis.sbtc.sCurveRewards_address, '0x70a08231000000000000000000000000' + contract.default_account.slice(2)])
+				calls.push([allabis.iearn.sCurveRewards_address, '0x70a08231000000000000000000000000' + contract.default_account.slice(2)])
 				let aggcalls = await contract.multicall.methods.aggregate(calls).call()
 				let decoded = aggcalls[1].map(hex => web3.eth.abi.decodeParameter('uint256', hex))
+				console.log(decoded, "THE DECODED")
 				//this.balances = []
 				helpers.chunkArr(decoded, 2).slice(0,this.pools.length).map((v, i) => {
 					let key = this.pools[i]
@@ -507,8 +509,9 @@
 					if(['tbtc', 'ren', 'sbtc'].includes(key)) Vue.set(this.balances, key, this.balances[key] * this.btcPrice)
 				})
 				let len = decoded.length
-				Vue.set(this.balances, 'susdv2', this.balances.susdv2 + (+decoded[len-2] * decoded[9]) / 1e36)
-				Vue.set(this.balances, 'sbtc', this.balances.sbtc + ((+decoded[len-1] * decoded[15]) / 1e36) * this.btcPrice)
+				Vue.set(this.balances, 'susdv2', this.balances.susdv2 + (+decoded[len-3] * decoded[9]) / 1e36)
+				Vue.set(this.balances, 'sbtc', this.balances.sbtc + ((+decoded[len-2] * decoded[15]) / 1e36) * this.btcPrice)
+				Vue.set(this.balances, 'y', this.balances.y + (+decoded[len-1] * decoded[5]) / 1e36)
 			},
 			handle_pool_change(e) {
 				if(document.querySelector('#from_currency') == document.activeElement 

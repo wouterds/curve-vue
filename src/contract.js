@@ -493,6 +493,10 @@ export async function init(contract, refresh = false) {
 
     	contract.snxExchanger = new state.web3.eth.Contract(synthetixExchanger_ABI, synthetixExchanger_address)
     }
+    if(['iearn','y'].includes(contract.currentContract)) {
+    	contract.curveRewards = new state.web3.eth.Contract(allabis.iearn.sCurveRewards_abi, allabis.iearn.sCurveRewards_address)
+		calls.push([contract.curveRewards._address, contract.curveRewards.methods.balanceOf(state.default_account || '0x0000000000000000000000000000000000000000').encodeABI()])
+    }
     if(['tbtc', 'ren', 'sbtc'].includes(contract.currentContract)) {
     	//initial_A
     	calls.push([allabis[contract.currentContract].swap_address, '0x5409491a'])

@@ -96,12 +96,12 @@
                 </button>
                 <button 
                     id='add-liquidity-stake' 
-                    v-show="['susdv2', 'sbtc'].includes(currentPool)" 
+                    v-show="['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)" 
                     :disabled = 'slippage < -0.03 || depositingZeroWarning'
                     @click = 'justDeposit = false; deposit_stake()'>
                     Deposit and stake <span class='loading line' v-show='loadingAction == 2'></span>
                 </button>
-                <button id='stakeunstaked' v-show="totalShare > 0 && ['susdv2', 'sbtc'].includes(currentPool)" @click='stakeTokens()'>
+                <button id='stakeunstaked' v-show="totalShare > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)" @click='stakeTokens()'>
                     Stake unstaked <span class='loading line' v-show='loadingAction == 3'></span>
                 </button>
                 <p class='info-message gentle-message' v-show="lpCrvReceived > 0">
@@ -118,6 +118,9 @@
                 <div id='mintr' v-show="['susdv2', 'sbtc'].includes(currentPool)">
                     <a href = 'https://mintr.synthetix.io/' target='_blank' rel="noopener noreferrer">Manage staking in Mintr</a>
                 </div>
+                <div id='mintr' v-show="['y', 'iearn'].includes(currentPool)">
+                    <a href = 'https://ygov.finance/' target='_blank' rel="noopener noreferrer">Manage staking in yGov</a>
+                </div>
                 <button id="migrate-new" @click='handle_migrate_new' v-show="currentPool == 'compound' && oldBalance > 0">Migrate from old</button>
                 <div class='info-message gentle-message' v-show='show_loading'>
                     <span v-html='waitingMessage'></span> <span class='loading line'></span>
@@ -125,12 +128,16 @@
                 <div class='info-message gentle-message' v-show='estimateGas'>
                     Estimated tx cost: {{ (estimateGas * gasPrice / 1e9 * ethPrice).toFixed(2) }}$
                 </div>
-                <div class='simple-error' v-show="justDeposit && currentPool == 'susdv2'">
+                <div class='simple-error' v-show="justDeposit && ['susdv2','sbtc','y','iearn'].includes(currentPool)">
                     Your tokens are being deposited into the susd pool without staking.
-                    You can do that manually later on here or on <a href = 'https://mintr.synthetix.io/' target='_blank' rel="noopener noreferrer"> Mintr. </a> 
+                    You can do that manually later on here or on 
+                    <a href = 'https://mintr.synthetix.io/' v-show="['susdv2', 'sbtc'].includes(currentPool)" target='_blank' rel="noopener noreferrer"> Mintr. </a> 
+                    <a href = 'https://ygov.finance/' v-show="['y', 'iearn'].includes(currentPool)" target='_blank' rel="noopener noreferrer"> yGov. </a> 
                 </div>
                 <div class='simple-error' v-show='errorStaking'>
-                    There was an error in staking your tokens. You can manually stake them on <a href = 'https://mintr.synthetix.io/' target='_blank' rel="noopener noreferrer"> Mintr. </a>
+                    There was an error in staking your tokens. You can manually stake them on 
+                    <a href = 'https://mintr.synthetix.io/' v-show="['susdv2', 'sbtc'].includes(currentPool)" target='_blank' rel="noopener noreferrer"> Mintr. </a>
+                    <a href = 'https://ygov.finance/' v-show="['y', 'iearn'].includes(currentPool)" target='_blank' rel="noopener noreferrer"> yGov. </a>
                 </div>
                 <div class='simple-error pulse' v-show='compareInputsWarning.length && !max_balances'>
                     Not enough balance for currencies {{ compareInputsWarning.toString() }}
@@ -610,15 +617,20 @@
 				}
 				this.waitingMessage = ''
 				if(!stake ) this.show_loading = false
-				if(stake && ['susdv2', 'sbtc'].includes(this.currentPool)) {
+				if(stake && ['susdv2', 'sbtc', 'y', 'iearn'].includes(this.currentPool)) {
                     console.warn(receipt.events)
                     try {
     					minted = BN(
     						Object.values(receipt.events).filter(event => {
     							return (event.address.toLowerCase() == allabis.susdv2.token_address.toLowerCase()
-                                            || event.address.toLowerCase() == allabis.sbtc.token_address.toLowerCase())
+                                            || event.address.toLowerCase() == allabis.sbtc.token_address.toLowerCase()
+                                            || event.address.toLowerCase() == allabis.iearn.token_address.toLowerCase()
+                                        )
     									&& event.raw.topics[1] == "0x0000000000000000000000000000000000000000000000000000000000000000" 
-    									&& event.raw.topics[2].toLowerCase() == '0x000000000000000000000000' + currentContract.default_account.slice(2).toLowerCase()
+    									&& (
+                                            event.raw.topics[2].toLowerCase() == '0x000000000000000000000000' + currentContract.default_account.slice(2).toLowerCase()
+                                            || event.raw.topics[2].toLowerCase() == '0x000000000000000000000000' + allabis.iearn.deposit_address.slice(2).toLowerCase()
+                                            )
     						})[0].raw.data)
                         await helpers.setTimeoutPromise(100)
     					await this.stakeTokens(minted, true)
@@ -628,9 +640,14 @@
                             minted = BN(
                                 Object.values(receipt.logs).filter(event => {
                                     return (event.address.toLowerCase() == allabis.susdv2.token_address.toLowerCase()
-                                                || event.address.toLowerCase() == allabis.sbtc.token_address.toLowerCase())
+                                                || event.address.toLowerCase() == allabis.sbtc.token_address.toLowerCase()
+                                                || event.address.toLowerCase() == allabis.iearn.token_address.toLowerCase()
+                                            )
                                             && event.topics[1] == "0x0000000000000000000000000000000000000000000000000000000000000000" 
-                                            && event.topics[2].toLowerCase() == '0x000000000000000000000000' + currentContract.default_account.slice(2).toLowerCase()
+                                            && (
+                                                event.topics[2].toLowerCase() == '0x000000000000000000000000' + currentContract.default_account.slice(2).toLowerCase()
+                                                || event.raw.topics[2].toLowerCase() == '0x000000000000000000000000' + allabis.iearn.deposit_address.slice(2).toLowerCase()
+                                                )
                                 })[0].data)
                             await helpers.setTimeoutPromise(100)
                             await this.stakeTokens(minted, true)

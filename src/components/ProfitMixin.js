@@ -66,7 +66,7 @@ export default {
 	        		this.ADDRESSES[symbol] = allabis[this.currentPool].coins[i]
 	        	}
 			    let [available, availableUSD, stakedBalanceUSD, stakedBalance] = await this.getAvailableAmount()
-			    if(['susdv2', 'sbtc'].includes(this.currentPool)) {
+			    if(['susdv2', 'sbtc', 'y', 'iearn'].includes(this.currentPool)) {
 			    	this.getStakedBalance = stakedBalance
 			    	this.getStakedBalanceUSD = stakedBalanceUSD
 			    }
@@ -470,8 +470,11 @@ export default {
 				if(!transfer.length) continue
 	            let transferTokens = +transfer[0].data
 	            console.log(transferTokens / 1e18, poolInfoPoint.virtual_price, transferTokens * poolInfoPoint.virtual_price / 1e36)
-	            if(addliquidity.length == 0 && ["0x000000000000000000000000dcb6a51ea3ca5d3fd898fd6564757c7aaec3ca92",
-	             "0x00000000000000000000000013c1542a468319688b89e323fe9a3be3a90ebb27"].includes(transfer[0].topics[1])) continue;
+	            if(addliquidity.length == 0 && [
+	            	"0x000000000000000000000000dcb6a51ea3ca5d3fd898fd6564757c7aaec3ca92",
+	             	"0x00000000000000000000000013c1542a468319688b89e323fe9a3be3a90ebb27",
+	             	"0x0000000000000000000000000001fb050fe7312791bf6475b96569d83f695c9f",
+	             ].includes(transfer[0].topics[1])) continue;
 	            let depositsUSD = transferTokens * poolInfoPoint.virtual_price / 1e36
 	        	allDepositsUSD += depositsUSD
 	            if(['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) this.depositsUSD += depositsUSD * poolInfoPoint.btcPrice
@@ -555,11 +558,15 @@ export default {
 	            let transferTokens = +transfer[0].data
 	            console.log(transferTokens / 1e18, poolInfoPoint.virtual_price, transferTokens * poolInfoPoint.virtual_price / 1e36)
 	            console.log(transfer)
+	            console.log("WITHDRAWALS")
             	if(removeliquidity.length == 0 && 
             		removeliquidityImbalance.length == 0 && 
             		removeliquidityOne.length == 0 && 
-            		["0x000000000000000000000000dcb6a51ea3ca5d3fd898fd6564757c7aaec3ca92", 
-            			"0x00000000000000000000000013c1542a468319688b89e323fe9a3be3a90ebb27"].includes(transfer[0].topics[2])) continue;
+            		[
+            			"0x000000000000000000000000dcb6a51ea3ca5d3fd898fd6564757c7aaec3ca92", 
+            			"0x00000000000000000000000013c1542a468319688b89e323fe9a3be3a90ebb27",
+            			"0x0000000000000000000000000001fb050fe7312791bf6475b96569d83f695c9f",
+        			].includes(transfer[0].topics[2])) continue;
             	let withdrawalsUSD = transferTokens * poolInfoPoint.virtual_price / 1e36
             	allWithdrawalsUSD += withdrawalsUSD
             	if(['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) this.withdrawalsUSD += withdrawalsUSD * poolInfoPoint.btcPrice
