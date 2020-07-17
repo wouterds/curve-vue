@@ -42,7 +42,11 @@
             <br>
             <ul v-if="['susdv2', 'sbtc'].includes(currentPool)" class='snxrewards'>
 
-                <a href='https://blog.synthetix.io/new-curve-pool-launch/' class='tooltip'>[?]</a>
+                <a v-show="currentPool == 'susdv2'" href='https://blog.synthetix.io/new-curve-pool-launch/' class='tooltip'>[?]</a>
+                <a v-show="currentPool == 'sbtc'" 
+                    href='https://medium.com/renproject/introducing-an-incentivized-btc-liquidity-pool-by-ren-synthetix-and-curve-213d21691d9a' class='tooltip'>
+                    [?]
+                </a>
 
                 <li :class="{'loading line': earnedSNX === null}">
                     <b>Pending SNX LP rewards:</b> <span v-show='earnedSNX !== null'> {{showEarnedSNX}} {{showinUSD ? 'USD' : 'SNX'}}</span>
@@ -77,7 +81,7 @@
             <ul v-if="['y', 'iearn'].includes(currentPool)" class='snxrewards'>
 
                 <a href='https://medium.com/iearn/earning-yfi-y-curve-fi-53b5fd347f0f' class='tooltip'>[?]</a>
-                
+
                 <li :class="{'loading line': earnedYFI === null}">
                     <b>Pending YFI LP rewards:</b> <span v-show='earnedYFI !== null'> {{showEarnedYFI}} YFI</span>
                 </li>
