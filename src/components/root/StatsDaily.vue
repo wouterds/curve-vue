@@ -14,6 +14,13 @@
  			</fieldset>
  		</div>
 
+ 		<div class='window white'>
+ 			<fieldset>
+ 				<legend>Trading fees</legend>
+ 				<highcharts :constructor-type="'stockChart'" :options="tradingFeesChartdata" ref='feecharts'></highcharts>
+ 			</fieldset>
+ 		</div>
+
 		<div class='window white' v-for='(currency, i) in Object.keys(pools)'>
 			<p class='text-center'>
 		      	<router-link :to="currency == 'susd' ? 'susdv2' : currency" v-show="currency != 'susd'">
@@ -164,8 +171,53 @@
 	                valueDecimals: 3,
 	                pointFormatter() {
                 		let value = Math.floor(this.y * 100) / 100 + '%';
-                		if(this.series.name == 'Trading Volume') return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${this.y.toFixed(0)}</b><br/>`
-	                	return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${value}</b><br/>`
+                		if(this.series.name == 'Trading Volume') return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${helpers.formatNumber(this.y, 0)}$</b><br/>`
+	                	return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${this.y.toFixed(0)}</b><br/>`
+	                }
+	            },
+	            legend: {
+	            	enabled: true,
+	            },
+				series: [],
+			},
+			tradingFeesChartdata: {
+				title: {
+					text: 'Trading Fees'
+				},
+				chart: {
+					panning: true,
+					zoomType: 'x',
+			        panKey: 'ctrl',
+			        height: 600,
+				},
+				yAxis: [
+					{
+		            	id: 'volumeAxis',
+		            	//type: 'logarithmic',
+		            	opposite: false,
+		            	title: {
+		            		text: 'Trading fees',
+		            		style: {
+		            			color: 'black'
+		            		},
+		            		margin: 10,
+		            	},
+		            	labels: {
+		            		style: {
+		            			color: 'black',
+		            		},
+		            		align: 'right',
+		            		x: -30,
+		            	},
+			            offset: 0,
+		            }
+	            ],
+				tooltip: {
+	                valueDecimals: 3,
+	                pointFormatter() {
+                		let value = Math.floor(this.y * 100) / 100 + '%';
+                		if(this.series.name == 'Trading Fees') return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${helpers.formatNumber(this.y, 0)}$</b><br/>`
+	                	return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${this.y.toFixed(0)}</b><br/>`
 	                }
 	            },
 	            legend: {
@@ -178,6 +230,7 @@
 			end: 0,
 			chart: null,
 			volumeChart: null,
+			tradingFeesChart: null,
 		}),
 		computed: {
 			volumesData() {
@@ -185,10 +238,11 @@
 			}
 		},
 		async mounted() {
-			this.$watch(()=>volumeStore.state.allVolume.ren.length, val => {
+			let allPools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc', 'ren', 'sbtc']
+			let allVolume = volumeStore.state.allVolume
+			this.$watch(()=>Object.keys(allVolume).every(pool => allVolume[pool].length > 0), val => {
 				if(val) {
 					let volumeSeries = []
-					let allPools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc', 'ren']
 					let data = volumeStore.state.allVolume
 					let maxlenpool = Object.keys(data).reduce((a, b) => data[a].length > data[b].length ? a : b)
 					data = Object.keys(data).reduce((obj, key) => {
@@ -222,14 +276,26 @@
 
 					this.volumeChart.hideLoading()
 
+					let tradingFees = volumeSeries.map(([timestamp, volume]) => [timestamp, volume * 0.04 / 100])
+
+					this.tradingFeesChart.addSeries({
+						type: 'line',
+						name: 'Trading Fees',
+						data: tradingFees,
+					})
+
+					this.tradingFeesChart.hideLoading()
+
 					this.chart.hideLoading()
 				}
 
 			})
 			this.chart = this.$refs.highcharts.chart
 			this.volumeChart = this.$refs.highcharts2.chart
+			this.tradingFeesChart = this.$refs.feecharts.chart
 			this.volumeChart.showLoading()
 			this.chart.showLoading()
+			this.tradingFeesChart.showLoading()
 			var start = new Date();
 			start.setHours(0,0,0,0);
 			this.start = start.getTime() / 1000
