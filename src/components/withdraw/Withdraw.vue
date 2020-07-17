@@ -323,6 +323,8 @@
             		this.withdrawc = true;
             		this.to_currency = null
             	}
+                else
+                    this.withdrawc = false
             	currentContract.showSlippage = false;
         		currentContract.slippage = 0;
                 let curveRewards = currentContract.curveRewards

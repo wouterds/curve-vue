@@ -101,7 +101,11 @@
                     @click = 'justDeposit = false; deposit_stake()'>
                     Deposit and stake <span class='loading line' v-show='loadingAction == 2'></span>
                 </button>
-                <button id='stakeunstaked' v-show="totalShare > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)" @click='stakeTokens()'>
+                <button id='stakeunstaked' 
+                    v-show="totalShare > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)"
+                    :disabled='stakePercentageInvalid' 
+                    @click='stakeTokens()'
+                    >
                     Stake unstaked <span class='loading line' v-show='loadingAction == 3'></span>
                 </button>
                 <p class='info-message gentle-message' v-show="lpCrvReceived > 0">
@@ -112,6 +116,29 @@
                         {{ !['ren', 'sbtc'].includes(currentPool) ? 'USD' : 'BTC' }} 
                     </span>
                 </p>
+                <div v-show="totalShare > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)">
+                    <button class='simplebutton advancedoptions' @click='showadvancedoptions = !showadvancedoptions'>
+                        Advanced staking options
+                        <span v-show='!showadvancedoptions'>▼</span>
+                        <span v-show='showadvancedoptions'>▲</span>
+                    </button>
+                    <div v-show='showadvancedoptions'>
+                        <fieldset>
+                            <legend>Advanced staking options:</legend>
+                            <div>
+                                <label for='stakepercentage'>Stake %</label>
+                                <input id='stakepercentage' v-model='stakepercentage' :class="{'invalid': stakePercentageInvalid}">
+                                <button id='stakeunstaked' 
+                                    v-show="totalShare > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)"
+                                    :disabled='stakePercentageInvalid' 
+                                    @click='stakeTokens()'
+                                >
+                                    Stake unstaked <span class='loading line' v-show='loadingAction == 3'></span>
+                                </button>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
                 <p class='trade-buttons' v-show="['ren', 'sbtc'].includes(currentPool)">
                     <a href='https://bridge.renproject.io/'>Mint/redeem renBTC</a>
                 </p>
@@ -205,6 +232,13 @@
     		estimateGas: 0,
     		ethPrice: 0,
             justDeposit: false,
+            stakepercentage: 100,
+            get showadvancedoptions() {
+                return localStorage.getItem('advancedoptions') === 'true' 
+            },
+            set showadvancedoptions(val) {
+                localStorage.setItem('advancedoptions', val)
+            },
             loadingAction: false,
             errorStaking: false,
     		slippagePromise: helpers.makeCancelable(Promise.resolve()),
@@ -277,6 +311,9 @@
           gasPriceWei() {
             return gasPriceStore.state.gasPriceWei
           },
+          stakePercentageInvalid() {
+            return this.stakepercentage < 0 || this.stakepercentage > 100
+          },
         },
         mounted() {
 	        this.setInputStyles(true)
@@ -286,7 +323,10 @@
         	async stakeTokens(tokens, deposit_and_stake = false) {
                 if(this.loadingAction == 3) return;
                 this.setLoadingAction(3);
-        		if(!tokens) tokens = BN(await currentContract.swap_token.methods.balanceOf(currentContract.default_account).call());
+        		if(!tokens) {
+                    tokens = BN(await currentContract.swap_token.methods.balanceOf(currentContract.default_account).call());
+                    tokens = BN(this.stakepercentage / 100).times(tokens)
+                }
         		this.waitingMessage = `Please approve staking ${this.toFixed(tokens.div(BN(1e18)))} of your sCurve tokens`
                 var { dismiss } = notifyNotification(this.waitingMessage)
 				await common.ensure_stake_allowance(tokens);
@@ -323,6 +363,7 @@
             async mounted(oldContract) {
 
             	if(['susd', 'susdv2', 'tbtc', 'ren', 'sbtc'].includes(currentContract.currentContract)) this.depositc = true;
+                else this.depositc = false;
             	this.changeSwapInfo(this.depositc)
             	currentContract.showSlippage = false;
         		currentContract.slippage = 0;
@@ -766,5 +807,23 @@
     .curvelpusd {
         display: inline-block;
         padding-top: 1em;
+    }
+    .advancedoptions {
+        margin-top: 1em;
+    }
+    .advancedoptions + div fieldset {
+        margin-top: 1em;
+    }
+    .advancedoptions + div legend {
+        text-align: center;
+    }
+    #stakepercentage {
+        width: 2.6em;
+    }
+    label[for='stakepercentage'] {
+        margin-right: 1em;
+    }
+    #stakepercentage.invalid {
+        background-color: red;
     }
 </style>
