@@ -26,9 +26,9 @@
 			      :tokenSupply = 'totalTokenSupplies[i]'
 			      :tokenBalance = 'totalTokenBalances[i]'
 			      :usdShare = 'usdShares[i]'
-			      :staked_info = "['susdv2', 'sbtc'].includes(currency) && staked_infos"
-			      :totalStake = 'totalStake'
-			      :usdStake = 'usdStake'
+			      :staked_info = "['susdv2', 'sbtc', 'y', 'iearn'].includes(currency) && staked_infos[currency]"
+			      :totalStake = 'totalStakes[currency]'
+			      :usdStake = 'usdStakes[currency]'
 			      :virtual_price = 'virtual_prices[i]'
 			      :A = 'As[i]'
 			      :future_A = 'future_As[i]'
@@ -75,9 +75,11 @@
 			bal_infos: {},
 			l_infos: {},
 			totalShares: [],
+			totalStakes: {},
 			usdShares: [],
+			usdStakes: {},
 
-			staked_infos: [],
+			staked_infos: {},
 			totalStake: -1,
 			usdStake: -1,
 
@@ -262,11 +264,14 @@
 			    let calls = await this.update_rates();
 				calls.push([contracts.susdv2.sCurveRewards_address, '0x70a08231000000000000000000000000' + (currentContract.default_account || '0x0000000000000000000000000000000000000000').slice(2)])
 				calls.push([contracts.sbtc.sCurveRewards_address, '0x70a08231000000000000000000000000' + (currentContract.default_account || '0x0000000000000000000000000000000000000000').slice(2)])
+				calls.push([contracts.iearn.sCurveRewards_address, '0x70a08231000000000000000000000000' + (currentContract.default_account || '0x0000000000000000000000000000000000000000').slice(2)])
 			    let aggcalls = await currentContract.multicall.methods.aggregate(calls).call();
 			    let block = aggcalls[0]
 			    let decoded = aggcalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
-			    let curveStakedBalance = decoded[decoded.length-2]
-			    let sbtcCurveStakedBalance = decoded[decoded.length-1]
+			    let curveStakedBalance = decoded[decoded.length-3]
+			    let sbtcCurveStakedBalance = decoded[decoded.length-2]
+			    let yCurveStakedBalance = decoded[decoded.length-1]
+			    console.log(yCurveStakedBalance, "Y CURVE STAKED BALANCE")
 			    decoded = decoded.slice(0, decoded.length-1)
 			    let i = 0;
 			    this.bal_infos['usdt'] = []
@@ -395,29 +400,21 @@
 		            }
 		            this.usdShares.push(decoded[ind+14] * decoded[ind+8] / 1e36)
 	            	this.totalShares.push(totalShare)
-	            	if(key == 'susdv2') {
-		            	this.totalStake = 0;
-				        if(curveStakedBalance > 0) {
-				            for (let i=0; i < contracts[key].N_COINS; i++) {
-				                var val = this.bal_infos[key][i] * curveStakedBalance / (+decoded[ind+15]);
-				                Vue.set(this.staked_infos, i, val)
-				                this.totalStake += val;
-				            }
-				        }
-				        this.usdStake = curveStakedBalance * decoded[ind+8] / 1e36
-				    }
-
-				    if(key == 'sbtc') {
-		            	this.totalStake = 0;
-				        if(sbtcCurveStakedBalance > 0) {
-				            for (let i=0; i < contracts[key].N_COINS; i++) {
-				                var val = this.bal_infos[key][i] * sbtcCurveStakedBalance / (+decoded[ind+15]);
-				                Vue.set(this.staked_infos, i, val)
-				                this.totalStake += val;
-				            }
-				        }
-				        this.usdStake = sbtcCurveStakedBalance * decoded[ind+8] / 1e36
-				    }
+	            	if(['susdv2', 'sbtc', 'y', 'iearn'].includes(key)) {
+	            		let stakedBalance = curveStakedBalance
+	            		if(key == 'sbtc') stakedBalance = sbtcCurveStakedBalance
+	            		if(['y', 'iearn'].includes(key)) stakedBalance = yCurveStakedBalance
+	            		this.totalStakes[key] = 0
+	            		this.staked_infos[key] = []
+	            		if(stakedBalance > 0) {
+	            			for(let i=0; i < contracts[key].N_COINS; i++) {
+	            				var val = this.bal_infos[key][i] * stakedBalance / (+decoded[ind+15]);
+	            				Vue.set(this.staked_infos[key], i, val)
+	            				this.totalStakes[key] += val
+	            			}
+	            		}
+	            		this.usdStakes[key] = stakedBalance * decoded[ind+8] / 1e36
+	            	}
 
 	            	i++;
 				}
