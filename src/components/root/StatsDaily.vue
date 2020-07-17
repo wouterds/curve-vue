@@ -18,7 +18,7 @@
  			<fieldset>
  				<legend>Trading fees</legend>
  				<div class='info-message gentle-message'>
- 					The chart shows only trading volume fees and does not account for fees from deposits/withdrawals
+ 					The chart shows only trading <b>volume</b> fees and does not account for fees from deposits/withdrawals
  				</div>
  				<highcharts :constructor-type="'stockChart'" :options="tradingFeesChartdata" ref='feecharts' class='tradingfees'></highcharts>
  			</fieldset>
