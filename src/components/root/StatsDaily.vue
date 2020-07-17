@@ -17,7 +17,10 @@
  		<div class='window white'>
  			<fieldset>
  				<legend>Trading fees</legend>
- 				<highcharts :constructor-type="'stockChart'" :options="tradingFeesChartdata" ref='feecharts'></highcharts>
+ 				<div class='info-message gentle-message'>
+ 					The chart shows only trading volume fees and does not account for fees from deposits/withdrawals
+ 				</div>
+ 				<highcharts :constructor-type="'stockChart'" :options="tradingFeesChartdata" ref='feecharts' class='tradingfees'></highcharts>
  			</fieldset>
  		</div>
 
@@ -339,3 +342,9 @@
 		},
 	}
 </script>
+
+<style scoped>
+	.tradingfees {
+		margin-top: 1em;
+	}
+</style>
