@@ -338,7 +338,7 @@
 		        		let reward = decoded[0] * decoded[1] / 1e18
 		        		//before YFI
 		        		if(timestamp < 1594972885) reward = 0
-		        		let SNXapy = 356 * reward / 7 * SNXprice / (0.65 * total_supply * virtual_price / 1e36) * 100
+		        		let SNXapy = 356 * reward / 7 * SNXprice / (0.98 * total_supply * virtual_price / 1e36) * 100
 		        		SNXapys.push([timestamp * 1000, SNXapy])
 		        	}
 
