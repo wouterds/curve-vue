@@ -149,6 +149,11 @@
                 v-show="['y', 'iearn'].includes(currentPool) && withdrawADAI > 0"
             >
                 {{(pendingSNXRewards / 1e18).toFixed(2)}} YFI -> {{(withdrawADAI / 1e18).toFixed(2)}} aDAI
+                <span class='tooltip'> [?]
+                    <span class='tooltiptext long'>
+                        Burn your YFI tokens to receive aDAI tokens
+                    </span>
+                </span>
             </button>
             <button id='unstake-snx'
                 @click='handle_remove_liquidity(true, true)'
