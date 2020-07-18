@@ -12,6 +12,7 @@ export default {
 		paidRewardsYFI: null,
 		weeklyEstimateYFI: null,
 		claimableADAI: null,
+		yfiPrice: null,
 	}),
 
 	async mounted() {
@@ -24,14 +25,17 @@ export default {
 
 	computed: {
 		showEarnedYFI() {
+			if(this.showinUSD) return (+this.earnedYFI * this.yfiPrice).toFixed(2)
 			return (+this.earnedYFI).toFixed(2)
 		},
 
 		showRewardsYFI() {
+			if(this.showinUSD) return (+this.paidRewardsYFI * this.yfiPrice).toFixed(2)
 			return (+this.paidRewardsYFI).toFixed(2)
 		},
 
 		showWeeklyYFI() {
+			if(this.showinUSD) return (+this.weeklyEstimateYFI * this.yfiPrice).toFixed(2)
 			return (+this.weeklyEstimateYFI).toFixed(2)
 		},
 
@@ -40,6 +44,10 @@ export default {
 	methods: {
 
 		async getPrices() {
+			let yfiPrice = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=yearn-finance&vs_currencies=usd')
+			yfiPrice = await yfiPrice.json()
+			this.yfiPrice = yfiPrice['yearn-finance'].usd
+
 			let curveRewards = currentContract.curveRewards
 			let aRewards = currentContract.aRewards
 			let calls = [
