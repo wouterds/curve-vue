@@ -56,13 +56,13 @@
                 return state.gasPriceInfo && state.gasPriceInfo.slow || 15
             },
 			gasPriceMedium() {
-                return state.gasPriceInfo && state.gasPriceInfo.medium || 20
+                return state.gasPriceInfo && state.gasPriceInfo.standard || 20
             },
             gasPriceFast() {
                 return state.gasPriceInfo && state.gasPriceInfo.fast || 25
             },
             gasPriceFastest() {
-                return state.gasPriceInfo && state.gasPriceInfo.fastest || 30
+                return state.gasPriceInfo && state.gasPriceInfo.instant || 30
             },
             gasPrice: {
             	get() {
@@ -98,9 +98,9 @@
         methods: {
             async getGasPrice() {
                 try {
-                    let gasPriceInfo = await retry(fetch('https://fees.upvest.co/estimate_eth_fees'))
+                    let gasPriceInfo = await retry(fetch('https://gasprice.poa.network/'))
                     gasPriceInfo = await gasPriceInfo.json()
-                    state.gasPriceInfo = gasPriceInfo.estimates
+                    state.gasPriceInfo = gasPriceInfo
                     if(state.gasPriceInfo.fast > 1000) throw new Error('too high!')
                 }
                 catch(err) {
