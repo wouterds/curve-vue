@@ -517,6 +517,10 @@ input[type=range]:focus::-ms-fill-upper {
   visibility: visible;
 }
 
+.tooltiptext.inverse {
+  background-color: #aaaaaa;
+}
+
 footer {
   flex-shrink: 0;
   display: flex;

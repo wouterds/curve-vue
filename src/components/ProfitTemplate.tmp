@@ -77,6 +77,18 @@
                         </span>
                     </span>
                 </li>
+
+                <br>
+
+                <li>
+                    <b>SNX price: </b><span :class="{'loading line': snxPrice === null}"></span><span>{{snxPrice && snxPrice.toFixed(2)}} USD</span>
+                </li>
+                <li v-if="currentPool == 'sbtc'">
+                    <b>REN price: </b><span :class="{'loading line': renPrice === null}"></span><span>{{renPrice && renPrice.toFixed(2)}} USD</span>
+                </li>
+                <li v-if="currentPool == 'sbtc'">
+                    <b>BPT price: </b><span :class="{'loading line': BPTPrice === null}"></span><span>{{BPTPrice && BPTPrice.toFixed(2)}} USD</span>
+                </li>
             </ul>
             <ul v-if="['y', 'iearn'].includes(currentPool)" class='snxrewards'>
 
@@ -93,6 +105,11 @@
                 </li>
                 <li :class="{'loading line': claimableADAI === null}">
                     <b>Claimable aDAI:</b> <span v-show='claimableADAI !== null'> {{claimableADAI && claimableADAI.toFixed(2)}} aDAI</span>
+                    <span class='tooltip'> [?]
+                        <span class='tooltiptext long inverse'>
+                            Amount of aDAI you'll receive by burning your YFI tokens for aDAI tokens
+                        </span>
+                    </span>
                 </li>
 
                 <li>
@@ -102,6 +119,12 @@
                             {{ toFixed(+showProfit + +showEarnedYFI + +showRewardsYFI) }} {{showinUSD ? 'USD' : '' }}
                         </span>
                     </span>
+                </li>
+
+                <br>
+
+                <li class='profitprices'>
+                    <b>YFI price: </b><span :class="{'loading line': yfiPrice === null}"></span><span>{{yfiPrice && yfiPrice.toFixed(2)}} USD</span>
                 </li>
             </ul>
         </ul>
