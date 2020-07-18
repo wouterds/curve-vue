@@ -135,6 +135,13 @@
 		                    	</span>
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[2]}">{{daily_apy[2]}}</span>%
+	                    	<div :class="{'loading line': yfiRewards === null, 'incentive-apr': true}">(+{{yfiRewards | toFixed2}}%
+                    			<span class='tooltip'>YFI
+	                                <span class='tooltiptext'>
+	                                    YFI LP reward annualized
+	                                </span>
+	                            </span>)
+                    		</div>
 	                    </span>
 	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.y && volumes.y[0] < 0}">
 	                    	<span v-show='volumes.y && volumes.y[0] >= 0'>${{(volumes.y && volumes.y[0] | 0) | formatNumber(0)}}</span>
@@ -391,6 +398,7 @@
 			},
 			snxRewards: null,
 			sbtcRewards: null,
+			yfiRewards: null,
 			balRewards: null,
 			btcPrice: null,
 		}),
@@ -433,9 +441,11 @@
 			async getCurveRewards() {
 				let curveRewards = new contract.web3.eth.Contract(allabis.susdv2.sCurveRewards_abi, allabis.susdv2.sCurveRewards_address)
 				let sbtcRewards = new contract.web3.eth.Contract(allabis.sbtc.sCurveRewards_abi, allabis.sbtc.sCurveRewards_address)
+				let yfiRewards = new contract.web3.eth.Contract(allabis.iearn.sCurveRewards_abi, allabis.iearn.sCurveRewards_address)
 
 				let sCurve = new contract.web3.eth.Contract(allabis.susdv2.swap_abi, allabis.susdv2.swap_address)
 				let sbtcCurve = new contract.web3.eth.Contract(allabis.sbtc.swap_abi, allabis.sbtc.swap_address)
+				let yCurve = new contract.web3.eth.Contract(allabis.iearn.swap_abi, allabis.iearn.swap_address)
 
 				let balancerPool = new contract.web3.eth.Contract(balancer_ABI, balancer_address)
 
@@ -456,6 +466,11 @@
                     	balancerPool._address,
                     	balancerPool.methods.getBalance('0x408e41876cccdc0f92210600ef50372656052a38').encodeABI()
                 	],
+
+					[yfiRewards._address, yfiRewards.methods.totalSupply().encodeABI()],
+					[yCurve._address, yCurve.methods.get_virtual_price().encodeABI()],
+                	[yfiRewards._address, yfiRewards.methods.DURATION().encodeABI()],
+					[yfiRewards._address, yfiRewards.methods.rewardRate().encodeABI()],
 				]
 
 				let aggcalls = await contract.multicall.methods.aggregate(calls).call();
@@ -466,14 +481,16 @@
 					fetch('https://api.coinpaprika.com/v1/tickers/btc-bitcoin'),
 					fetch('https://api.coingecko.com/api/v3/simple/price?ids=balancer&vs_currencies=usd'),
 					fetch('https://pushservice.curve.fi/getBalancerTVL'),
+					fetch('https://api.coingecko.com/api/v3/simple/price?ids=yearn-finance&vs_currencies=usd'),
 				])
 				let prices = await Promise.all(requests.map(request => request.json()))
-				let [snxPrice, renPrice, btcPrice, balPrice, balancerTVL] = prices;
+				let [snxPrice, renPrice, btcPrice, balPrice, balancerTVL, yfiPrice] = prices;
 				snxPrice = snxPrice.quotes.USD.price;
 				renPrice = renPrice.quotes.USD.price;
 				btcPrice = btcPrice.quotes.USD.price;
 				balPrice = balPrice.balancer.usd;
 				balancerTVL = balancerTVL.TVL
+				yfiPrice = yfiPrice['yearn-finance'].usd
 
 				//total factor 0.64
 
@@ -483,6 +500,7 @@
 
 				this.sbtcRewards = (10000 * snxPrice + 25000 * renPrice) / 7 * 365 / (btcPrice * decoded[4] * decoded[5] / 1e36) * 100
 
+				this.yfiRewards = 365 * (decoded[10] * decoded[11] / 1e18)/7*yfiPrice/((+decoded[8] * (+decoded[9]) / 1e36)) * 100
 
 				console.log(this.sbtcRewards, "SBTC REWARDS")
 			},
