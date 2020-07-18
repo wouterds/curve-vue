@@ -36,6 +36,10 @@
 	                	<a :href="'https://etherscan.io/address/' + adapterAddresses[allPools[i]]" v-show="['ren','sbtc'].includes(allPools[i])">
 	                		<img class='icon' :src="getTokenUrl(i)"> <span class='text'>adapter address</span>
 	                	</a>
+	                	<a href='https://etherscan.io/token/0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e' v-show="['y', 'iearn'].includes(allPools[i])">
+	                		<img class='icon' :src="publicPath + 'curveIcons/yfi.png'">
+	                		YFI token
+	                	</a>
 	            </fieldset>
 	        </fieldset>
 	    </div>
