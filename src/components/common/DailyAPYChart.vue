@@ -154,6 +154,7 @@
 		                	if(this.series.name == 'Daily APY') return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${value}</b><br/>`
 	                		if(this.series.name == 'SNX APY') return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${value}</b><br/>`
                 			if(this.series.name == 'SNX+REN APY') return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${value}</b><br/>`
+                			if(this.series.name == 'YFI APY') return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${value}</b><br/>`
                 			if(this.series.name == 'Total APY') return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${value}</b><br/>`
 		                	if(this.series.name == 'Lending APY') return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${value}</b><br/>`
 		                	if(this.series.name === 'Trading Volume') {
@@ -308,52 +309,55 @@
 		        	})
 		    	}
 
-		   //  	if(['y', 'iearn'].includes(this.pool)) {
-		   //      	let startTime = this.data[0].timestamp
-		   //      	let endTime = this.data[this.data.length - 1].timestamp
-		   //      	let SNXprices = await fetch(`https://api.coingecko.com/api/v3/coins/yearn-finance/market_chart/range?vs_currency=usd&from=${startTime}&to=${endTime}`)
-		   //      	console.log(`https://api.coingecko.com/api/v3/coins/yearn-finance/market_chart/range?vs_currency=usd&from=${startTime}&to=${endTime}`)
-		   //      	SNXprices = (await SNXprices.json()).prices
-		   //      	console.log("AZ SUM TUKA", SNXprices)
-		   //      	let curveRewards = new web3.eth.Contract(abis.iearn.sCurveRewards_abi, abis.iearn.sCurveRewards_address)
-		   //      	let multicall = new web3.eth.Contract(multicall_abi, multicall_address)
+		    	if(['y', 'iearn'].includes(this.pool)) {
+		    		//YFI token deployed
+		        	let startTime = 1594972885
+		        	let endTime = this.data[this.data.length - 1].timestamp
+		        	let SNXprices = await fetch(`https://api.coingecko.com/api/v3/coins/yearn-finance/market_chart/range?vs_currency=usd&from=${startTime}&to=${endTime}`)
+		        	console.log(`https://api.coingecko.com/api/v3/coins/yearn-finance/market_chart/range?vs_currency=usd&from=${startTime}&to=${endTime}`)
+		        	SNXprices = (await SNXprices.json()).prices
+		        	console.log("AZ SUM TUKA", SNXprices)
+		        	let curveRewards = new web3.eth.Contract(abis.iearn.sCurveRewards_abi, abis.iearn.sCurveRewards_address)
+		        	let multicall = new web3.eth.Contract(multicall_abi, multicall_address)
 
-		   //      	let calls = [
-					// 	[curveRewards._address, curveRewards.methods.DURATION().encodeABI()],
-					// 	[curveRewards._address, curveRewards.methods.rewardRate().encodeABI()],
-					// ]
+		        	let calls = [
+						[curveRewards._address, curveRewards.methods.DURATION().encodeABI()],
+						[curveRewards._address, curveRewards.methods.rewardRate().encodeABI()],
+					]
 
-					// let aggcalls = await multicall.methods.aggregate(calls).call()
-					// let decoded = aggcalls[1].map(hex => web3.eth.abi.decodeParameter('uint256', hex))
+					let aggcalls = await multicall.methods.aggregate(calls).call()
+					let decoded = aggcalls[1].map(hex => web3.eth.abi.decodeParameter('uint256', hex))
 
-		   //      	let SNXapys = []
-		   //      	for(let i = 1; i < this.data.length; i++) {
-		   //      		let timestamp = this.data[i].timestamp
-		   //      		let total_supply = this.data[i].supply
-		   //      		let virtual_price = this.data[i].virtual_price
-		   //      		console.log(SNXprices, "SNX PRICES")
-		   //      		let SNXprice = this.findClosestPrice(this.data[i].timestamp, SNXprices)
-		   //      		let reward = decoded[0] * decoded[1] / 1e18
-		   //      		let SNXapy = 356 * reward / 7 * SNXprice / (0.65 * total_supply * virtual_price / 1e36) * 100
-		   //      		SNXapys.push([timestamp * 1000, SNXapy])
-		   //      	}
+		        	let SNXapys = []
+		        	for(let i = 1; i < this.data.length; i++) {
+		        		let timestamp = this.data[i].timestamp
+		        		let total_supply = this.data[i].supply
+		        		let virtual_price = this.data[i].virtual_price
+		        		console.log(SNXprices, "SNX PRICES")
+		        		let SNXprice = this.findClosestPrice(this.data[i].timestamp, SNXprices)
+		        		let reward = decoded[0] * decoded[1] / 1e18
+		        		//before YFI
+		        		if(timestamp < 1594972885) reward = 0
+		        		let SNXapy = 356 * reward / 7 * SNXprice / (0.65 * total_supply * virtual_price / 1e36) * 100
+		        		SNXapys.push([timestamp * 1000, SNXapy])
+		        	}
 
-		   //      	this.chart.addSeries({
-		   //      		name: 'SNX APY',
-		   //      		lineWidth: 2,
-		   //      		data: SNXapys,
-		   //      		color: '#f45b5b',
-		   //      	})
+		        	this.chart.addSeries({
+		        		name: 'YFI APY',
+		        		lineWidth: 2,
+		        		data: SNXapys,
+		        		color: '#f45b5b',
+		        	})
 
-		   //      	let totalAPYs = chartData.map(([timestamp, apy], i) => [timestamp, apy + SNXapys[i][1]])
+		        	let totalAPYs = chartData.map(([timestamp, apy], i) => [timestamp, apy + SNXapys[i][1]])
 
-		   //      	this.chart.addSeries({
-		   //      		name: 'Total APY',
-		   //      		lineWidth: 2,
-		   //      		data: totalAPYs,
-		   //      		color: '#8085e9',
-		   //      	})
-		   //  	}
+		        	this.chart.addSeries({
+		        		name: 'Total APY',
+		        		lineWidth: 2,
+		        		data: totalAPYs,
+		        		color: '#8085e9',
+		        	})
+		    	}
 
 
 
@@ -419,7 +423,7 @@
 	    			color: '#7bb5ec',
 	    		})
 
-		        if(!['susdv2', 'tbtc', 'ren', 'sbtc'].includes(this.pool)) {
+		        if(!['susdv2', 'tbtc', 'ren', 'sbtc', 'y', 'iearn'].includes(this.pool)) {
 		        	let totalAPYs = chartData.map(([timestamp, apy], i) => [timestamp, apy + lendingrates[i][1]])
 
 		        	this.chart.addSeries({
