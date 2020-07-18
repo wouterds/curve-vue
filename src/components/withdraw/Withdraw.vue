@@ -145,7 +145,7 @@
                 Withdraw {{(withdrawSNXPool / 1e18).toFixed(0)}} SNX + {{(withdrawRENPool / 1e18).toFixed(0)}} REN
             </button>
             <button id='claim-adai' 
-                @click='claim_SNX(true, false)'
+                @click='claimYFIaDAI()'
                 v-show="['y', 'iearn'].includes(currentPool) && withdrawADAI > 0"
             >
                 {{(pendingSNXRewards / 1e18).toFixed(2)}} YFI -> {{(withdrawADAI / 1e18).toFixed(2)}} aDAI
@@ -588,33 +588,43 @@
                     }
                 }
 
-                if(['y', 'iearn'].includes(this.currentPool) && !claim_bpt_only || !unstake) {
-                    this.estimateGas = 50000
-
-                    try {
-                        let balance = BN(await currentContract.aRewards.methods.claimable(currentContract.default_account).call())
-                        let yFI = new currentContract.web3.eth.Contract(ERC20_abi, '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e')
-                        await common.approveAmount(yFI, balance, currentContract.default_account, currentContract.aRewards._address)
-                        await currentContract.aRewards.methods.claim(balance.toFixed(0,1))
-                        .send({
-                            from: currentContract.default_account,
-                            gasPrice: this.gasPriceWei,
-                            gas: 125000,
-                        })
-                        .once('transactionHash', hash => {
-                            dismiss()
-                            notifyHandler(hash)
-                        })
-                    }
-                    catch(err) {
-                        console.log(err)
-                        dismiss()
-                        errorStore.handleError(err)
-                    }
-                }
-
                 this.show_loading = false
 
+            },
+            async claimYFIaDAI() {
+                this.estimateGas = 50000
+
+                var { dismiss } = notifyNotification('Please confirm approval to burn YFI for aDAI')
+
+                try {
+
+                    let balance = BN(await currentContract.aRewards.methods.claimable(currentContract.default_account).call())
+                    let yFI = new currentContract.web3.eth.Contract(ERC20_abi, '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e')
+                    await common.approveAmount(yFI, balance, currentContract.default_account, currentContract.aRewards._address)
+                    dismiss()
+
+                    var { dismiss1 } = notifyNotification('Please confirm burning YFI to aDAI transaction')
+
+                    await currentContract.aRewards.methods.claim(balance.toFixed(0,1))
+                    .send({
+                        from: currentContract.default_account,
+                        gasPrice: this.gasPriceWei,
+                        gas: 125000,
+                    })
+                    .once('transactionHash', hash => {
+                        dismiss1()
+                        notifyHandler(hash)
+                    })
+                    .on('error', err => {
+                        dismiss1()
+                        throw err
+                    })
+                }
+                catch(err) {
+                    console.log(err)
+                    dismiss()
+                    errorStore.handleError(err)
+                }
             },
 			async unstake(amount, exit = false, unstake_only = false) {
                 if(unstake_only)
@@ -658,6 +668,8 @@
     				})
                     if(exit) {
         				this.claim_SNX()
+                        if(['y', 'iearn'].includes(this.currentPool))
+                            this.claimYFIaDAI()
                     }
                 }
                 catch(err) {
