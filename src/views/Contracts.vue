@@ -27,7 +27,7 @@
 	                	<a :href = "'https://etherscan.io/address/' + depositZaps[i].deposit" v-show="!['ren', 'sbtc'].includes(allPools[i])">
 	                		<img class='icon' :src="getTokenUrl(i)"> <span class='text'>deposit address</span>
 	                	</a>
-	                	<a :href= "'https://etherscan.io/address/' + rewardsAddresses[allPools[i]]" v-show="['susdv2', 'sbtc'].includes(allPools[i])">
+	                	<a :href= "'https://etherscan.io/address/' + rewardsAddresses[allPools[i]]" v-show="['susdv2', 'sbtc', 'y', 'iearn'].includes(allPools[i])">
 	                		<img class='icon' :src="getTokenUrl(i)"> <span class='text'>staking rewards address</span>
 	                	</a>
 	                	<a href="https://etherscan.io/address/0x9fe350DfA5F66bC086243F21A8F0932514316627" v-show="['ren'].includes(allPools[i])">
