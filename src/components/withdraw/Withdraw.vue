@@ -106,6 +106,22 @@
 
         <gas-price></gas-price>
 
+        <div id='modal' class='modal' v-show='showModal'>
+            <div class='modal-content window white'>
+                <fieldset>
+                    <div class='legend2 hoverpointer' @click='showModal = false'>
+                        [<span class='greentext'>■</span>]
+                    </div>
+                    <legend>CONFIRM</legend>
+                    <div class='modaltext'>
+                        Confirm <span class='warningtext'>burning</span> {{(pendingSNXRewards / 1e18).toFixed(2)}} YFI for {{(withdrawADAI / 1e18).toFixed(2)}} aDAI
+                    </div>
+                    <button @click='showModal = false; claimYFIaDAI()'> Confirm </button>
+                    <button @click='showModal = false' class='buttoncancel'>Cancel</button>
+                </fieldset>
+            </div>
+        </div>
+
         <div id='withdraw_buttons' class='buttons'>
             <div class='info-message gentle-message' id='amount-warning' v-show = 'nobalance'>
 	        	You don't have any available amount to withdraw
@@ -145,7 +161,7 @@
                 Withdraw {{(withdrawSNXPool / 1e18).toFixed(0)}} SNX + {{(withdrawRENPool / 1e18).toFixed(0)}} REN
             </button>
             <button id='claim-adai' 
-                @click='claimYFIaDAI()'
+                @click='showModal = true'
                 v-show="['y', 'iearn'].includes(currentPool) && withdrawADAI > 0"
             >
                 {{(pendingSNXRewards / 1e18).toFixed(2)}} YFI -> {{(withdrawADAI / 1e18).toFixed(2)}} aDAI
@@ -249,6 +265,7 @@
             ethPrice: 0,
             loadingAction: false,
             warninglow: false,
+            showModal: false,
     		slippagePromise: helpers.makeCancelable(Promise.resolve()),
     	}),
         async created() {
@@ -1121,5 +1138,54 @@
     }
     #withdraw_buttons button:nth-child(n+3) {
         margin-top: 0.6em;
+    }
+    .hoverpointer {
+        cursor: pointer;
+    }
+    .modal-content {
+        text-align: center;
+        padding: 0;
+        border: none;
+        width: 280px;
+    }
+    .modal-content fieldset {
+        color: white;
+        font-weight: bolder;
+        border: 6px double white;
+        padding-block-start: 1em;
+        padding-block-end: 1em;
+    }
+    .modal-content button {
+        margin-top: 0.6em;
+        padding: 0 2em;
+    }
+    .legend2 {
+      position: absolute;
+      top: 0;
+      left: 2em;
+      background: #c0c0c0;
+      line-height:1.2em;
+    }
+    .greentext {
+        color: green;
+    }
+    .legend2 .greentext {
+        display: inline-block;
+        transform: translate3d(0,-0.1em,10em);
+    }
+    .legend2 .greentext:hover {
+        transform: none;
+    }
+    .warningtext {
+        color: darkred;
+    }
+    .buttoncancel {
+        margin-left: 1em;
+        background: gray;
+        box-shadow: none;
+        border: none;
+    }
+    .modaltext {
+        color: black;
     }
 </style>
