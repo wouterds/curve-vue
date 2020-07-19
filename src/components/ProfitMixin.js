@@ -16,6 +16,8 @@ export default {
 
 		getStakedBalance: -1,
 		getStakedBalanceUSD: -1,
+
+		dailyAPY: null,
 	}),
 	computed: {
 		fromBlock() {
@@ -58,10 +60,12 @@ export default {
 	        	let reqs = await Promise.all([
 	        		fetch(`${window.domain}/raw-stats/${subdomain}-1440m.json`),
 	        		fetch(`${window.domain}/raw-stats/${subdomain}-5m.json`),
+	        		fetch(`${window.domain}/raw-stats/apys.json`),
         		]);
 	        	let res = await Promise.all(reqs.map(req => req.json()));
 	        	this.priceData = res[0]
 	        	this.priceData5m = res[1]
+	        	this.dailyAPY = res[2].apy.day[subdomain] * 100 / 365
 	        	for(let [i, symbol] of Object.values(allCurrencies[this.currentPool]).entries()) {
 	        		this.ADDRESSES[symbol] = allabis[this.currentPool].coins[i]
 	        	}

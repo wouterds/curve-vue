@@ -790,3 +790,7 @@ li.coins label:hover {
   margin-left: 0;
   padding-left: 0;
 }
+
+label[for='showinUSD'], label[for='showintokens'] {
+  cursor: pointer;
+}

@@ -47,6 +47,21 @@
             	</span>
             </li>
             <br>
+            <li>
+                <b>
+                    Daily profit(unstable)
+                    <span class='tooltip'>[?]
+                        <span class='tooltiptext long inverse'>
+                            Profit from Pool trading fees for a day using APY of {{ dailyAPY && dailyAPY.toFixed(2) }}% per day
+                        </span>
+                    </span>
+                    :
+                </b>
+                <span :class="{'loading line': dailyAPY === null}">
+                    <span v-show='dailyAPY !== null'> {{((showAvailable + showStakedBalance) * dailyAPY / 100).toFixed(2)}} {{showinUSD ? 'USD' : 'tokens'}}</span>
+                </span>
+            </li>
+            <br>
             <ul v-if="['susdv2', 'sbtc'].includes(currentPool)" class='snxrewards'>
 
                 <a v-show="currentPool == 'susdv2'" href='https://blog.synthetix.io/new-curve-pool-launch/' class='tooltip'>[?]</a>
