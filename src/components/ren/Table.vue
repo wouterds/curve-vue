@@ -239,7 +239,7 @@
 							<span class='confirmed' v-show='[0,3].includes(transaction.type) && transaction.state >= 10 && transaction.state < 14'>
 								Confirmed
 							</span>
-							<span v-show='[0,3].includes(transaction.type) && [14,15].includes(transaction.state)'>
+							<span v-show='[0,3].includes(transaction.type) && [14,15,17].includes(transaction.state)'>
 								Done
 							</span>
 							<span v-show='transaction.type == 1 && transaction.state >= 30 && transaction.state < 60'> {{ transaction.confirmations }} / 30 </span>
