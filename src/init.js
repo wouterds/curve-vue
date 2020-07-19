@@ -6,6 +6,8 @@ import Authereum from "authereum";
 import BurnerConnectProvider from "@burner-wallet/burner-connect-provider";
 */
 import Onboard from 'bnc-onboard'
+import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
+
 import Notify from "bnc-notify"
 
 import * as common from './utils/common.js'
@@ -78,7 +80,8 @@ const wallets = [
   {
     walletName: "ledger",
     rpcUrl:
-      "https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b"
+      "https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b",
+    LedgerTransport: TransportWebUSB,
   },
   { walletName: "dapper" },
   { walletName: "coinbase" },
