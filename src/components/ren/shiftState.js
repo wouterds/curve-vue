@@ -39,7 +39,7 @@ export function hasIncomplete() {
 		if(!key.startsWith('curvebtc_')) continue;
 		value = JSON.parse(value)
 		if(value.removed) continue;
-		if([0,3].includes(value.type) && ![14,15].includes(value.state)) len++
+		if([0,3].includes(value.type) && ![14,15,17].includes(value.state)) len++
 		if(value.type == 1 && value.state != 65) len++
 	}
 	return len
