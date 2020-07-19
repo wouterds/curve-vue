@@ -686,7 +686,7 @@
                     if(exit) {
         				this.claim_SNX()
                         if(['y', 'iearn'].includes(this.currentPool))
-                            this.claimYFIaDAI()
+                            this.showModal = true
                     }
                 }
                 catch(err) {
