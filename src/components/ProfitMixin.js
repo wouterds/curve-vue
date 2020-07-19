@@ -89,7 +89,7 @@ export default {
 	    		if(!['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) this.btcPrice = 1
 	    		console.log(currentContract.curveStakedBalance, currentContract.virtual_price, this.btcPrice)
 	    		return [currentContract.totalShare * 100, currentContract.usdShare * this.btcPrice || 0,
-    				currentContract.curveStakedBalance * currentContract.virtual_price * this.btcPrice / 1e18, currentContract.totalStake * 100]
+    				currentContract.curveStakedBalance * currentContract.virtual_price * this.btcPrice / 1e18, currentContract.curveStakedBalance / 1e18 * 100]
 	    	}
 	    	return this.calcAvailable();
 	    },
