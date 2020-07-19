@@ -276,7 +276,7 @@
           },
           calcFee() {
             let N_COINS = allabis[currentContract.currentContract].N_COINS
-            return this.fee * N_COINS / (4 * (N_COINS -1))
+            return this.fee / 100 * N_COINS / (4 * (N_COINS -1))
           },
           compareInputsWarning() {
             let currencies = []
