@@ -16,7 +16,7 @@
 		</button>
 
 
-		<div id='modal' class='modal' v-show='showModal'>
+		<div id='modal' class='modal' v-show='showModal' @click.self='showModal = false'>
 			<div class='modal-content window white'>
 				<fieldset>
 					<div class='legend2 hoverpointer' @click='showModal = false'>
@@ -29,7 +29,7 @@
 			</div>
 		</div>
 
-		<div id='modalinit' class='modal' v-show='showModal1' v-if='lastTransaction && [0,3].includes(lastTransaction.type)'>
+		<div id='modalinit' class='modal' v-show='showModal1' v-if='lastTransaction && [0,3].includes(lastTransaction.type)' @click.self='removeTx(lastTransaction)'>
 			<div class='modal-content window white'>
 				<fieldset>
 					<div class='legend2 hoverpointer' @click='removeTx(lastTransaction)'>
