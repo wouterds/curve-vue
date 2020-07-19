@@ -61,6 +61,19 @@
             <ul>
                 <gas-price></gas-price>
 
+                <div id='max_slippage'><span>Max slippage:</span>
+                    <input id="slippage01" type="radio" name="slippage" value='0.1' v-model='maxSlippage'>
+                    <label for="slippage01">0.1%</label>
+
+                    <input id="slippage1" type="radio" name="slippage" checked value='1' v-model='maxSlippage'>
+                    <label for="slippage1">1%</label>
+
+                    <input id="custom_slippage" type="radio" name="slippage" value='-' @click='customippageDisabled = false'>
+                    <label for="custom_slippage" @click='customSlippageDisabled = false'>
+                        <input type="text" id="custom_slippage_input" :disabled='customSlippageDisabled' name="custom_slippage_input" v-model='maxInputSlippage'> %
+                    </label>
+                </div>
+
                 <li>
                     <input id="sync-balances" type="checkbox" name="sync-balances" @change='handle_sync_balances_proportion' :disabled='disabledButtons' checked v-model='sync_balances'>
                     <label for="sync-balances">Add all coins in a balanced proportion</label>
@@ -239,6 +252,9 @@
             set showadvancedoptions(val) {
                 localStorage.setItem('advancedoptions', val)
             },
+            maxSlippage: 1,
+            maxInputSlippage: '',
+            customSlippageDisabled: true,
             loadingAction: false,
             errorStaking: false,
     		slippagePromise: helpers.makeCancelable(Promise.resolve()),
@@ -266,7 +282,10 @@
         		!this.max_balances && this.highlightAllInputs();
         		//await Promise.all([...Array(currentContract.N_COINS).keys()].map(i=>this.change_currency(i, false)))
         		await this.calcSlippage()
-        	}
+        	},
+            getMaxSlippage() {
+                this.getLPCrvReceived()
+            },
         },
         computed: {
           ...getters,
@@ -313,6 +332,11 @@
           },
           stakePercentageInvalid() {
             return this.stakepercentage < 0 || this.stakepercentage > 100
+          },
+          getMaxSlippage() {
+            let maxSlippage = +this.maxSlippage;
+            if(this.maxInputSlippage) maxSlippage = +this.maxInputSlippage;
+            return (100 - maxSlippage)/100
           },
         },
         mounted() {
@@ -578,7 +602,7 @@
                     let token_amounts = this.amounts
                     token_amount = await currentContract.swap.methods.calc_token_amount(token_amounts, true).call();
                     token_amount = BN(token_amount).times(BN(1).minus(BN(this.calcFee)))
-                    token_amount = BN(token_amount).times(0.99).toFixed(0,1);
+                    token_amount = BN(token_amount).times(BN(this.getMaxSlippage)).toFixed(0,1);
                 }
 				if(this.depositc)
 					this.estimateGas = contractGas.deposit[this.currentPool] / 2
@@ -720,7 +744,7 @@
             async getLPCrvReceived() {
                 let inputs = this.inputs.map(v => v || 0)
                 this.lpCrvReceived = (await currentContract.swap.methods
-                    .calc_token_amount(inputs.map((v, i) => BN(v).div(currentContract.c_rates[i]).toFixed(0,1)), true).call() / 1e18) * 0.99
+                    .calc_token_amount(inputs.map((v, i) => BN(v).div(currentContract.c_rates[i]).toFixed(0,1)), true).call() / 1e18) * this.getMaxSlippage
             },
 			async change_currency(i, setInputs = true, event) {
 				if(event) {
