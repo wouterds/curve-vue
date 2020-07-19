@@ -122,6 +122,7 @@
             </div>
         </div>
 
+
         <div id='withdraw_buttons' class='buttons'>
             <div class='info-message gentle-message' id='amount-warning' v-show = 'nobalance'>
 	        	You don't have any available amount to withdraw
@@ -198,6 +199,31 @@
             </div>
             <Slippage v-bind="{show_nobalance, show_nobalance_i}"/>
         </div>
+
+        <div v-show="staked_balance > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)">
+            <button class='simplebutton advancedoptions' @click='showadvancedoptions = !showadvancedoptions'>
+                Advanced unstaking options
+                <span v-show='!showadvancedoptions'>▼</span>
+                <span v-show='showadvancedoptions'>▲</span>
+            </button>
+            <div v-show='showadvancedoptions'>
+                <fieldset>
+                    <legend>Advanced unstaking options:</legend>
+                    <div>
+                        <label for='unstakepercentage'>Unstake %</label>
+                        <input id='unstakepercentage' v-model='unstakepercentage' :class="{'invalid': unstakePercentageInvalid}">
+                        <button id='unstakestaked' 
+                            v-show="staked_balance > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)"
+                            :disabled='unstakePercentageInvalid' 
+                            @click='unstakeStaked()'
+                        >
+                            Unstake {{ unstakeAmount }} staked
+                        </button>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+
     </div>
 </template>
 
@@ -263,6 +289,13 @@
             customSlippageDisabled: true,
             estimateGas: 0,
             ethPrice: 0,
+            unstakepercentage: 100,
+            get showadvancedoptions() {
+                return localStorage.getItem('advancedoptions') === 'true' 
+            },
+            set showadvancedoptions(val) {
+                localStorage.setItem('advancedoptions', val)
+            },
             loadingAction: false,
             warninglow: false,
             showModal: false,
@@ -328,6 +361,12 @@
             },
             gasPriceWei() {
                 return gasPriceStore.state.gasPriceWei
+            },
+            unstakePercentageInvalid() {
+                return this.unstakepercentage < 0 || this.unstakepercentage > 100
+            },
+            unstakeAmount() {
+                return this.toFixed(BN(this.unstakepercentage / 100).times(this.staked_balance / 1e18))
             },
         },
         mounted() {
@@ -642,6 +681,10 @@
                     dismiss()
                     errorStore.handleError(err)
                 }
+            },
+            async unstakeStaked() {
+                let amount = BN(this.unstakepercentage / 100).times(BN(this.staked_balance))
+                this.unstake(amount, false, true)
             },
 			async unstake(amount, exit = false, unstake_only = false) {
                 if(unstake_only)
@@ -1187,5 +1230,26 @@
     }
     .modaltext {
         color: black;
+    }
+    .advancedoptions {
+        margin-top: 1em;
+    }
+    .advancedoptions + div fieldset {
+        margin-top: 1em;
+    }
+    .advancedoptions + div legend {
+        text-align: center;
+    }
+    #unstakestaked {
+        margin-left: 1em;
+    }
+    #unstakepercentage {
+        width: 2.6em;
+    }
+    label[for='unstakepercentage'] {
+        margin-right: 1em;
+    }
+    #unstakepercentage.invalid {
+        background-color: red;
     }
 </style>
