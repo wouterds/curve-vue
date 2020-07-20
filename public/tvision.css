@@ -669,7 +669,7 @@ button.bn-onboard-custom, #derivation-select button, #account-select + button {
   margin-top: 0.3em;
 }
 
-#profit-info label[for='showintokens'] {
+#profit-info label[for='showintokens'], #profit-info label[for='showinBTC'] {
   margin-left: 0.5em;
 }
 
@@ -791,6 +791,6 @@ li.coins label:hover {
   padding-left: 0;
 }
 
-label[for='showinUSD'], label[for='showintokens'] {
+label[for='showinUSD'], label[for='showintokens'], label[for='showinBTC'] {
   cursor: pointer;
 }

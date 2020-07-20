@@ -1,12 +1,15 @@
 <div class='blue window half-width info'>
     <fieldset id='profit-info'>
         <legend>
-            Profit in {{showinUSD ? 'USD' : 'tokens'}}
+            Profit in {{ profitIn }}
             <div class='showinoptions' v-show='!notinpricedata'>
-                <input id="showinUSD" type="checkbox" name="showinUSD" :value='false' :checked='showinUSD == true' @click='showinUSD = !showinUSD'>
+                <input id="showinUSD" type="radio" name="showinUSD" value='1' v-model='showinUSD'>
                 <label for="showinUSD">Show in USD</label>
 
-                <input id="showintokens" type="checkbox" name="showintokens" :value='true' :checked='showinUSD == false' @click='showinUSD = !showinUSD'>
+                <input id="showinBTC" type="radio" name="showinUSD" value='2' v-model='showinUSD'>
+                <label for="showinBTC" v-show="['ren', 'sbtc'].includes(currentPool)">Show in BTC</label>
+
+                <input id="showintokens" type="radio" name="showintokens" value='3' v-model='showinUSD'>
                 <label for="showintokens">Show in tokens</label>
             </div>
         </legend>
@@ -58,7 +61,7 @@
                     :
                 </b>
                 <span :class="{'loading line': dailyAPY === null}">
-                    <span v-show='dailyAPY !== null'> {{((showAvailable + showStakedBalance) * dailyAPY / 100).toFixed(2)}} {{showinUSD ? 'USD' : 'tokens'}}</span>
+                    <span v-show='dailyAPY !== null'> {{((showAvailable + showStakedBalance) * dailyAPY / 100).toFixed(2)}} {{ profitIn }}</span>
                 </span>
             </li>
             <br>
@@ -71,24 +74,24 @@
                 </a>
 
                 <li :class="{'loading line': earnedSNX === null}">
-                    <b>Pending SNX LP rewards:</b> <span v-show='earnedSNX !== null'> {{showEarnedSNX}} {{showinUSD ? 'USD' : 'SNX'}}</span>
+                    <b>Pending SNX LP rewards:</b> <span v-show='earnedSNX !== null'> {{showEarnedSNX}} {{[1,3].includes(showinUSD) ? 'USD' : 'SNX'}}</span>
                 </li>
                 <li v-show="currentPool == 'sbtc'" :class="{'loading line': earnedREN === null}">
-                    <b>Pending REN LP rewards:</b> <span v-show='earnedREN !== null'> {{showEarnedREN}} {{showinUSD ? 'USD' : 'REN'}}</span>
+                    <b>Pending REN LP rewards:</b> <span v-show='earnedREN !== null'> {{showEarnedREN}} {{[1,3].includes(showinUSD) ? 'USD' : 'REN'}}</span>
                 </li>
 
                 <li :class="{'loading line': earnedSNX === null}">
-                    <b>Paid SNX LP rewards:</b> <span v-show='paidRewardsSNX !== null'> {{showRewardsSNX}} {{showinUSD ? 'USD' : 'SNX'}}</span>
+                    <b>Paid SNX LP rewards:</b> <span v-show='paidRewardsSNX !== null'> {{showRewardsSNX}} {{[1,3].includes(showinUSD) ? 'USD' : 'SNX'}}</span>
                 </li>
                 <li v-show="currentPool == 'sbtc'" :class="{'loading line': earnedSNX === null}">
-                    <b>Paid REN LP rewards:</b> <span v-show='paidRewardsREN !== null'> {{showRewardsREN}} {{showinUSD ? 'USD' : 'REN'}}</span>
+                    <b>Paid REN LP rewards:</b> <span v-show='paidRewardsREN !== null'> {{showRewardsREN}} {{[1,3].includes(showinUSD) ? 'USD' : 'REN'}}</span>
                 </li>
 
                 <li :class="{'loading line': weeklyEstimateSNX === null}" v-show="currentPool == 'susdv2' && showStakedBalance > 0">
-                    <b>Estimated weekly SNX LP rewards:</b> <span v-show='weeklyEstimateSNX !== null'> {{showWeeklySNX}} {{showinUSD ? 'USD' : 'SNX'}}</span>
+                    <b>Estimated weekly SNX LP rewards:</b> <span v-show='weeklyEstimateSNX !== null'> {{showWeeklySNX}} {{[1,3].includes(showinUSD) ? 'USD' : 'SNX'}}</span>
                 </li>
                 <li v-show="currentPool == 'sbtc' && showStakedBalance > 0" :class="{'loading line': weeklyEstimateBPT === null}">
-                    <b>Estimated weekly BPT LP rewards:</b> <span v-show='weeklyEstimateBPT !== null'> {{showWeeklyBPT}} {{showinUSD ? 'USD' : 'BPT'}}</span>
+                    <b>Estimated weekly BPT LP rewards:</b> <span v-show='weeklyEstimateBPT !== null'> {{showWeeklyBPT}} {{[1,3].includes(showinUSD) ? 'USD' : 'BPT'}}</span>
                 </li>
 
                 <li>
@@ -101,7 +104,7 @@
                     :</b> 
                     <span :class="{'loading line': available == -1}"> 
                         <span v-show='available != -1'>
-                            {{ toFixed(+showProfit + +showEarnedSNX + +showEarnedREN + +showRewardsSNX + +showRewardsREN) }} {{showinUSD ? 'USD' : '' }}
+                            {{ toFixed(+showProfit + +showEarnedSNX + +showEarnedREN + +showRewardsSNX + +showRewardsREN) }} {{[1,3].includes(showinUSD) ? 'USD' : '' }}
                         </span>
                     </span>
                 </li>
@@ -123,13 +126,13 @@
                 <a href='https://medium.com/iearn/earning-yfi-y-curve-fi-53b5fd347f0f' class='tooltip'>[?]</a>
 
                 <li :class="{'loading line': earnedYFI === null}">
-                    <b>Pending YFI LP rewards:</b> <span v-show='earnedYFI !== null'> {{showEarnedYFI}} {{showinUSD ? 'USD' : 'YFI'}}</span>
+                    <b>Pending YFI LP rewards:</b> <span v-show='earnedYFI !== null'> {{showEarnedYFI}} {{[1,3].includes(showinUSD) ? 'USD' : 'YFI'}}</span>
                 </li>
                 <li :class="{'loading line': earnedYFI === null}">
-                    <b>Paid YFI LP rewards:</b> <span v-show='paidRewardsYFI !== null'> {{showRewardsYFI}} {{showinUSD ? 'USD' : 'YFI'}}</span>
+                    <b>Paid YFI LP rewards:</b> <span v-show='paidRewardsYFI !== null'> {{showRewardsYFI}} {{[1,3].includes(showinUSD) ? 'USD' : 'YFI'}}</span>
                 </li>
                 <li v-show="showStakedBalance > 0" :class="{'loading line': weeklyEstimateYFI === null}">
-                    <b>Estimated weekly YFI LP rewards:</b> <span v-show='weeklyEstimateYFI !== null'> {{showWeeklyYFI}} {{showinUSD ? 'USD' : 'YFI'}}</span>
+                    <b>Estimated weekly YFI LP rewards:</b> <span v-show='weeklyEstimateYFI !== null'> {{showWeeklyYFI}} {{[1,3].includes(showinUSD) ? 'USD' : 'YFI'}}</span>
                 </li>
                 <li :class="{'loading line': claimableADAI === null}">
                     <b>Claimable aDAI:</b> <span v-show='claimableADAI !== null'> {{claimableADAI && claimableADAI.toFixed(2)}} aDAI</span>

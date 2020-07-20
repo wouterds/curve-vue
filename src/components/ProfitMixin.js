@@ -223,7 +223,7 @@ export default {
 		    //check if timestamp was before recording, this is only for when timestamp > latest recorded, get latest recorded
 		    if(timestamp < this.priceData[0].timestamp) {
 		    	this.notinpricedata = true
-		    	this.showinUSD = false;
+		    	this.showinUSD = 3;
 		    	return this.priceData[0];
 		    }
 		    if(dates === undefined) return this.priceData[this.priceData.length-1]
@@ -423,6 +423,7 @@ export default {
 
 		    let depositUsdSum = 0;
 		    this.depositsUSD = 0;
+		    this.depositsBTC = 0
 		    let allDepositsUSD = 0
 
 		    let fromBlock = this.fromBlock;
@@ -435,6 +436,7 @@ export default {
 		        depositUsdSum += +localStorage.getItem(this.currentPool + 'lastDeposits')
 		        this.depositsUSD = allDepositsUSD = +localStorage.getItem(this.currentPool + 'lastDepositsUSD')
 		        if(['ren', 'sbtc'].includes(this.currentPool)) {
+		        	this.depositsBTC = this.depositsUSD
 		        	this.depositsUSD = this.depositsUSD * this.btcPrice
 		        }
 		    }
@@ -481,7 +483,10 @@ export default {
 	             ].includes(transfer[0].topics[1])) continue;
 	            let depositsUSD = transferTokens * poolInfoPoint.virtual_price / 1e36
 	        	allDepositsUSD += depositsUSD
-	            if(['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) this.depositsUSD += depositsUSD * poolInfoPoint.btcPrice
+	            if(['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) {
+	            	this.depositsUSD += depositsUSD * poolInfoPoint.btcPrice
+	            	this.depositsBTC += depositsUSD
+	            }
 	            else
 	            	this.depositsUSD += depositsUSD
 	            console.log(transferTokens)
@@ -515,6 +520,7 @@ export default {
 		    default_account = default_account.substr(2).toLowerCase();
 		    let withdrawals = 0;
 		    this.withdrawalsUSD = 0;
+		    this.withdrawalsBTC = 0;
 		    let allWithdrawalsUSD = 0
 		    let fromBlock = this.fromBlock;
 		    if(localStorage.getItem(this.currentPool + 'wversion') == this.version 
@@ -526,7 +532,10 @@ export default {
 			        fromBlock = '0x'+parseInt(block+1).toString(16)
 			        withdrawals += +localStorage.getItem(this.currentPool + 'lastWithdrawals')
 			        this.withdrawalsUSD = allWithdrawalsUSD = +localStorage.getItem(this.currentPool + 'lastWithdrawalsUSD')
-			        if(['ren', 'sbtc'].includes(this.currentPool)) this.withdrawalsUSD = this.withdrawalsUSD * this.btcPrice
+			        if(['ren', 'sbtc'].includes(this.currentPool)) {
+			        	this.withdrawalsBTC = this.withdrawalsUSD
+			        	this.withdrawalsUSD = this.withdrawalsUSD * this.btcPrice
+			        }
 		    }
 		    const logs = await currentContract.web3.eth.getPastLogs({
 		        fromBlock: fromBlock,
@@ -573,7 +582,10 @@ export default {
         			].includes(transfer[0].topics[2])) continue;
             	let withdrawalsUSD = transferTokens * poolInfoPoint.virtual_price / 1e36
             	allWithdrawalsUSD += withdrawalsUSD
-            	if(['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) this.withdrawalsUSD += withdrawalsUSD * poolInfoPoint.btcPrice
+            	if(['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) {
+            		this.withdrawalsUSD += withdrawalsUSD * poolInfoPoint.btcPrice
+            		this.withdrawalsBTC += withdrawalsUSD
+            	}
 	            else
 	            	this.withdrawalsUSD += withdrawalsUSD
 		        if(removeliquidity.length) {

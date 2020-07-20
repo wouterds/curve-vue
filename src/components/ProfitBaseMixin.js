@@ -46,10 +46,13 @@ export default {
     profit: -1,
 		profit: '',
     depositsUSD: -1,
+    depositsBTC: -1,
     withdrawalsUSD: -1,
+    withdrawalsBTC: -1,
     availableUSD: -1,
     profitUSD: -1,
-    showinUSD: true,
+    showinUSD: 1,
+    showinBTC: false,
 		BN: '',
 		priceData: '',
     priceData5m: '',
@@ -66,24 +69,31 @@ export default {
         return process.env.VUE_APP_VERSION
       },
       showDeposits() {
-      if(this.showinUSD) return this.depositsUSD;
-        return (this.deposits / 100)
+      if(this.showinUSD == 1) return this.depositsUSD;
+      if(this.showinUSD == 2) return this.depositsBTC
+      return (this.deposits / 100)
       },
       showWithdrawals() {
-      if(this.showinUSD) return this.withdrawalsUSD;
-        return (this.withdrawals / 100)
+      if(this.showinUSD == 1) return this.withdrawalsUSD;
+      if(this.showinUSD == 2) return this.withdrawalsBTC
+      return (this.withdrawals / 100)
       },
       showAvailable() {
-      if(this.showinUSD) return this.availableUSD;
-        return (this.available / 100)
+      if(this.showinUSD == 1) return this.availableUSD;
+      return (this.available / 100)
       },
       showStakedBalance() {
       if(!['susdv2', 'sbtc', 'y', 'iearn'].includes(this.currentPool)) return 0
-      if(this.showinUSD) return this.getStakedBalanceUSD;
-        return (this.getStakedBalance / 100); 
+      if(this.showinUSD == 1) return this.getStakedBalanceUSD;
+      return (this.getStakedBalance / 100); 
       },
       showProfit() {
         return ((+this.showAvailable + +this.showStakedBalance) + +this.showWithdrawals - +this.showDeposits) || 0
+      },
+      profitIn() {
+        if(this.showinUSD == 1) return 'USD'
+        if(this.showinUSD == 2) return 'BTC'
+        if(this.showinUSD == 3) return 'tokens'
       },
     },
     beforeDestroy() {
@@ -94,7 +104,7 @@ export default {
             if(num == 0) return 0
             if(num == '' || num === null || num === undefined) return ''
             if(precisions == 2 && ['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) precisions = 8
-            if(this.showinUSD) precisions = 2
+            if(this.showinUSD == 1) precisions = 2
             let rounded = helpers.formatNumber(num, precisions)
             return rounded
         },
