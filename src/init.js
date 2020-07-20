@@ -148,9 +148,14 @@ export const onboard = Onboard({
       }
     },
     address: account => {
-      if(state.contract.default_account && state.contract.initializedContracts)
-        common.update_fee_info()
-      state.contract.default_account = account;
+      if(account === undefined) {
+        changeWallets()
+      }
+      else {
+        if(state.contract.default_account && state.contract.initializedContracts)
+          common.update_fee_info()
+        state.contract.default_account = account;
+      }
     }
   },
   walletSelect: {
@@ -191,6 +196,15 @@ async function init(init = true, name, walletlink = false) {
     console.error(err)
   }
 
+}
+
+export async function changeWallets() {
+  state.contract.default_account = ''
+  await onboard.walletReset()
+  localStorage.removeItem('selectedWallet')
+  state.contract.totalShare = 0
+  let userSelectedWallet = await onboard.walletSelect();
+  await onboard.walletCheck();
 }
 
 export default init;

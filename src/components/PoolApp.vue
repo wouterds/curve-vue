@@ -128,7 +128,7 @@
 <script>
   import BalancesInfo from '../components/BalancesInfo.vue'
   import { getters, contract as currentContract, changeContract, poolMenu } from '../contract'
-  import init, { onboard } from '../init'
+  import init, { onboard, changeWallets } from '../init'
   import allabis from '../allabis'
 
   export default {
@@ -181,12 +181,7 @@
         changeContract(pool)
       },
       async changeWallets() {
-        currentContract.default_account = ''
-        onboard.walletReset()
-        localStorage.removeItem('selectedWallet')
-        currentContract.totalShare = 0
-        let userSelectedWallet = await onboard.walletSelect();
-        await onboard.walletCheck();
+        changeWallets()
       },
       async changeAccounts() {
         return onboard.accountSelect();
