@@ -705,6 +705,11 @@
                 
                 var { dismiss } = notifyNotification(this.waitingMessage)
 
+                let stakedAmount = BN(await currentContract.curveRewards.methods.balanceOf(currentContract.default_account).call())
+
+                if(stakedAmount.lt(amount))
+                    amount = stakedAmount
+
                 try {
     				await new Promise((resolve, reject) => {
     					currentContract.curveRewards.methods.withdraw(amount.toFixed(0,1))
