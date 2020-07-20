@@ -560,6 +560,9 @@ export default {
     								&& log.topics[2] != '0x000000000000000000000000' + default_account)
 	        	if(!transfer.length) continue
 	            let transferTokens = +transfer[0].data
+	        	if(transfer.find(tr => tr.topics[2] == "0x00000000000000000000000031fe9b68887842dc94b6e5960290d8023d9355b6")) {
+	        		transferTokens = +transfer[1].data
+	        	}
 	            console.log(transferTokens / 1e18, poolInfoPoint.virtual_price, transferTokens * poolInfoPoint.virtual_price / 1e36)
 	            console.log(transfer)
 	            console.log("WITHDRAWALS")
