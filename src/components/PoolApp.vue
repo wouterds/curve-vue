@@ -30,6 +30,7 @@
             <router-link to='/volumepercoin'>Coin volumes</router-link>
             <a href="https://twitter.com/CurveFinance">#Twitter</a>
             <a href="https://t.me/curvefi">@Telegram</a>
+            <a href="https://t.me/curveficn">@Telegram CN</a>
             <a href="https://discord.gg/9uEHakc" rel='noopener noreferrer'>@Discord</a>
             <a href="https://explore.duneanalytics.com/public/dashboards/RTH47mNjQcoLv5oG0HMDdI0iDq7BHxk1PzCRdwQB">Dune Analytics</a>
             <p>____________</p>
@@ -114,6 +115,7 @@
       <a :href="'https://etherscan.io/address/' + this.tokenAddress" rel='noopener noreferrer'>Token contract</a>
       <a href="https://twitter.com/CurveFinance" rel='noopener noreferrer'>#Twitter</a>
       <a href="https://t.me/curvefi" rel='noopener noreferrer'>@Telegram</a>
+      <a href="https://t.me/curveficn" rel='noopener noreferrer'>@Telegram CN</a>
       <a href="https://discord.gg/9uEHakc" rel='noopener noreferrer'>@Discord</a>
       <a href="https://explore.duneanalytics.com/public/dashboards/RTH47mNjQcoLv5oG0HMDdI0iDq7BHxk1PzCRdwQB" rel='noopener noreferrer'>Dune Analytics</a>
       <a href="https://github.com/curvefi/curve-contract">git@</a>
