@@ -395,6 +395,7 @@
                 }
                 if(['sbtc'].includes(this.currentPool)) {
                     this.balancerPool = new currentContract.web3.eth.Contract(balancer_ABI, balancer_address)
+                    window.balancerPool = this.balancerPool
                     let calls = [
                         [curveRewards._address, curveRewards.methods.earned(this.default_account).encodeABI()],
                         [this.balancerPool._address, this.balancerPool.methods.totalSupply().encodeABI()],
@@ -610,9 +611,11 @@
                             .once('transactionHash', hash => {
                                 dismiss()
                                 notifyHandler(hash)
+                            })
+                            .on('receipt', () => {
+                                this.pendingSNXRewards = 0
                                 resolve()
                             })
-                            .on('receipt', () => this.pendingSNXRewards = 0)
                             .catch(err => {
                                 errorStore.handleError(err)
                                 dismiss()
@@ -1027,7 +1030,6 @@
                 this.show_loading = false;
                 this.waitingMessage = ''
                 this.estimateGas = 0
-                this.gasPrice = 0
 
 			    await this.update_balances();
 			    await common.update_fee_info();

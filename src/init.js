@@ -6,7 +6,7 @@ import Authereum from "authereum";
 import BurnerConnectProvider from "@burner-wallet/burner-connect-provider";
 */
 import Onboard from 'bnc-onboard'
-import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
+//import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
 
 import Notify from "bnc-notify"
 
