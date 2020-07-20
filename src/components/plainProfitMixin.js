@@ -38,37 +38,37 @@ export default {
 		},
 
 		showEarnedSNX() {
-			if(this.showinUSD) return (+this.earnedSNX * this.snxPrice).toFixed(2)
+			if(this.showinUSD == 1) return (+this.earnedSNX * this.snxPrice).toFixed(2)
 			return (+this.earnedSNX).toFixed(2)
 		},
 
 		showEarnedREN() {
-			if(this.showinUSD) return (+this.earnedREN * this.renPrice).toFixed(2)
+			if(this.showinUSD == 1) return (+this.earnedREN * this.renPrice).toFixed(2)
 			return (+this.earnedREN).toFixed(2)
 		},
 
 		showRewardsSNX() {
-			if(this.showinUSD) return (+this.paidRewardsSNX * this.snxPrice).toFixed(3)
+			if(this.showinUSD == 1) return (+this.paidRewardsSNX * this.snxPrice).toFixed(3)
 			return (+this.paidRewardsSNX).toFixed(2)
 		},
 
 		showRewardsREN() {
-			if(this.showinUSD) return (+this.paidRewardsREN * this.renPrice).toFixed(3)
+			if(this.showinUSD == 1) return (+this.paidRewardsREN * this.renPrice).toFixed(3)
 			return (+this.paidRewardsREN).toFixed(2)
 		},
 
 		showWeeklySNX() {
-			if(this.showinUSD) return (+this.weeklyEstimateSNX * this.snxPrice).toFixed(3)
+			if(this.showinUSD == 1) return (+this.weeklyEstimateSNX * this.snxPrice).toFixed(3)
 			return (+this.weeklyEstimateSNX).toFixed(2)
 		},
 
 		showWeeklyREN() {
-			if(this.showinUSD) return (+this.weeklyEstimateREN * this.snxPrice).toFixed(3)
+			if(this.showinUSD == 1) return (+this.weeklyEstimateREN * this.snxPrice).toFixed(3)
 			return (+this.weeklyEstimateREN).toFixed(2)
 		},
 
 		showWeeklyBPT() {
-			if(this.showinUSD) return (+this.weeklyEstimateBPT * this.BPTPrice).toFixed(2)
+			if(this.showinUSD == 1) return (+this.weeklyEstimateBPT * this.BPTPrice).toFixed(2)
 			return (+this.weeklyEstimateBPT).toFixed(4)
 		},
 	},

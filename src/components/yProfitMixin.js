@@ -25,17 +25,17 @@ export default {
 
 	computed: {
 		showEarnedYFI() {
-			if(this.showinUSD) return (+this.earnedYFI * this.yfiPrice).toFixed(2)
+			if(this.showinUSD == 1) return (+this.earnedYFI * this.yfiPrice).toFixed(2)
 			return (+this.earnedYFI).toFixed(2)
 		},
 
 		showRewardsYFI() {
-			if(this.showinUSD) return (+this.paidRewardsYFI * this.yfiPrice).toFixed(2)
+			if(this.showinUSD == 1) return (+this.paidRewardsYFI * this.yfiPrice).toFixed(2)
 			return (+this.paidRewardsYFI).toFixed(2)
 		},
 
 		showWeeklyYFI() {
-			if(this.showinUSD) return (+this.weeklyEstimateYFI * this.yfiPrice).toFixed(2)
+			if(this.showinUSD == 1) return (+this.weeklyEstimateYFI * this.yfiPrice).toFixed(2)
 			return (+this.weeklyEstimateYFI).toFixed(2)
 		},
 
