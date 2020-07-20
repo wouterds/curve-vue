@@ -606,7 +606,7 @@
                             .send({
                                 from: currentContract.default_account,
                                 gasPrice: this.gasPriceWei,
-                                gas: 800000,
+                                gas: 400000,
                             })
                             .once('transactionHash', hash => {
                                 dismiss()
