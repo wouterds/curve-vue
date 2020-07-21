@@ -133,7 +133,7 @@
         lower fields. You'll get charge with the exchange fee in the latter
         case.</p>
 
-        <a href='https://curve-dev.now.sh' class='devserver'>Development environment</a>
+        <a href='https://curve-dev.vercel.app' class='devserver'>Development environment</a>
     </div>
 
 </template>
