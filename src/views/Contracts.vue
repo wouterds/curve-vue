@@ -15,6 +15,15 @@
 	                		<span class='text'>Curve Registry docs</span>
 	                	</a>
 	            </fieldset>
+	            <fieldset>
+	            	<legend>Insurance</legend>
+	                	<a href = "https://app.nexusmutual.io/#/SmartContractCover">
+	                		<img class='icon' :src="publicPath + 'curveIcons/nexusmutual.png'"> <span class='text'>Stablecoin pools - curvev2.nexusmutual.eth</span>
+	                	</a>
+	                	<a href = "https://etherscan.io/address/0xc1DB00a8E5Ef7bfa476395cdbcc98235477cDE4E">
+	                		<img class='icon' :src="publicPath + 'curveIcons/nexusmutual.png'"> <span class='text'>BTC pools - curvebtc.nexusmutual.eth</span>
+	                	</a>
+	            </fieldset>
 	            <fieldset v-for = '(addresses, i) in contractAddresses'>
 	            	<legend>{{allPools[i]}}</legend>
 	                	<a :href = "'https://etherscan.io/address/' + addresses.swap">
