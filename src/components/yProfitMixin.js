@@ -113,7 +113,7 @@ export default {
 		    if(direction == 1) {
 		        fromBlock = '0x'+parseInt(block).toString(16)
 		        toBlock = '0x'+parseInt(block+100).toString(16)
-		        toBlock = 'latest'
+		        //toBlock = 'latest'
 		    }
 		    if(direction == 0) {
 		        fromBlock = '0x'+parseInt(block-1).toString(16)
