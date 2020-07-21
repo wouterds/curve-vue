@@ -210,15 +210,20 @@
                 <fieldset>
                     <legend>Advanced unstaking options:</legend>
                     <div>
-                        <label for='unstakepercentage'>Unstake %</label>
-                        <input id='unstakepercentage' v-model='unstakepercentage' :class="{'invalid': unstakePercentageInvalid}">
-                        <button id='unstakestaked' 
-                            v-show="staked_balance > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)"
-                            :disabled='unstakePercentageInvalid' 
-                            @click='unstakeStaked()'
-                        >
-                            Unstake {{ unstakeAmount }} staked
-                        </button>
+                        <div id='stakedbalance'>
+                            Staked tokens: <span @click='unstakepercentage = staked_balance / 1e18'>{{ (staked_balance / 1e18).toFixed(2) }}</span>
+                        </div>
+                        <div>
+                            <label for='unstakepercentage'>Unstake</label>
+                            <input id='unstakepercentage' v-model='unstakepercentage' :class="{'invalid': unstakePercentageInvalid}">
+                            <button id='unstakestaked' 
+                                v-show="staked_balance > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)"
+                                :disabled='unstakePercentageInvalid' 
+                                @click='unstakeStaked()'
+                            >
+                                Unstake staked
+                            </button>
+                        </div>
                     </div>
                 </fieldset>
             </div>
@@ -363,7 +368,7 @@
                 return gasPriceStore.state.gasPriceWei
             },
             unstakePercentageInvalid() {
-                return this.unstakepercentage < 0 || this.unstakepercentage > 100
+                return BN(this.unstakepercentage).times(1e18).gt(BN(this.staked_balance).times(1.01))
             },
             unstakeAmount() {
                 return this.toFixed(BN(this.unstakepercentage / 100).times(this.staked_balance / 1e18))
@@ -686,7 +691,7 @@
             //     }
             // },
             async unstakeStaked() {
-                let amount = BN(this.unstakepercentage / 100).times(BN(this.staked_balance))
+                let amount = BN(this.unstakepercentage).times(1e18)
                 this.unstake(amount, false, true)
             },
 			async unstake(amount, exit = false, unstake_only = false) {
@@ -1251,12 +1256,20 @@
         margin-left: 1em;
     }
     #unstakepercentage {
-        width: 2.6em;
+        width: 5.1em;
+    }
+    #stakedbalance span {
+        cursor: pointer;
+        border-bottom: 1px solid black;
+        border-bottom-style: dashed;
     }
     label[for='unstakepercentage'] {
         margin-right: 1em;
     }
     #unstakepercentage.invalid {
         background-color: red;
+    }
+    #stakedbalance + div {
+        margin-top: 1em;
     }
 </style>
