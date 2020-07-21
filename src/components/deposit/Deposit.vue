@@ -61,19 +61,6 @@
             <ul>
                 <gas-price></gas-price>
 
-                <div id='max_slippage'><span>Max slippage:</span>
-                    <input id="slippage01" type="radio" name="slippage" value='0.1' v-model='maxSlippage'>
-                    <label for="slippage01">0.1%</label>
-
-                    <input id="slippage1" type="radio" name="slippage" checked value='1' v-model='maxSlippage'>
-                    <label for="slippage1">1%</label>
-
-                    <input id="custom_slippage" type="radio" name="slippage" value='-' @click='customippageDisabled = false'>
-                    <label for="custom_slippage" @click='customSlippageDisabled = false'>
-                        <input type="text" id="custom_slippage_input" :disabled='customSlippageDisabled' name="custom_slippage_input" v-model='maxInputSlippage'> %
-                    </label>
-                </div>
-
                 <li>
                     <input id="sync-balances" type="checkbox" name="sync-balances" @change='handle_sync_balances_proportion' :disabled='disabledButtons' checked v-model='sync_balances'>
                     <label for="sync-balances">Add all coins in a balanced proportion</label>
@@ -102,7 +89,7 @@
             </div>
             <p style="text-align: center" class='buttons'>
                 <button id="add-liquidity" 
-                    :disabled="currentPool == 'susdv2' && slippage < -0.03 || depositingZeroWarning"
+                    :disabled="currentPool == 'susdv2' && slippage < -0.03 || depositingZeroWarning || isZeroSlippage"
                     @click='justDeposit = true; handle_add_liquidity()' 
                     >
                         Deposit <span class='loading line' v-show='loadingAction == 1'></span>
@@ -110,7 +97,7 @@
                 <button 
                     id='add-liquidity-stake' 
                     v-show="['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)" 
-                    :disabled = 'slippage < -0.03 || depositingZeroWarning'
+                    :disabled = 'slippage < -0.03 || depositingZeroWarning || isZeroSlippage'
                     @click = 'justDeposit = false; deposit_stake()'>
                     Deposit and stake <span class='loading line' v-show='loadingAction == 2'></span>
                 </button>
@@ -131,13 +118,13 @@
                 </p>
                 <div v-show="totalShare > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)">
                     <button class='simplebutton advancedoptions' @click='showadvancedoptions = !showadvancedoptions'>
-                        Advanced staking options
+                        Advanced options
                         <span v-show='!showadvancedoptions'>▼</span>
                         <span v-show='showadvancedoptions'>▲</span>
                     </button>
                     <div v-show='showadvancedoptions'>
                         <fieldset>
-                            <legend>Advanced staking options:</legend>
+                            <legend>Advanced options:</legend>
                             <div>
                                 <label for='stakepercentage'>Stake %</label>
                                 <input id='stakepercentage' v-model='stakepercentage' :class="{'invalid': stakePercentageInvalid}">
@@ -149,8 +136,33 @@
                                     Stake unstaked <span class='loading line' v-show='loadingAction == 3'></span>
                                 </button>
                             </div>
+
+                            <div id='max_slippage'>
+                                <span class='tooltip'>
+                                    Max slippage:
+                                    <span class='tooltiptext long'>
+                                        Customize the maximum slippage you can get when depositing
+                                    </span>
+                                </span>
+                                <input id="slippage01" type="radio" name="slippage" value='0.1' v-model='maxSlippage'>
+                                <label for="slippage01">0.1%</label>
+
+                                <input id="slippage1" type="radio" name="slippage" checked value='1' v-model='maxSlippage'>
+                                <label for="slippage1">1%</label>
+
+                                <input id="custom_slippage" type="radio" name="slippage" value='-' @click='customippageDisabled = false'>
+                                <label for="custom_slippage" @click='customSlippageDisabled = false'>
+                                    <input type="text" id="custom_slippage_input" :disabled='customSlippageDisabled' :class="{'invalid': warningInputSlippage}" name="custom_slippage_input" v-model='maxInputSlippage'> %
+                                </label>
+
+                                <div class='simple-error' v-show='warningInputSlippage'>
+                                    {{ maxInputSlippage }}% is too low of a slippage - your transaction may fail 
+                                </div>
+                            </div>
                         </fieldset>
+
                     </div>
+
                 </div>
                 <p class='trade-buttons' v-show="['ren', 'sbtc'].includes(currentPool)">
                     <a href='https://bridge.renproject.io/'>Mint/redeem renBTC</a>
@@ -337,6 +349,13 @@
             let maxSlippage = +this.maxSlippage;
             if(this.maxInputSlippage) maxSlippage = +this.maxInputSlippage;
             return (100 - maxSlippage)/100
+          },
+          warningInputSlippage() {
+            if(!this.maxInputSlippage) return false
+            return +this.maxInputSlippage < 0.5
+          },
+          isZeroSlippage() {
+            return this.maxInputSlippage !== '' && (+this.maxInputSlippage == 0 || isNaN(this.maxInputSlippage))
           },
         },
         mounted() {
@@ -847,7 +866,10 @@
     label[for='stakepercentage'] {
         margin-right: 1em;
     }
-    #stakepercentage.invalid {
+    #stakepercentage.invalid, #max_slippage .invalid {
         background-color: red;
+    }
+    #max_slippage {
+        margin-top: 0.4em;
     }
 </style>
