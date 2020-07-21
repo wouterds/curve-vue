@@ -149,6 +149,7 @@ export const onboard = Onboard({
     },
     address: account => {
       if(account === undefined) {
+        if(localStorage.getItem('-walletlink:https://www.walletlink.org:session:id') === null)
         changeWallets()
       }
       else {
