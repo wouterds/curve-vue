@@ -106,7 +106,7 @@
 
         <gas-price></gas-price>
 
-        <div id='modal' class='modal' v-show='showModal' @click.self='showModal = false'>
+        <!-- <div id='modal' class='modal' v-show='showModal' @click.self='showModal = false'>
             <div class='modal-content window white'>
                 <fieldset>
                     <div class='legend2 hoverpointer' @click='showModal = false'>
@@ -120,7 +120,7 @@
                     <button @click='showModal = false' class='buttoncancel'>Cancel</button>
                 </fieldset>
             </div>
-        </div>
+        </div> -->
 
 
         <div id='withdraw_buttons' class='buttons'>
@@ -161,7 +161,7 @@
             >
                 Withdraw {{(withdrawSNXPool / 1e18).toFixed(0)}} SNX + {{(withdrawRENPool / 1e18).toFixed(0)}} REN
             </button>
-            <button id='claim-adai' 
+            <!-- <button id='claim-adai' 
                 @click='showModal = true'
                 v-show="['y', 'iearn'].includes(currentPool) && withdrawADAI > 0"
             >
@@ -171,7 +171,7 @@
                         Burn your YFI tokens to receive aDAI tokens
                     </span>
                 </span>
-            </button>
+            </button> -->
             <button id='unstake-snx'
                 @click='handle_remove_liquidity(true, true)'
                 v-show="['susdv2', 'sbtc','y','iearn'].includes(currentPool) && staked_balance > 0"
@@ -650,41 +650,41 @@
                 this.show_loading = false
 
             },
-            async claimYFIaDAI() {
-                this.estimateGas = 50000
+            // async claimYFIaDAI() {
+            //     this.estimateGas = 50000
 
-                var { dismiss } = notifyNotification('Please confirm approval to burn YFI for aDAI')
+            //     var { dismiss } = notifyNotification('Please confirm approval to burn YFI for aDAI')
 
-                try {
+            //     try {
 
-                    let balance = BN(await currentContract.aRewards.methods.claimable(currentContract.default_account).call())
-                    let yFI = new currentContract.web3.eth.Contract(ERC20_abi, '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e')
-                    await common.approveAmount(yFI, balance, currentContract.default_account, currentContract.aRewards._address)
-                    dismiss()
+            //         let balance = BN(await currentContract.aRewards.methods.claimable(currentContract.default_account).call())
+            //         let yFI = new currentContract.web3.eth.Contract(ERC20_abi, '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e')
+            //         await common.approveAmount(yFI, balance, currentContract.default_account, currentContract.aRewards._address)
+            //         dismiss()
 
-                    var { dismiss1 } = notifyNotification('Please confirm burning YFI to aDAI transaction')
+            //         var { dismiss1 } = notifyNotification('Please confirm burning YFI to aDAI transaction')
 
-                    await currentContract.aRewards.methods.claim(balance.toFixed(0,1))
-                    .send({
-                        from: currentContract.default_account,
-                        gasPrice: this.gasPriceWei,
-                        gas: 125000,
-                    })
-                    .once('transactionHash', hash => {
-                        dismiss1()
-                        notifyHandler(hash)
-                    })
-                    .on('error', err => {
-                        dismiss1()
-                        throw err
-                    })
-                }
-                catch(err) {
-                    console.log(err)
-                    dismiss()
-                    errorStore.handleError(err)
-                }
-            },
+            //         await currentContract.aRewards.methods.claim(balance.toFixed(0,1))
+            //         .send({
+            //             from: currentContract.default_account,
+            //             gasPrice: this.gasPriceWei,
+            //             gas: 125000,
+            //         })
+            //         .once('transactionHash', hash => {
+            //             dismiss1()
+            //             notifyHandler(hash)
+            //         })
+            //         .on('error', err => {
+            //             dismiss1()
+            //             throw err
+            //         })
+            //     }
+            //     catch(err) {
+            //         console.log(err)
+            //         dismiss()
+            //         errorStore.handleError(err)
+            //     }
+            // },
             async unstakeStaked() {
                 let amount = BN(this.unstakepercentage / 100).times(BN(this.staked_balance))
                 this.unstake(amount, false, true)
@@ -736,8 +736,8 @@
     				})
                     if(exit) {
         				this.claim_SNX()
-                        if(['y', 'iearn'].includes(this.currentPool))
-                            this.showModal = true
+                        //if(['y', 'iearn'].includes(this.currentPool))
+                            //this.showModal = true
                     }
                 }
                 catch(err) {
