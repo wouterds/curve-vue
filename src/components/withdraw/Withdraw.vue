@@ -214,7 +214,7 @@
                             Staked tokens: <span @click='unstakepercentage = staked_balance / 1e18'>{{ (staked_balance / 1e18).toFixed(2) }}</span>
                         </div>
                         <div>
-                            <label for='unstakepercentage'>Unstake</label>
+                            <label for='unstakepercentage'>Unstake:</label>
                             <input id='unstakepercentage' v-model='unstakepercentage' :class="{'invalid': unstakePercentageInvalid}">
                             <button id='unstakestaked' 
                                 v-show="staked_balance > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)"
@@ -294,7 +294,7 @@
             customSlippageDisabled: true,
             estimateGas: 0,
             ethPrice: 0,
-            unstakepercentage: 100,
+            unstakepercentage: 0,
             get showadvancedoptions() {
                 return localStorage.getItem('advancedoptions') === 'true' 
             },
@@ -518,6 +518,7 @@
                 console.log(decoded[decoded.length-2])
                 if(['susdv2', 'sbtc','y','iearn'].includes(this.currentPool)) this.staked_balance = BN(decoded[decoded.length-2])
                 else this.staked_balance = BN(0)
+                this.unstakepercentage = this.toFixed(this.staked_balance.div(1e18))
 				this.token_supply = +decoded[decoded.length-1]
 			},
 			async handle_change_amounts(i, event) {
