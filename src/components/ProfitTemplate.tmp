@@ -1,18 +1,21 @@
 <div class='blue window half-width info'>
     <fieldset id='profit-info'>
         <legend>
-            Profit in {{ profitIn }}
+        Profit in {{ profitIn }} {{ profitIn == 'USD' ? '[Virtual profit]' : profitIn == 'tokens' ? '[Impermanent Profit]' : 'tokens'}}
             <div class='showinoptions' v-show='!notinpricedata'>
                 <input id="showinUSD" type="radio" name="showinUSD" value='1' v-model='showinUSD'>
-                <label for="showinUSD">Show in USD</label>
+                <label for="showinUSD">Show in USD [Virtual profit]</label>
 
                 <input id="showinBTC" type="radio" name="showinUSD" value='2' v-model='showinUSD'>
                 <label for="showinBTC" v-show="['ren', 'sbtc'].includes(currentPool)">Show in BTC</label>
 
                 <input id="showintokens" type="radio" name="showintokens" value='3' v-model='showinUSD'>
-                <label for="showintokens">Show in tokens</label>
+                <label for="showintokens">Show in tokens [Impermanent profit]</label>
             </div>
         </legend>
+        <div class='info-message' v-show="showinUSD == 3">
+            Profit in tokens is affected by deposit slippage and fluctuations in token pricings
+        </div>
         <ul id='profit'>
             <li>
             	<b>Deposits:</b> 
@@ -33,7 +36,8 @@
             	</span>
                 <span v-if = "['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)">
                     (<span :class="{'loading line': getStakedBalance == -1}"></span>
-                    <span v-show='+showStakedBalance >= 0'>{{toFixed(+showStakedBalance >= 0 && showStakedBalance)}} </span> staked)
+                    <span v-show='+showStakedBalance >= 0'>{{toFixed(+showStakedBalance >= 0 && showStakedBalance)}} </span> 
+                    <span v-show='showStakedTokens != -1'>[{{showStakedTokens}}]</span> staked)
                 </span>
             </li>
             <li>

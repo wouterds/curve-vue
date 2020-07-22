@@ -673,6 +673,13 @@ button.bn-onboard-custom, #derivation-select button, #account-select + button {
   margin-left: 0.5em;
 }
 
+#profit-info .info-message {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  background: silver;
+  color: black;
+}
+
 .coins {
     margin-top: 0.3em;
 }

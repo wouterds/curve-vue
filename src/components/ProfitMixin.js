@@ -16,6 +16,7 @@ export default {
 
 		getStakedBalance: -1,
 		getStakedBalanceUSD: -1,
+		stakedTokens: -1,
 
 		dailyAPY: null,
 	}),
@@ -73,6 +74,7 @@ export default {
 			    if(['susdv2', 'sbtc', 'y', 'iearn'].includes(this.currentPool)) {
 			    	this.getStakedBalance = stakedBalance
 			    	this.getStakedBalanceUSD = stakedBalanceUSD
+			    	this.stakedTokens = currentContract.curveStakedBalance
 			    }
 			    this.deposits = await this.getDeposits();
 			    this.withdrawals = await this.getWithdrawals();

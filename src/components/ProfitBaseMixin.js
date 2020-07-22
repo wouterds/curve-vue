@@ -69,23 +69,27 @@ export default {
         return process.env.VUE_APP_VERSION
       },
       showDeposits() {
-      if(this.showinUSD == 1) return this.depositsUSD;
-      if(this.showinUSD == 2) return this.depositsBTC
-      return (this.deposits / 100)
+        if(this.showinUSD == 1) return this.depositsUSD;
+        if(this.showinUSD == 2) return this.depositsBTC
+        return (this.deposits / 100)
       },
       showWithdrawals() {
-      if(this.showinUSD == 1) return this.withdrawalsUSD;
-      if(this.showinUSD == 2) return this.withdrawalsBTC
-      return (this.withdrawals / 100)
+        if(this.showinUSD == 1) return this.withdrawalsUSD;
+        if(this.showinUSD == 2) return this.withdrawalsBTC
+        return (this.withdrawals / 100)
       },
       showAvailable() {
-      if(this.showinUSD == 1) return this.availableUSD;
-      return (this.available / 100)
+        if(this.showinUSD == 1) return this.availableUSD;
+        return (this.available / 100)
       },
       showStakedBalance() {
-      if(!['susdv2', 'sbtc', 'y', 'iearn'].includes(this.currentPool)) return 0
-      if(this.showinUSD == 1) return this.getStakedBalanceUSD;
-      return (this.getStakedBalance / 100); 
+        if(!['susdv2', 'sbtc', 'y', 'iearn'].includes(this.currentPool)) return 0
+        if(this.showinUSD == 1) return this.getStakedBalanceUSD;
+        return (this.getStakedBalance / 100); 
+      },
+      showStakedTokens() {
+        if(this.stakedTokens == -1) return -1
+        return this.toFixed(this.stakedTokens / 1e18)
       },
       showProfit() {
         return ((+this.showAvailable + +this.showStakedBalance) + +this.showWithdrawals - +this.showDeposits) || 0
