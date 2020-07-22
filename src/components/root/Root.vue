@@ -419,9 +419,9 @@
 		},
 		async mounted() {
 			this.keydownListener = document.addEventListener('keydown', this.handle_pool_change)
+	        this.getAPY()
 			contract.web3 && contract.multicall && this.getCurveRewards() && this.getBalances();
 			this.btcPrice = await priceStore.getBTCPrice()
-	        this.getAPY()
 		},
 		beforeDestroy() {
 			document.removeEventListener('keydown', this.handle_pool_change);
@@ -475,22 +475,8 @@
 
 				let aggcalls = await contract.multicall.methods.aggregate(calls).call();
 				let decoded = aggcalls[1].map(hex => contract.web3.eth.abi.decodeParameter('uint256', hex))
-				let requests = await Promise.all([
-					fetch('https://api.coinpaprika.com/v1/tickers/hav-havven'), 
-					fetch('https://api.coinpaprika.com/v1/tickers/ren-republic-protocol'),
-					fetch('https://api.coinpaprika.com/v1/tickers/btc-bitcoin'),
-					fetch('https://api.coingecko.com/api/v3/simple/price?ids=balancer&vs_currencies=usd'),
-					fetch('https://pushservice.curve.fi/getBalancerTVL'),
-					fetch('https://poloniex.com/public?command=returnTicker'),
-				])
-				let prices = await Promise.all(requests.map(request => request.json()))
+				let prices = await this.fetchPrices()
 				let [snxPrice, renPrice, btcPrice, balPrice, balancerTVL, yfiPrice] = prices;
-				snxPrice = snxPrice.quotes.USD.price;
-				renPrice = renPrice.quotes.USD.price;
-				btcPrice = btcPrice.quotes.USD.price;
-				balPrice = balPrice.balancer.usd;
-				balancerTVL = balancerTVL.TVL
-				yfiPrice = yfiPrice['USDT_YFI'].last
 
 				//total factor 0.64
 
@@ -503,6 +489,35 @@
 				this.yfiRewards = 365 * (decoded[10] * decoded[11] / 1e18)/7*yfiPrice/((+decoded[8] * (+decoded[9]) / 1e36)) * 100
 
 				console.log(this.sbtcRewards, "SBTC REWARDS")
+			},
+			async fetchPrices() {
+				let requests  = await Promise.allSettled([
+					fetch('https://api.coingecko.com/api/v3/simple/price?ids=havven,republic-protocol,bitcoin,balancer,yearn-finance&vs_currencies=usd'),
+					fetch('https://pushservice.curve.fi/getBalancerTVL'),
+				])
+				let prices = await Promise.all(requests.map((request, i) => {
+					return request.status == 'fulfilled' && request.value.json()
+				}))
+				let snxPrice = prices[0] && prices[0].havven.usd
+				let renPrice = prices[0] && prices[0]['republic-protocol'].usd
+				let btcPrice = prices[0] && prices[0]['bitcoin'].usd
+				let balPrice = prices[0] && prices[0].balancer.usd
+				let balancerTVL = prices[1].TVL
+				let yfiPrice = prices[0] && prices[0]['yearn-finance'].usd
+				if(requests[0].status == 'rejected') {
+					let requests = await Promise.allSettled([
+						fetch('https://api.coinpaprika.com/v1/tickers/hav-havven'), 
+						fetch('https://api.coinpaprika.com/v1/tickers/ren-republic-protocol'),
+						fetch('https://api.coinpaprika.com/v1/tickers/btc-bitcoin'),
+						fetch('https://poloniex.com/public?command=returnTicker'),
+					])
+					let prices = await Promise.all(requests.map(request => request.status == 'fulfilled' && request.value.json()))
+					snxPrice = prices[0] && prices[0].quotes.USD.price;
+					renPrice = prices[1] && prices[1].quotes.USD.price;
+					btcPrice = prices[2] && prices[2].quotes.USD.price;
+					yfiPrice = prices[3] && prices[3]['USDT_YFI'].last
+				}
+				return [snxPrice, renPrice, btcPrice, balPrice, balancerTVL, yfiPrice]
 			},
 			async getBalances() {
 				if(!contract.default_account) return;
