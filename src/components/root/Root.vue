@@ -481,7 +481,7 @@
 					fetch('https://api.coinpaprika.com/v1/tickers/btc-bitcoin'),
 					fetch('https://api.coingecko.com/api/v3/simple/price?ids=balancer&vs_currencies=usd'),
 					fetch('https://pushservice.curve.fi/getBalancerTVL'),
-					fetch('https://api.coingecko.com/api/v3/simple/price?ids=yearn-finance&vs_currencies=usd'),
+					fetch('https://poloniex.com/public?command=returnTicker'),
 				])
 				let prices = await Promise.all(requests.map(request => request.json()))
 				let [snxPrice, renPrice, btcPrice, balPrice, balancerTVL, yfiPrice] = prices;
@@ -490,7 +490,7 @@
 				btcPrice = btcPrice.quotes.USD.price;
 				balPrice = balPrice.balancer.usd;
 				balancerTVL = balancerTVL.TVL
-				yfiPrice = yfiPrice['yearn-finance'].usd
+				yfiPrice = yfiPrice['USDT_YFI'].last
 
 				//total factor 0.64
 
