@@ -316,7 +316,6 @@
 		        	let SNXprices = await fetch(`https://api.coingecko.com/api/v3/coins/yearn-finance/market_chart/range?vs_currency=usd&from=${startTime}&to=${endTime}`)
 		        	console.log(`https://api.coingecko.com/api/v3/coins/yearn-finance/market_chart/range?vs_currency=usd&from=${startTime}&to=${endTime}`)
 		        	SNXprices = (await SNXprices.json()).prices
-		        	console.log("AZ SUM TUKA", SNXprices)
 		        	let curveRewards = new web3.eth.Contract(abis.iearn.sCurveRewards_abi, abis.iearn.sCurveRewards_address)
 		        	let multicall = new web3.eth.Contract(multicall_abi, multicall_address)
 

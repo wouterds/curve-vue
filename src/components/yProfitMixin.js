@@ -44,9 +44,9 @@ export default {
 	methods: {
 
 		async getPrices() {
-			let yfiPrice = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=yearn-finance&vs_currencies=usd')
+			let yfiPrice = await fetch('https://poloniex.com/public?command=returnTicker')
 			yfiPrice = await yfiPrice.json()
-			this.yfiPrice = yfiPrice['yearn-finance'].usd
+			this.yfiPrice = +yfiPrice['USDT_YFI'].last
 
 			let curveRewards = currentContract.curveRewards
 			let aRewards = currentContract.aRewards
