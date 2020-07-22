@@ -242,6 +242,7 @@
 			        this.data = await newdata.json()
 			        var step_size = Math.max(Math.round(this.data.length / 500), 1);
 			        let start_index = this.data.findIndex(el => el.virtual_price > 0)
+			        if(subdomain == 'rens') start_index = 3
 			        this.virtual_price_0 = this.data[start_index].virtual_price;
 			        var start_profit = this.data[start_index].virtual_price / 1e18
 
@@ -292,9 +293,8 @@
 	            		let key = "1-"+i;
 	                	if(i == 0) key = "0-1"
 	                	let price = point.prices[key] && point.prices[key][3]
-	                	if(i == 0) price = 1 / price
+	                	if(i > 0) price = 1 / price
 	                	price = price || 1
-	                	if(['ren2', 'rens'].includes(subdomain)) price = point.prices['0-1'] && point.prices['0-1'][3] || 1
 
 	            		let real_amount = balance * point.rates[i] / abis[subdomain == 'susd' ? 'susdv2' : subdomain == 'ren2' ? 'ren' : subdomain == 'rens' ? 'sbtc' : subdomain].coin_precisions[i];
 	            		return real_amount / S * (point.virtual_price / this.virtual_price_0) * price
