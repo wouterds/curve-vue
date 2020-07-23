@@ -19,6 +19,10 @@
 			<highcharts :options="piechartdata" ref='piecharts'></highcharts>
 		</div>
 
+		<div class='window white'>
+			<highcharts :options="piechartdatacoins" ref='piecoinscharts'></highcharts>
+		</div>
+
 		<div class='window white' v-show='totalDeposits > 0'>
 			<highcharts :options="mypiechartdata" ref='mypiecharts'></highcharts>
 		</div>
@@ -189,6 +193,42 @@
 			    },
 			    series: [],
 			},
+			piechartdatacoins: {
+				chart: {
+			        plotBackgroundColor: null,
+			        plotBorderWidth: null,
+			        plotShadow: false,
+			        type: 'pie'
+			    },
+			    title: {
+			        text: 'Pool coin % holdings'
+			    },
+			    tooltip: {
+			        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+			    },
+			    accessibility: {
+			        point: {
+			            valueSuffix: '%'
+			        }
+			    },
+			    plotOptions: {
+			        pie: {
+			            allowPointSelect: true,
+			            cursor: 'pointer',
+			            dataLabels: {
+			                enabled: true,
+			                formatter: (function(self) {
+			                	return function(point) { 
+			                		return `<b>${this.key}</b>: 
+			                		${helpers.formatNumber(self.allCoins[this.key], 0)}$
+			                		(${this.percentage.toFixed(2)}%)`
+			                	}
+			                })(this),
+			            }
+			        }
+			    },
+			    series: [],
+			},
 			mypiechartdata: {
 				chart: {
 			        plotBackgroundColor: null,
@@ -327,11 +367,13 @@
 			},
 			chart: null,
 			piechart: null,
+			piecoinschart: null,
 			mypiechart: null,
 			coinchart: null,
 			showbars: true,
 			showline: true,
 			allPools: null,
+			allCoins: null,
 			balances: {
 				compound: -1,
 				usdt: -1,
@@ -378,8 +420,10 @@
 		async mounted() {
 			this.chart = this.$refs.highcharts.chart;
 			this.piechart = this.$refs.piecharts.chart;
+			this.piecoinschart = this.$refs.piecoinscharts.chart;
 			this.mypiechart = this.$refs.mypiecharts.chart;
 			this.coinchart = this.$refs.coincharts.chart;
+			this
 			this.chart.showLoading()
 			this.piechart.showLoading()
 			this.mypiechart.showLoading()
@@ -512,6 +556,32 @@
 			}, true, false)
 
 			this.piechart.hideLoading()
+
+			this.allCoins = Object.fromEntries(Object.entries(coinbalances).filter(([p, v]) => p != 'tbtc')
+									.map(([p, v]) => [p, coinbalances[p][coinbalances[p].length-1][1]]))
+
+			latestDeposits = Object.keys(coinbalances).filter(p => !['tbtc','hbtc'].includes(p.toLowerCase())).map(p => coinbalances[p][coinbalances[p].length-1][1])
+
+			poolHoldings = latestDeposits.reduce((a, b) => a + b, 0)
+
+			poolPercentages = latestDeposits.map(poolDeposits => (poolDeposits / poolHoldings) * 100)
+
+			poolPercentages = poolPercentages.map((percentage, i) => ({
+				name: Object.keys(coinbalances).filter(p => !['hbtc','tbtc'].includes(p))[i],
+				y: poolPercentages[i],
+			}))
+
+
+			highest = poolPercentages.map(data=>data.y).indexOf(Math.max(...poolPercentages.map(data => data.y)))
+			poolPercentages[highest].sliced = true;
+			poolPercentages[highest].selected = true;
+
+			this.piecoinschart.addSeries({
+				name: 'Coin %',
+				data: poolPercentages,
+			}, true, false)
+
+			this.piecoinschart.hideLoading()
 
 			this.chart.update({
 				title: {
