@@ -1,6 +1,14 @@
 <template>
 	<div>
-		<span v-show='transaction.fromAddress && transaction.fromAddress.toLowerCase() != default_account.toLowerCase() && ![14, 65].includes(state)' class='submitfromwarning'>
+		<span v-show='transaction.error !== null'>
+			<span class='tooltip'>
+				<span class='errortext'>Error</span><img class='icon small hoverpointer warning' :src="publicPath + 'exclamation-circle-solid.svg'">
+				<span class='tooltiptext long errormessage'>
+					{{ transaction.error }}
+				</span>
+			</span>
+		</span>
+		<span v-show='(transaction.fromAddress && transaction.fromAddress.toLowerCase() != default_account.toLowerCase() && ![14, 65].includes(state)) && transaction.error === null' class='submitfromwarning'>
 			<span class='tooltip'>
 				Submit from {{ shortenAddress(transaction.fromAddress) }}
 				<span class='tooltiptext long'>
@@ -8,7 +16,7 @@
 				</span>
 			</span>
 		</span>
-		<span v-show='transaction.fromAddress && transaction.fromAddress.toLowerCase() == default_account.toLowerCase() || [14, 65].includes(state)'>
+		<span v-show='(transaction.fromAddress && transaction.fromAddress.toLowerCase() == default_account.toLowerCase() || [14, 65].includes(state)) && transaction.error === null'>
 			<span v-show='state == 0'>
 				Waiting for renVM BTC deposit address
 			</span>
@@ -120,12 +128,15 @@
 			default_account() {
 				return state.default_account
 			},
+			publicPath() {
+        		return process.env.BASE_URL
+        	},
 		},
 		methods: {
 			shortenAddress(address) {
 				return address.slice(0,6) + '...' + address.slice(-3)
 			},
-		}
+		},
 	}
 </script>
 
@@ -138,5 +149,22 @@
 	}
 	.submitfromwarning .tooltip {
 		width: min-content;
+	}
+	.icon.small {
+		height: 1em;
+	}
+	.hoverpointer {
+		cursor: pointer;
+	}
+	.errortext {
+		color: darkred;
+	}
+	.icon.warning {
+		width: 1em;
+		margin-left: 0.5em;
+		filter: invert(13%) sepia(90%) saturate(4444%) hue-rotate(11deg) brightness(88%) contrast(97%);
+	}
+	.errormessage {
+		word-break: break-all;
 	}
 </style>

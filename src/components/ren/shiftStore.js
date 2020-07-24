@@ -83,6 +83,8 @@ const txObject = () => ({
 	modalConfirmed: false,
 	removed: false,
 
+	error: null,
+
 })
 
 let oldrenAdapter = new contract.web3.eth.Contract(allabis.ren.adapterABI, allabis.ren.oldAdapterAddress)
@@ -626,103 +628,115 @@ export async function initMint(transaction) {
 
 export async function sendMint(transfer) {
 
-	console.log(transfer, "SEND MINT")
-
-
 	let transaction = state.transactions.find(t => t.id == transfer.id)
-	console.log(transaction.from)
-	if(transaction.fromAddress && transaction.fromAddress.toLowerCase() != state.default_account.toLowerCase()) {
-		return;
-	}
 
-	//transaction is ready to be sent to eth network
-	if(transaction.renResponse && transaction.signature) {
-		if(!transaction.ethTxHash && transaction.state != 16) {
-			transaction.state = 11
-			transaction.confirmations = 'Confirmed'
-			upsertTx(transaction)
-			if(transaction.type == 0) await mintThenSwap(transfer)
-			if(transaction.type == 3) await mintThenDeposit(transaction)
+	try {
+
+		console.log(transfer, "SEND MINT")
+
+
+		console.log(transaction.from)
+		if(transaction.fromAddress && transaction.fromAddress.toLowerCase() != state.default_account.toLowerCase()) {
+			return;
 		}
-		else if(transaction.state != 17) {
-			transaction.state = 14
-			upsertTx(transaction)
-		}
-	}
-	else {
-		let mint = await initMint(transfer);
 
-
-		//transaction initated, but didn't get an address, so updating
-		if(!transaction.gatewayAddress) {
-			transaction.params = mint.params;
-			try {
-				transaction.gatewayAddress = await mint.gatewayAddress()
+		//transaction is ready to be sent to eth network
+		if(transaction.renResponse && transaction.signature) {
+			if(!transaction.ethTxHash && transaction.state != 16) {
+				transaction.state = 11
+				transaction.confirmations = 'Confirmed'
+				upsertTx(transaction)
+				if(transaction.type == 0) await mintThenSwap(transfer)
+				if(transaction.type == 3) await mintThenDeposit(transaction)
 			}
-			catch(err) {
-				console.error(err)
+			else if(transaction.state != 17) {
+				transaction.state = 14
+				upsertTx(transaction)
 			}
-			console.log("GATEWAY ADDRESS")
-			transaction.state = 1
-			upsertTx(transaction)
 		}
-
-		let deposit
-		//transaction was submitted to btc network
-		if(transaction.btcTxHash && String(transaction.btcTxVOut) !== 'undefined') {
-			deposit = await mint.wait(state.confirmations, {
-				txHash: transaction.btcTxHash,
-				vOut: +transaction.btcTxVOut,
-			})
-			.on('deposit', deposit => {
-				console.log('DEPOSIT SUBMITTED', deposit)
-				console.log(transfer, "THE TRANSFER")
-				if(deposit.utxo) {
-					let confirmations = deposit.utxo.confirmations
-					if(transaction.state == 2) {
-						transaction.state = 3;
-					}
-					else
-						transaction.state = 3 + confirmations
-
-					transaction.confirmations = confirmations
-					transaction.btcTxHash = deposit.utxo.txHash
-					transaction.btcTxVOut = deposit.utxo.vOut
-					upsertTx(transaction)
-				}
-			})
-		}
-		//transaction not submitted to btc network
 		else {
-			deposit = await mint.wait(state.confirmations)
-							.on('deposit', deposit => {
-								console.log("DEPOSIT", deposit)
-								if(deposit.utxo) {
-									if(transaction.state == 1) {
-										transaction.state = 2
-										state.showModal = false
+			let mint = await initMint(transfer);
+
+
+			//transaction initated, but didn't get an address, so updating
+			if(!transaction.gatewayAddress) {
+				transaction.params = mint.params;
+				try {
+					transaction.gatewayAddress = await mint.gatewayAddress()
+				}
+				catch(err) {
+					console.error(err)
+				}
+				console.log("GATEWAY ADDRESS")
+				transaction.state = 1
+				upsertTx(transaction)
+			}
+
+			let deposit
+			//transaction was submitted to btc network
+			if(transaction.btcTxHash && String(transaction.btcTxVOut) !== 'undefined') {
+				deposit = await mint.wait(state.confirmations, {
+					txHash: transaction.btcTxHash,
+					vOut: +transaction.btcTxVOut,
+				})
+				.on('deposit', deposit => {
+					console.log('DEPOSIT SUBMITTED', deposit)
+					console.log(transfer, "THE TRANSFER")
+					if(deposit.utxo) {
+						let confirmations = deposit.utxo.confirmations
+						if(transaction.state == 2) {
+							transaction.state = 3;
+						}
+						else
+							transaction.state = 3 + confirmations
+
+						transaction.confirmations = confirmations
+						transaction.btcTxHash = deposit.utxo.txHash
+						transaction.btcTxVOut = deposit.utxo.vOut
+						upsertTx(transaction)
+					}
+				})
+			}
+			//transaction not submitted to btc network
+			else {
+				deposit = await mint.wait(state.confirmations)
+								.on('deposit', deposit => {
+									console.log("DEPOSIT", deposit)
+									if(deposit.utxo) {
+										if(transaction.state == 1) {
+											transaction.state = 2
+											state.showModal = false
+										}
+										transaction.confirmations = deposit.utxo.confirmations
+										if(transaction.confirmations) transaction.state = 3 + deposit.utxo.confirmations
+										transaction.btcTxHash = deposit.utxo.txHash
+										transaction.btcTxVOut = deposit.utxo.vOut
+										upsertTx(transaction)
 									}
-									transaction.confirmations = deposit.utxo.confirmations
-									if(transaction.confirmations) transaction.state = 3 + deposit.utxo.confirmations
-									transaction.btcTxHash = deposit.utxo.txHash
-									transaction.btcTxVOut = deposit.utxo.vOut
-									upsertTx(transaction)
-								}
-							})
+								})
+			}
+
+			transaction.state = 10
+
+			let signature = await deposit.submit()
+			let wasSubmitted = await mint.findTransaction(web3.currentProvider)
+			if(wasSubmitted && wasSubmitted.length) transaction.state = 14;
+			transaction.state = 11
+			transaction.renResponse = signature.renVMResponse;
+			transaction.signature = signature.signature
+			transaction.utxoAmount = transaction.renResponse.autogen.amount
+			upsertTx(transaction)
+			if(transaction.type == 0) mintThenSwap(transaction)
+			if(transaction.type == 3) mintThenDeposit(transaction)
 		}
-
-		transaction.state = 10
-
-		let signature = await deposit.submit()
-		let wasSubmitted = await mint.findTransaction(web3.currentProvider)
-		if(wasSubmitted && wasSubmitted.length) transaction.state = 14;
-		transaction.state = 11
-		transaction.renResponse = signature.renVMResponse;
-		transaction.signature = signature.signature
-		transaction.utxoAmount = transaction.renResponse.autogen.amount
-		upsertTx(transaction)
-		if(transaction.type == 0) mintThenSwap(transaction)
-		if(transaction.type == 3) mintThenDeposit(transaction)
+	}
+	catch(err) {
+		console.error(err)
+		errorStore.handleError(err)
+		if(err.message && err.message.includes('insufficient')) {
+			transaction.error = err.message
+			upsertTx(transaction)
+		}
 	}
 }
 
