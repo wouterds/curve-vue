@@ -192,9 +192,16 @@ export function formatNumber(number, dec = 2, dsep, tsep) {
 }
 
 export async function getETHPrice() {
-  let req = await fetch('https://api.coinpaprika.com/v1/tickers/eth-ethereum');
-  let res = await req.json()
-  return res.quotes.USD.price
+  let price = 260
+  try {
+    let req = await fetch('https://pushservice.curve.fi/getETHprice');
+    let res = await req.json()
+    price = res.price
+  }
+  catch(err) {
+    console.error(err)
+  }
+  return price
 }
 
 export function findClosestIndex(timestamp, data) {
