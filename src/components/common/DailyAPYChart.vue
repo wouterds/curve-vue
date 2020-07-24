@@ -89,6 +89,7 @@
 		            	id: 'apyAxis',
 		            	opposite: false,
 		            	type: 'logarithmic',
+		            	min: 0.5,
 	        			title: {
 	        				text: 'Daily APY [%]',
 	        				style: {
@@ -230,6 +231,7 @@
 		        	let calls = [
 						[curveRewards._address, curveRewards.methods.DURATION().encodeABI()],
 						[curveRewards._address, curveRewards.methods.rewardRate().encodeABI()],
+						[curveRewards._address, curveRewards.methods.periodFinish().encodeABI()],
 					]
 
 					let aggcalls = await multicall.methods.aggregate(calls).call()
@@ -244,6 +246,8 @@
 		        		let reward = 64000
 		        		if(timestamp > 1590705735 && timestamp < 1594256015) reward = 48000
 		        		if(timestamp > 1594256015) reward = decoded[0] * decoded[1] / 1e18
+		        		if(+decoded[2] < timestamp)
+		        			reward = 0.000001
 		        		let SNXapy = 356 * reward / 7 * SNXprice / (0.98 * total_supply * virtual_price / 1e36) * 100
 		        		SNXapys.push([timestamp * 1000, SNXapy])
 		        	}
@@ -265,6 +269,8 @@
 		        	})
 		    	}
 
+		    	let now = Date.now() / 1000
+
 		    	if(this.pool == 'sbtc') {
 		        	let startTime = this.data[0].timestamp
 		        	let endTime = this.data[this.data.length - 1].timestamp
@@ -279,6 +285,9 @@
 		        	let RENprices = prices[1].prices
 		        	let btcPrice = prices[2].quotes.USD.price
 
+		        	let curveRewards = new web3.eth.Contract(abis.iearn.sCurveRewards_abi, abis.iearn.sCurveRewards_address)
+		        	let sbtcPeriodFinish = await curveRewards.methods.periodFinish().call()
+
 		        	let SNXapys = []
 		        	for(let i = 1; i < this.data.length; i++) {
 		        		let timestamp = this.data[i].timestamp
@@ -288,7 +297,11 @@
 		        		let RENprice = this.findClosestPrice(this.data[i].timestamp, RENprices)
 		        		let SNXreward = 10000
 		        		let RENreward = 25000
-		        		let SNXapy = 356 * (10000 * SNXprice + 25000 * RENprice) / 7  / (0.98 * btcPrice * total_supply * virtual_price / 1e36) * 100
+		        		if(+sbtcPeriodFinish < timestamp) {
+		        			SNXreward = 0.000001
+		        			RENreward = 0.000001
+		        		}
+		        		let SNXapy = 356 * (SNXreward * SNXprice + RENreward * RENprice) / 7  / (0.98 * btcPrice * total_supply * virtual_price / 1e36) * 100
 		        		SNXapys.push([timestamp * 1000, SNXapy])
 		        	}
 
@@ -322,6 +335,7 @@
 		        	let calls = [
 						[curveRewards._address, curveRewards.methods.DURATION().encodeABI()],
 						[curveRewards._address, curveRewards.methods.rewardRate().encodeABI()],
+						[curveRewards._address, curveRewards.methods.periodFinish().encodeABI()],
 					]
 
 					let aggcalls = await multicall.methods.aggregate(calls).call()
@@ -335,6 +349,8 @@
 		        		console.log(SNXprices, "SNX PRICES")
 		        		let SNXprice = this.findClosestPrice(this.data[i].timestamp, SNXprices)
 		        		let reward = decoded[0] * decoded[1] / 1e18
+		        		if(+decoded[2] < timestamp)
+		        			reward = 0.000001
 		        		//before YFI
 		        		if(timestamp < 1594972885) reward = 0
 		        		let SNXapy = 356 * reward / 7 * SNXprice / (0.98 * total_supply * virtual_price / 1e36) * 100
