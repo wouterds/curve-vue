@@ -42,9 +42,17 @@ export default {
 			return (+this.earnedSNX).toFixed(2)
 		},
 
+		showEarnedSNXUSD() {
+			return (+this.earnedSNX * this.snxPrice).toFixed(2)
+		},
+
 		showEarnedREN() {
 			if(this.showinUSD == 1) return (+this.earnedREN * this.renPrice).toFixed(2)
 			return (+this.earnedREN).toFixed(2)
+		},
+
+		showEarnedRENUSD() {
+			return (+this.earnedREN * this.renPrice).toFixed(2)
 		},
 
 		showRewardsSNX() {
@@ -52,9 +60,17 @@ export default {
 			return (+this.paidRewardsSNX).toFixed(2)
 		},
 
+		showRewardsSNXUSD() {
+			return (+this.paidRewardsSNX * this.snxPrice).toFixed(3)
+		},
+
 		showRewardsREN() {
 			if(this.showinUSD == 1) return (+this.paidRewardsREN * this.renPrice).toFixed(3)
 			return (+this.paidRewardsREN).toFixed(2)
+		},
+
+		showRewardsRENUSD() {
+			return (+this.paidRewardsREN * this.renPrice).toFixed(3)
 		},
 
 		showWeeklySNX() {

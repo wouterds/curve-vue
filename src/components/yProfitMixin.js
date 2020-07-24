@@ -29,9 +29,17 @@ export default {
 			return (+this.earnedYFI).toFixed(2)
 		},
 
+		showEarnedYFIUSD() {
+			return (+this.earnedYFI * this.yfiPrice).toFixed(2)
+		},
+
 		showRewardsYFI() {
 			if(this.showinUSD == 1) return (+this.paidRewardsYFI * this.yfiPrice).toFixed(2)
 			return (+this.paidRewardsYFI).toFixed(2)
+		},
+
+		showRewardsYFIUSD() {
+			return (+this.paidRewardsYFI * this.yfiPrice).toFixed(2)
 		},
 
 		showWeeklyYFI() {
