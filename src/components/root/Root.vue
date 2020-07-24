@@ -470,6 +470,10 @@
 					[yCurve._address, yCurve.methods.get_virtual_price().encodeABI()],
                 	[yfiRewards._address, yfiRewards.methods.DURATION().encodeABI()],
 					[yfiRewards._address, yfiRewards.methods.rewardRate().encodeABI()],
+
+					[curveRewards._address, curveRewards.methods.periodFinish().encodeABI()],
+					[sbtcRewards._address, sbtcRewards.methods.periodFinish().encodeABI()],
+					[yfiRewards._address, yfiRewards.methods.periodFinish().encodeABI()],
 				]
 
 				let aggcalls = await contract.multicall.methods.aggregate(calls).call();
@@ -482,10 +486,17 @@
 				this.balRewards = (decoded[6] / 1e18 * snxPrice + decoded[7] / 1e18 * renPrice) * 0.64 / balancerTVL * balPrice * 100
 
 				this.snxRewards = 365 * (decoded[2] * decoded[3] / 1e18)/7*snxPrice/((+decoded[0]) * (+decoded[1])/1e36) * 100
+				let now = Date.now() / 1000
+				if(+decoded[12] < now)
+					this.snxRewards = 0
 
 				this.sbtcRewards = (10000 * snxPrice + 25000 * renPrice) / 7 * 365 / (btcPrice * decoded[4] * decoded[5] / 1e36) * 100
+				if(+decoded[13] < now)
+					this.sbtcRewards = 0
 
 				this.yfiRewards = 365 * (decoded[10] * decoded[11] / 1e18)/7*yfiPrice/((+decoded[8] * (+decoded[9]) / 1e36)) * 100
+				if(+decoded[14] < now)
+					this.yfiRewards = 0
 
 				console.log(this.sbtcRewards, "SBTC REWARDS")
 			},
