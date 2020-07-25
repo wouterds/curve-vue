@@ -230,7 +230,7 @@ let routes = [
     ],
   },
   {
-    path:'/ren/native',
+    path:'/ren/native/:recover?',
     component: PoolApp,
     children: [
       {
@@ -241,7 +241,7 @@ let routes = [
     ]
   },
   {
-    path:'/sbtc/native',
+    path:'/sbtc/native/:recover?',
     component: PoolApp,
     children: [
       {

@@ -740,6 +740,43 @@ export async function sendMint(transfer) {
 	}
 }
 
+export async function recoverRedeposit(transfer, newtxhash, newvout) {
+	let transaction = state.transactions.find(t => t.id == transfer.id)
+	transaction.btcTxHash = newtxhash
+	let deposit = await initMint(transfer);
+
+	let signature = await deposit.submit({
+		txHash: newtxhash,
+		vOut: +newvout,
+	})
+
+	transaction.state = 10
+	transaction.ethTxHash = ''
+	transaction.renResponse = signature.renVMResponse;
+	transaction.signature = signature.signature
+	transaction.utxoAmount = transaction.renResponse.autogen.amount
+	upsertTx(transaction)
+	if(transaction.type == 0) mintThenSwap(transaction)
+	if(transaction.type == 3) mintThenDeposit(transaction)
+
+}
+
+export async function recoverStuck(transfer) {
+	let contractParams = transfer.params.contractCalls[0].contractParams
+	let encoded = web3.eth.abi.encodeParameters(
+                    (contractParams || []).map(i => i.type),
+                    (contractParams || []).map(i => i.value),
+                );
+	let adapter = renAdapterBiconomy
+	if(window.location.href.includes('sbtc'))
+		adapter = sbtcAdapterBiconomy
+	await adapter.methods.recoverStuck(encoded, transfer.utxoAmount, transfer.renResponse.autogen.nhash, transfer.signature)
+		.send({
+			from: state.default_account,
+			gas: 1000000,
+		})
+}
+
 export async function swapNow(transaction) {
 	mintThenSwap(transaction, true)
 }

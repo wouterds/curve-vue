@@ -29,6 +29,26 @@
 			</div>
 		</div>
 
+		<div id='modalrecover' class='modal' v-show='showModalRecover' @click.self='showModalRecover = false'>
+			<div class='modal-content window white'>
+				<fieldset>
+					<div class='legend2 hoverpointer' @click='showModalRecover = false'>
+						[<span class='greentext'>■</span>]
+					</div>
+					<legend>Recover transaction</legend>
+					<div class='content'>
+						<label for='newtxhash'>New tx hash:</label>
+						<input id='newtxhash' v-model='newtxhash'></label>
+
+						<label for='newvout'>New vOut:</label>
+						<input id='newvout' v-model='newvout'></label>
+					</div>
+					<button @click='recover' id='recoverredeposit'> Recover redeposit </button>
+					<button @click='recoverStuck'> Recover stuck </button>
+				</fieldset>
+			</div>
+		</div>
+
 		<div id='modalinit' class='modal' v-show='showModal1' v-if='lastTransaction && [0,3].includes(lastTransaction.type)' @click.self='removeTx(lastTransaction)'>
 			<div class='modal-content window white'>
 				<fieldset>
@@ -260,6 +280,9 @@
 							@mint='mintThenSwap'
 							@resubmit='resubmit'
 							/>
+						<span v-show='isRecover'>
+							<img class='icon small hoverpointer' @click='showRecover(transaction)' :src="publicPath + 'cog-solid.svg'">
+						</span>
 					</td>
 					<td class='nowrap'>
 						<span v-show='[0,3].includes(transaction.type)'>
@@ -380,6 +403,9 @@
 						@mint='mintThenSwap'
 						@resubmit='resubmit'
 						/>
+						<span v-show='isRecover'>
+							<img class='icon small hoverpointer' @click='showRecover(transaction)' :src="publicPath + 'cog-solid.svg'">
+						</span>
 				</div>
 				<div class='nowrap'>
 					<b>Progress: </b>
@@ -434,6 +460,10 @@
         	copied: false,
         	confirmCheckbox: false,
         	showRemoved: false,
+
+        	recovertx: null,
+        	newtxhash: '',
+        	newvout: '',
 		}),
 
 		computed: {
@@ -486,8 +516,19 @@
         			state.showModal1 = value
         		},
         	},
+        	showModalRecover: {
+        		get() {
+        			return state.showModalRecover
+        		},
+        		set(value) {
+        			state.showModalRecover = value
+        		},
+        	},
         	default_account() {
         		return state.default_account
+        	},
+        	isRecover() {
+        		return state.recover
         	},
 		},
 
@@ -573,6 +614,19 @@
 
 			resubmit(transaction) {
 				store.resubmit(transaction)
+			},
+
+			showRecover(transaction) {
+				this.recovertx = transaction
+				this.showModalRecover = true
+			},
+
+			recover() {
+				store.recoverRedeposit(this.recovertx, this.newtxhash, this.newvout)
+			},
+
+			recoverStuck() {
+				store.recoverStuck(this.recovertx)
 			},
 
 			receiveRenDeposit(transaction) {
@@ -766,5 +820,15 @@
 	}
 	tr.completed .btcaddress span, .transactionmobile.completed .btcaddress span {
 		text-decoration: line-through;
+	}
+	#modalrecover .content {
+		color: black;
+		text-align: left;
+	}
+	#modalrecover .modal-content {
+		width: 400px;
+	}
+	#recoverredeposit {
+		margin-right: 1em;
 	}
 </style>

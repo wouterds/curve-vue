@@ -23,6 +23,7 @@ export const state = Vue.observable({
 
 	showModal: false,
 	showModal1: false,
+	showModalRecover: false,
 
 	msg_signature: null,
 	password: null,
@@ -31,6 +32,8 @@ export const state = Vue.observable({
 
 	loaded: false,
 	adapterContract: null,
+
+	recover: false,
 })
 
 export function hasIncomplete() {

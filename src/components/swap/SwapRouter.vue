@@ -53,6 +53,7 @@
 
 		created() {
 			if(this.$route.path.includes('native')) this.swapbtc = true
+			if(this.$route.path.includes('recover')) shiftState.state.recover = true
 			this.$watch(() => currentContract.currentContract, (val, oldval) => {
 				if(['ren', 'sbtc'].includes(oldval) && !['ren', 'sbtc'].includes(val)) this.swapbtc = false
 			}, {
