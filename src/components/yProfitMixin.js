@@ -115,12 +115,12 @@ export default {
 		    let default_account = this.account
 		    default_account = default_account.substr(2).toLowerCase();
 
-		    let fromBlock = '0x'+parseInt(block-100).toString(16)
+		    let fromBlock = '0x'+parseInt(block-10).toString(16)
 		    let toBlock = '0x'+parseInt(block).toString(16)
-		    fromBlock = this.fromBlock
+		    //fromBlock = this.fromBlock
 		    if(direction == 1) {
 		        fromBlock = '0x'+parseInt(block).toString(16)
-		        toBlock = '0x'+parseInt(block+100).toString(16)
+		        toBlock = '0x'+parseInt(block+10).toString(16)
 		        //toBlock = 'latest'
 		    }
 		    if(direction == 0) {
