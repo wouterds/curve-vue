@@ -131,7 +131,25 @@
   import init, { onboard, changeWallets } from '../init'
   import allabis from '../allabis'
 
+  const titles = {
+      compound: 'Compounded',
+      usdt: 'Tethered',
+      iearn: 'Yield',
+      busd: 'bUSD',
+      susd: 'sUSD-yCurve old',
+      susdv2: 'sUSD',
+        pax: 'PAX',
+        tbtc: 'TBTC',
+        ren: 'renBTC',
+        sbtc: 'sBTC',
+    }
+
   export default {
+    metaInfo() {
+      return {
+        title: 'Curve.fi :: ' + titles[this.currentPool],
+      }
+    },
     data: () => ({
       gitBranches: {
         compound: 'compound',
