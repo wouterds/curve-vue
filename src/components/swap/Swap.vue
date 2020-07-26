@@ -198,6 +198,9 @@
     import * as errorStore from '../common/errorStore'
 
     import BigNumber from 'bignumber.js'
+
+    let { setIntervalAsync, clearIntervalAsync } = require('set-interval-async/dynamic')
+
     var cBN = (val) => new BigNumber(val);
 
 
@@ -249,6 +252,8 @@
             ethPrice: 0,
             icontype: '',
             loadingAction: false,
+
+            interval: null,
         }),
         async created() {
             this.$watch(()=>currentContract.default_account, (val, oldval) => {
@@ -399,6 +404,9 @@
             async set_to_amount() {
                 this.promise.cancel()
                 let promise = this.setAmountPromise()
+                this.interval && !this.interval.stopped && clearIntervalAsync(this.interval)
+                if(typeof (+this.fromInput) === 'number' && !isNaN(+this.fromInput))
+                    this.interval = setIntervalAsync(this.set_to_amount, 3000)
                 try {
                     let [dy, dy_, dx_, balance] = await promise
                     this.toInput = dy;

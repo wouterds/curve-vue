@@ -223,6 +223,8 @@
 
     import * as Comlink from 'comlink'
 
+    let { setIntervalAsync, clearIntervalAsync } = require('set-interval-async/dynamic')
+
     import Worker from 'worker-loader!./worker.js';
     const worker = new Worker();
     const calcWorker = Comlink.wrap(worker);
@@ -284,6 +286,8 @@
             ethPrice: 0,
             estimateGas: 0,
             loadingAction: false,
+
+            interval: null,
         }),
         computed: {
             //onesplit exchanges [uniswap, kyber, bancor, oasis, cCurve, tCurve, yCurve, bCurve, sCurve]
@@ -969,6 +973,9 @@
                 return [txPricePool, txPrice1split]
             },
             async set_to_amount() {
+                this.interval && !this.interval.stopped && clearIntervalAsync(this.interval)
+                if(typeof (+this.fromInput) === 'number' && !isNaN(+this.fromInput))
+                    this.interval = setIntervalAsync(this.set_to_amount, 3000)
                 this.distribution = null
                 let minAmount = 10000
                 if(this.swapwrapped) minAmount *= 50
