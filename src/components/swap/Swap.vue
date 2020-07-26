@@ -630,7 +630,11 @@
                 let balance = await this.coins[i].methods.balanceOf(currentContract.default_account).call();
                 this.maxBalance = balance;
             }
-        }
+        },
+
+        beforeDestroy() {
+            this.interval && clearIntervalAsync(this.interval)
+        },
     }
 </script>
 

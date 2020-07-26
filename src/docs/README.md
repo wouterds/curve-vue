@@ -28,6 +28,22 @@ Coins:
 2. [cUSDC](https://etherscan.io/address/0x39AA39c021dfbaE8faC545936693aC917d5E7563)
 3. [USDT](https://etherscan.io/address/0xdAC17F958D2ee523a2206206994597C13D831ec7)
 
+
+##### PAX pool
+[Swap address](https://etherscan.io/address/0x06364f10B501e868329afBc005b3492902d6C763)
+Underlying coins:
+1. [DAI](https://etherscan.io/address/0x6B175474E89094C44Da98b954EedeAC495271d0F)
+2. [USDC](https://etherscan.io/address/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48)
+3. [USDT](https://etherscan.io/address/0xdAC17F958D2ee523a2206206994597C13D831ec7)
+4. [PAX](https://etherscan.io/address/0x8E870D67F660D95d5be530380D0eC0bd388289E1)
+
+Coins: 
+1. [ycDAI](https://etherscan.io/address/0x99d1Fa417f94dcD62BfE781a1213c092a47041Bc)
+2. [ycUSDC](https://etherscan.io/address/0x9777d7E2b60bB01759D0E2f8be2095df444cb07E)
+3. [ycUSDT](https://etherscan.io/address/0x1bE5d71F2dA660BFdee8012dDc58D024448A0A59)
+4. [PAX](https://etherscan.io/address/0x8E870D67F660D95d5be530380D0eC0bd388289E1)
+
+
 ##### Y pool
 **Notice that addresses of yTokens used are different for Y and BUSD pools**
 
@@ -61,6 +77,58 @@ Coins:
 2. [yUSDC](https://etherscan.io/address/0x26EA744E5B887E5205727f55dFBE8685e3b21951)
 3. [yUSDT](https://etherscan.io/address/0xE6354ed5bC4b393a5Aad09f21c46E101e692d447)
 4. [yTUSD](https://etherscan.io/address/0x04bC0Ab673d88aE9dbC9DA2380cB6B79C4BCa9aE)
+
+#### sUSDv2 pool
+
+**This is a no-lending pool, undelying coins and coins are the same**
+
+[Swap address](https://etherscan.io/address/0xA5407eAE9Ba41422680e2e00537571bcC53efBfD)
+
+Underlying coins:
+[DAI](https://etherscan.io/address/0x6B175474E89094C44Da98b954EedeAC495271d0F)
+[USDC](https://etherscan.io/address/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48)
+[USDT](https://etherscan.io/address/0xdAC17F958D2ee523a2206206994597C13D831ec7)
+[sUSD](https://etherscan.io/address/0x57Ab1ec28D129707052df4dF418D58a2D46d5f51)
+
+Coins:
+[DAI](https://etherscan.io/address/0x6B175474E89094C44Da98b954EedeAC495271d0F)
+[USDC](https://etherscan.io/address/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48)
+[USDT](https://etherscan.io/address/0xdAC17F958D2ee523a2206206994597C13D831ec7)
+[sUSD](https://etherscan.io/address/0x57Ab1ec28D129707052df4dF418D58a2D46d5f51)
+
+
+#### Ren pool
+
+**This is a no-lending pool, undelying coins and coins are the same**
+
+[Swap address](https://etherscan.io/address/0x93054188d876f558f4a66B2EF1d97d16eDf0895B)
+
+Underlying coins:
+[renBTC](https://etherscan.io/address/0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D)
+[wBTC](https://etherscan.io/address/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599)
+
+Coins:
+[renBTC](https://etherscan.io/address/0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D)
+[wBTC](https://etherscan.io/address/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599)
+
+
+#### sbtc pool
+
+**This is a no-lending pool, undelying coins and coins are the same**
+
+[Swap address](https://etherscan.io/address/0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714)
+
+Underlying coins:
+[renBTC](https://etherscan.io/address/0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D)
+[wBTC](https://etherscan.io/address/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599)
+[sBTC](https://etherscan.io/address/0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6)
+
+Coins:
+[renBTC](https://etherscan.io/address/0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D)
+[wBTC](https://etherscan.io/address/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599)
+[sBTC](https://etherscan.io/address/0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6)
+
+
 
 
 # How to integrate Curve smart contracts
@@ -310,3 +378,12 @@ Result [DAI, USDC, USDT, TUSD]
 ```
 [553933.9858153213, 4224564.972267471, 3670559.5272607645, 3029672.351525377]
 ```
+
+## Getting APYs for a pool
+
+[Get all pools](http://pushservice.curve.fi/pools)
+
+Get APYs for a pool(all currencies in a pool have same APY)
+
+http://pushservice.curve.fi/apys/:pool
+For example http://pushservice.curve.fi/apys/susdv2

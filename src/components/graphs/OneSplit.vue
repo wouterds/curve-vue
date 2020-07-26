@@ -1118,7 +1118,11 @@
 
                 this.snxExchanger = new contract.web3.eth.Contract(synthetixExchanger_ABI, synthetixExchanger_address)
             }
-        }
+        },
+
+        beforeDestroy() {
+            this.interval && clearIntervalAsync(this.interval)
+        },
     }
 </script>
 
