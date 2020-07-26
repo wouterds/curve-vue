@@ -4,6 +4,8 @@
 - y(yDAI, yUSDC, yUSDT, yTUSD)
 - busd(yDAI, yUSDC, yUSDT, yBUSD)
 - susd(DAI, USDC, USDT, sUSD)
+- ren(renBTC, wBTC)
+- sbtc(renBTC, wBTC, sBTC)
 
 ##### Compound pool
 [Swap address](https://etherscan.io/address/0xA2B47E3D5c44877cca798226B7B8118F9BFb7A56)
