@@ -127,9 +127,13 @@ export default {
                 )
 			}
 			calls.push([curveRewards._address, curveRewards.methods.DURATION().encodeABI()],
-					[curveRewards._address, curveRewards.methods.rewardRate().encodeABI()])
+					[curveRewards._address, curveRewards.methods.rewardRate().encodeABI()],
+					[curveRewards._address, curveRewards.methods.periodFinish().encodeABI()],
+			)
 			let aggcalls = await currentContract.multicall.methods.aggregate(calls).call()
 			let decoded = aggcalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
+			let now = Date.now() / 1000
+			let periodFinish = decoded[decoded.length-1]
 			if(currentContract.currentContract == 'susdv2') {
 				this.earnedSNX = +decoded[0] / 1e18
 				let rewardLogs = await currentContract.web3.eth.getPastLogs({
@@ -149,7 +153,7 @@ export default {
 				let rewards = rewardLogs.map(log=>currentContract.web3.eth.abi.decodeParameter('uint256', log.data) / 1e18).reduce((a, b) => a + b, 0)
 				this.paidRewardsSNX = rewards
 				let len = decoded.length
-				this.weeklyEstimateSNX = (decoded[len-2] * decoded[len-1] / 1e18) * currentContract.curveStakedBalance  / decoded[3]
+				this.weeklyEstimateSNX = (decoded[len-3] * decoded[len-2] / 1e18) * currentContract.curveStakedBalance  / decoded[3]
 			}
 			if(currentContract.currentContract == 'sbtc') {
 				this.earnedSNX = decoded[0] * decoded[5] / decoded[4] / 1e18
@@ -177,6 +181,10 @@ export default {
 				
 				this.paidRewardsSNX = rewards * decoded[4] / decoded[3]
 				this.paidRewardsREN = rewards * decoded[5] / decoded[3]
+			}
+			if(+periodFinish < now) {
+				this.weeklyEstimateSNX = 0
+				this.weeklyEstimateBPT = 0
 			}
 			this.profitTotalStake = +decoded[1] / 1e18
 		},
