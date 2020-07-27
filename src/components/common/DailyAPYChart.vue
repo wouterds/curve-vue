@@ -89,7 +89,7 @@
 		            	id: 'apyAxis',
 		            	opposite: false,
 		            	type: 'logarithmic',
-		            	min: 0.5,
+		            	min: 0.1,
 	        			title: {
 	        				text: 'Daily APY [%]',
 	        				style: {
@@ -285,7 +285,7 @@
 		        	let RENprices = prices[1].prices
 		        	let btcPrice = prices[2].quotes.USD.price
 
-		        	let curveRewards = new web3.eth.Contract(abis.iearn.sCurveRewards_abi, abis.iearn.sCurveRewards_address)
+		        	let curveRewards = new web3.eth.Contract(abis.sbtc.sCurveRewards_abi, abis.sbtc.sCurveRewards_address)
 		        	let sbtcPeriodFinish = await curveRewards.methods.periodFinish().call()
 
 		        	let SNXapys = []

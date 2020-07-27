@@ -2,6 +2,10 @@
     <fieldset id='profit-info'>
         <legend>
         Profit in {{ profitIn }} {{ profitIn == 'USD' ? '[Virtual profit]' : profitIn == 'tokens' ? '[Impermanent Profit]' : 'tokens'}}
+            <span class='tooltip'>
+                <img class='icon small hoverpointer clear-cache-icon' :src="publicPath + 'sync-solid.svg'" @click='clearCache(); mounted()'>
+                <span class='tooltiptext inverse'>Clear profit cache</span>
+            </span>
             <div class='showinoptions' v-show='!notinpricedata'>
                 <input id="showinUSD" type="radio" name="showinUSD" value='1' v-model='showinUSD'>
                 <label for="showinUSD">Show in USD [Virtual profit]</label>

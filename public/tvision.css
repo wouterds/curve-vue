@@ -801,3 +801,11 @@ li.coins label:hover {
 label[for='showinUSD'], label[for='showintokens'], label[for='showinBTC'] {
   cursor: pointer;
 }
+
+.hoverpointer {
+  cursor: pointer;
+}
+
+.clear-cache-icon:hover {
+  transform: rotateZ(45deg);
+}

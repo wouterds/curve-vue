@@ -99,6 +99,9 @@ export default {
         if(this.showinUSD == 2) return 'BTC'
         if(this.showinUSD == 3) return 'tokens'
       },
+      publicPath() {
+        return process.env.BASE_URL
+      },
     },
     beforeDestroy() {
         this.cancel = true;
