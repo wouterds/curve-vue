@@ -248,6 +248,12 @@ This method is used when you want to remove liquidity from the pool in uneven am
 This method accepts an array of coin amounts to remove from the pool and max amount of pool tokens to burn
 `max_burn_amount`. Reverts if amount of burned pool tokens is bigger than specified `max_burn_amount`.
 
+```python
+def remove_liquidity_one_coin(_token_amount: uint256, i: int128, min_amount: uint256)
+```
+
+This method accepts a `_token_amount` to withdraw from pool and a coin `i` to withdraw that amount in
+with withdrawal resulting in at least `min_amount` of coin `i` -if not - reverts
 
 ## Bonus: measuring profits
 
