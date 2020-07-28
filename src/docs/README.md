@@ -245,6 +245,8 @@ def remove_liquidity_imbalance(amounts: uint256[N_COINS], max_burn_amount: uint2
 This method is used when you want to remove liquidity from the pool in uneven amounts. That can give
 **slippage** or **bonus** depending on if the coin is low or high in the pool.
 
+## Withdrawing in one coin from the pool (for pools supporting it - ren, sbtc, ...)
+
 This method accepts an array of coin amounts to remove from the pool and max amount of pool tokens to burn
 `max_burn_amount`. Reverts if amount of burned pool tokens is bigger than specified `max_burn_amount`.
 
