@@ -97,6 +97,10 @@
         <div class='info-message gentle-message window half-width gentle-message' v-if='hasConnectedWallet'>
           You haven't connected a wallet. <button @click='changeWallets'>Connect wallet</button>
         </div>
+        <div class='simple-error window' v-show='plsReturn'>
+          Your recent withdrawal from Curve resulted in getting 1000 more USDT because of another user mistakenly transferring funds to the contract.
+          If you wish to return them - please contact us on <a href='https://twitter.com/CurveFinance'>Twitter</a>/<a href='https://t.me/curvefi'>Telegram</a>/<a href="https://discord.gg/9uEHakc" rel='noopener noreferrer'>@Discord</a>. Thank you! 
+        </div>
         <router-view/>
     </div>
     </div>
@@ -154,6 +158,9 @@
         return this.default_account == '0x0000000000000000000000000000000000000000' 
                 && !['Donate', 'StatsDaily', 'Audits', 'Stats', 'Contracts', 'FAQ', 'RootFAQ'].includes(this.$route.name)
       },
+      plsReturn() {
+        return currentContract.currentContract.toLowerCase() == '0x72c20f89008729c91b6bb85f3104fda942494cef'.toLowerCase()
+      },
     },
     methods: {
       changePools(pool) {
@@ -183,5 +190,8 @@
   }
   h1 > img {
     height: 52.125px;
+  }
+  .simple-error.window {
+    box-shadow: none;
   }
 </style>

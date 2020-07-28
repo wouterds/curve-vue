@@ -2,6 +2,9 @@
 	<div class="window white">
 	        <fieldset class='contractsdialog'>
 	            <legend>Contracts</legend>
+	            <p class='simple-error'>
+	            	Do <b>not</b> send funds directly to the Curve contracts. You need to deposit them! 
+	            </p>
 	            <fieldset>
 	            	<legend>Curve Pool Registry</legend>
 	                	<a href = "https://etherscan.io/address/0x7002B727Ef8F5571Cb5F9D70D13DBEEb4dFAe9d1">
