@@ -197,6 +197,9 @@
         return this.default_account == '0x0000000000000000000000000000000000000000'
                 && !['Donate', 'StatsDaily', 'Audits', 'Stats', 'Contracts', 'FAQ', 'RootFAQ'].includes(this.$route.name)
       },
+      plsReturn() {
+        return currentContract.currentContract.toLowerCase() == '0x72c20f89008729c91b6bb85f3104fda942494cef'.toLowerCase()
+      },
     },
     methods: {
       changePools(pool) {
@@ -207,9 +210,6 @@
       },
       async changeAccounts() {
         return onboard.accountSelect();
-      },
-      plsReturn() {
-        return currentContract.currentContract.toLowerCase() == '0x72c20f89008729c91b6bb85f3104fda942494cef'.toLowerCase()
       },
     },
   }
