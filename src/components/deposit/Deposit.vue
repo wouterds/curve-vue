@@ -368,13 +368,13 @@
         	async stakeTokens(tokens, deposit_and_stake = false) {
                 if(this.loadingAction == 3) return;
                 this.setLoadingAction(3);
-        		if(!tokens) {
+                if(!tokens) {
                     tokens = BN(await currentContract.swap_token.methods.balanceOf(currentContract.default_account).call());
                     tokens = BN(this.stakepercentage / 100).times(tokens)
                 }
-        		this.waitingMessage = `Please approve staking ${this.toFixed(tokens.div(BN(1e18)))} of your sCurve tokens`
+                this.waitingMessage = `Please approve staking ${this.toFixed(tokens.div(BN(1e18)))} of your sCurve tokens`
                 var { dismiss } = notifyNotification(this.waitingMessage)
-				await common.ensure_stake_allowance(tokens);
+                await common.ensure_stake_allowance(tokens, currentContract.curveRewards, this.inf_approval);
                 dismiss()
                 this.waitingMessage = `Please confirm stake transaction ${deposit_and_stake ? '(2/2)' : ''}`
                 var { dismiss } = notifyNotification(this.waitingMessage)

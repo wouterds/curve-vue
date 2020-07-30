@@ -12,7 +12,7 @@ import { notify, notifyHandler } from '../init'
 
 var cBN = (val) => new BigNumber(val);
 
-let requiresResetAllowance = ['0xdAC17F958D2ee523a2206206994597C13D831ec7']
+let requiresResetAllowance = ['0xdAC17F958D2ee523a2206206994597C13D831ec7', '0xC25a3A3b969415c80451098fa907EC722572917F', '0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3', '0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8']
 
 export function approve(contract, amount, account, toContract) {
     if(!toContract) toContract = currentContract.swap_address
@@ -58,14 +58,23 @@ export function approve_to_migrate(amount, account) {
             });
 }
 
-export async function ensure_allowance_zap_out(amount, fromContract, toContract) {
+export async function ensure_allowance_zap_out(amount, fromContract, toContract, infinite = false) {
     var default_account = currentContract.default_account
     if(!fromContract) fromContract = currentContract.swap_token;
     if(!toContract) toContract = allabis[currentContract.currentContract].deposit_address
     let allowance = cBN(await currentContract.swap_token.methods.allowance(default_account, toContract).call())
-    if(allowance.lt(cBN(amount))) {    
-        if(allowance > 0) await approve(fromContract, 0, default_account, toContract)
-        await approve(fromContract, amount, default_account, toContract)
+    if(!infinite) {
+        if(allowance.lt(cBN(amount))) {    
+            if(allowance > 0) await approve(fromContract, 0, default_account, toContract)
+            await approve(fromContract, amount, default_account, toContract)
+        }
+    }
+    else {
+        if(allowance.lt(currentContract.max_allowance.div(cBN(2))) && cBN(amount).gt(0)) {
+            if(allowance > 0 && requiresResetAllowance.includes(fromContract._address))
+                await approve(fromContract, 0, default_account, toContract)
+            await approve(fromContract, currentContract.max_allowance, default_account, toContract)
+        }
     }
 }
 
@@ -183,14 +192,23 @@ export function init_menu() {
     })
 }
 
-export async function ensure_stake_allowance(amount, stakeContract) {
+export async function ensure_stake_allowance(amount, stakeContract, infinite = false) {
     var default_account = currentContract.default_account;
     if(!stakeContract) stakeContract = currentContract.curveRewards
     let allowance = cBN(await currentContract.swap_token.methods.allowance(default_account, stakeContract._address).call());
-    if(allowance.lt(amount)) {
-        if(allowance.gt(0))
-            await approve(currentContract.swap_token, 0, default_account, stakeContract._address)
-        await approve(currentContract.swap_token, amount, default_account, stakeContract._address)
+    if(!infinite) {
+        if(allowance.lt(amount)) {
+            if(allowance.gt(0))
+                await approve(currentContract.swap_token, 0, default_account, stakeContract._address)
+            await approve(currentContract.swap_token, amount, default_account, stakeContract._address)
+        }
+    }
+    else {
+        if(allowance.lt(currentContract.max_allowance.div(cBN(2))) && cBN(amount).gt(0)) {
+            if(allowance > 0 && requiresResetAllowance.includes(currentContract.swap_token._address))
+                await approve(currentContract.swap_token, 0, default_account, stakeContract._address)
+            await approve(currentContract.swap_token, amount, default_account, stakeContract._address)
+        }
     }
 }
 

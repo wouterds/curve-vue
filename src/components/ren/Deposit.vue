@@ -362,7 +362,7 @@
                 let curveRewards = new contract.web3.eth.Contract(allabis.sbtc.sCurveRewards_abi, allabis.sbtc.sCurveRewards_address)
 
                 var { dismiss } = notifyNotification(this.waitingMessage)
-                await common.ensure_stake_allowance(tokens, curveRewards);
+                await common.ensure_stake_allowance(tokens, curveRewards, this.inf_approval);
                 dismiss()
                 this.waitingMessage = `Please confirm stake transaction ${deposit_and_stake ? '(2/2)' : ''}`
                 var { dismiss } = notifyNotification(this.waitingMessage)

@@ -122,6 +122,10 @@
             </div>
         </div> -->
 
+        <p v-show='showInfApprovalZap'>
+            <input id='inf_approval' type='checkbox' v-model='inf_approval'>
+            <label for='inf_approval'>Infinite approval - trust zap contract forever</label>
+        </p>
 
         <div id='withdraw_buttons' class='buttons'>
             <div class='info-message gentle-message' id='amount-warning' v-show = 'nobalance'>
@@ -305,6 +309,7 @@
             warninglow: false,
             showModal: false,
     		slippagePromise: helpers.makeCancelable(Promise.resolve()),
+            inf_approval: true,
     	}),
         async created() {
 
@@ -373,6 +378,13 @@
             unstakeAmount() {
                 return this.toFixed(BN(this.unstakepercentage / 100).times(this.staked_balance / 1e18))
             },
+            showInfApprovalZap() {
+                if(!this.withdrawc && this.currentPool != 'susdv2')
+                    return true
+                if(this.share != '---' && ((this.to_currency !== null && this.to_currency < 10) || this.to_currency == 10)) {
+                    return true
+                }
+            },
         },
         mounted() {
         	if(['susdv2', 'sbtc', 'y', 'iearn'].includes(this.currentPool)) {
@@ -394,6 +406,9 @@
             	currentContract.showSlippage = false;
         		currentContract.slippage = 0;
                 let curveRewards = currentContract.curveRewards
+                let allowance = BN(await currentContract.swap_token.methods.allowance(currentContract.default_account || '0x0000000000000000000000000000000000000000', currentContract.deposit_zap._address).call())
+                if(allowance.lte(currentContract.max_allowance.div(BN(2))))
+                    this.inf_approval = false
                 if(['susdv2', 'y', 'iearn'].includes(this.currentPool)) {
                     this.pendingSNXRewards = await curveRewards.methods.earned(this.default_account).call()
                     console.log(this.pendingSNXRewards, "PENDING SNX REWARDS")
@@ -879,7 +894,7 @@
                         var { dismiss } = notifyNotification(this.waitingMessage)
                         try {
                             this.estimateGas = gas / (['compound', 'usdt'].includes(currentContract.currentContract) ? 1.5 : 2.5)
-                            if(!['tbtc','ren','sbtc'].includes(currentContract.currentContract)) await common.ensure_allowance_zap_out(token_amount)
+                            if(!['tbtc','ren','sbtc'].includes(currentContract.currentContract)) await common.ensure_allowance_zap_out(token_, undefined, undefined, this.inf_approvalamount)
                             dismiss()
                             this.waitingMessage = 'Please confirm withdrawal transaction'
                             var { dismiss } = notifyNotification(this.waitingMessage)
@@ -921,7 +936,7 @@
                         this.waitingMessage = `Please approve ${this.toFixed((amount / 1e18))} Curve LP tokens for withdrawal`
                         var { dismiss } = notifyNotification(this.waitingMessage)
                         this.estimateGas = contractGas.depositzap[this.currentPool].withdraw / 2
-                        if(!['tbtc','ren','sbtc'].includes(currentContract.currentContract)) await common.ensure_allowance_zap_out(amount)
+                        if(!['tbtc','ren','sbtc'].includes(currentContract.currentContract)) await common.ensure_allowance_zap_out(amount, undefined, undefined, this.inf_approval)
                         dismiss()
                         let min_amount;
                         try {
@@ -964,7 +979,7 @@
                         var { dismiss } = notifyNotification(this.waitingMessage)
                         try {
                             this.estimateGas = contractGas.depositzap[this.currentPool].withdrawShare / 2
-                            if(!['tbtc','ren','sbtc'].includes(currentContract.currentContract)) await common.ensure_allowance_zap_out(amount)
+                            if(!['tbtc','ren','sbtc'].includes(currentContract.currentContract)) await common.ensure_allowance_zap_out(amount, undefined, undefined, this.inf_approval)
                             dismiss()
                             this.waitingMessage = 'Please confirm withdrawal transaction'
                             var { dismiss } = notifyNotification(this.waitingMessage)
