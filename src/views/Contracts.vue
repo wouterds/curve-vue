@@ -147,4 +147,7 @@
 	    background-color: blue;
     	color: white;
 	}
+	.simple-error {
+		margin-bottom: 1em;
+	}
 </style>
