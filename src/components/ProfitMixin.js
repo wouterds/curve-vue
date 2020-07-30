@@ -568,7 +568,8 @@ export default {
 	            let transfer = receipt.logs
 	        					.filter(log=>log.topics[0] == this.TRANSFER_TOPIC 
     								&& log.topics[1] == '0x000000000000000000000000' + default_account
-    								&& log.topics[2] != '0x000000000000000000000000' + default_account)
+    								&& log.topics[2] != '0x000000000000000000000000' + default_account
+    								&& log.address.toLowerCase() == currentContract.token_address.toLowerCase())
 	        	if(!transfer.length) continue
 	            let transferTokens = +transfer[transfer.length-1].data
 	            console.log(transferTokens / 1e18, poolInfoPoint.virtual_price, transferTokens * poolInfoPoint.virtual_price / 1e36)
