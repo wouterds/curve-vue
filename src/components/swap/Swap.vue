@@ -149,7 +149,13 @@
                         </fieldset>
                     </div>
                 </div>
-                <p class='simple-error' v-show='exchangeRate<=0.98'>
+                <p class='simple-error' v-show="exchangeRate<=0.98 && (to_currency > 0 && !['ren', 'sbtc'].includes(currentPool))">
+                    Warning! Exchange rate is too low!
+                </p>
+                <p class='simple-error' v-show="exchangeRate<=0.98 && ['ren', 'sbtc'].includes(currentPool)">
+                    Warning! Exchange rate is too low!
+                </p>
+                <p class='simple-error' v-show="exchangeRate<=0.95 && (to_currency == 0 && !['ren', 'sbtc'].includes(currentPool))">
                     Warning! Exchange rate is too low!
                 </p>
                 <p class='trade-buttons' v-show="['ren', 'sbtc'].includes(currentPool)">
