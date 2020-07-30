@@ -142,14 +142,14 @@
                 <li v-show="showStakedBalance > 0" :class="{'loading line': weeklyEstimateYFI === null}">
                     <b>Estimated weekly YFI LP rewards:</b> <span v-show='weeklyEstimateYFI !== null'> {{showWeeklyYFI}} {{+showinUSD == 1 ? 'USD' : 'YFI'}}</span>
                 </li>
-                <li :class="{'loading line': claimableADAI === null}">
+                <!-- <li :class="{'loading line': claimableADAI === null}">
                     <b>Claimable aDAI:</b> <span v-show='claimableADAI !== null'> {{claimableADAI && claimableADAI.toFixed(2)}} aDAI</span>
                     <span class='tooltip'> [?]
                         <span class='tooltiptext long inverse'>
                             Amount of aDAI you'll receive by burning your YFI tokens for aDAI tokens
                         </span>
                     </span>
-                </li>
+                </li> -->
 
                 <li>
                     <b>
