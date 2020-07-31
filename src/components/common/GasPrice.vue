@@ -21,7 +21,7 @@
                     :disabled='customGasDisabled'
                     name="custom_gas_input"
                     :value = 'customGasPriceInput'
-                   	@input='gasPrice = $event.target.value'>
+                   	@input='setCustomGas($event)'>
                 <span v-show='customGasPriceInput == gasPriceSlow'> Slow</span>
                 <span v-show='customGasPriceInput && customGasPriceInput < gasPriceSlow' class='gastoolow'> 
                     <span class='tooltip'>
@@ -127,7 +127,14 @@
                     state.gasPrice = state.gasPriceInfo.fast
                     state.fetched = true
                 }
-            }
+            },
+
+            async setCustomGas(event) {
+                let value = event.target.value
+                if(event.target.value > this.gasPriceFastest * 1.5)
+                    value = this.gasPriceFastest * 1.5
+                this.gasPrice = value
+            },
         },
 
 	}
