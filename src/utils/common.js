@@ -323,6 +323,7 @@ export async function multiInitState(calls, contract, initContracts = false) {
     let decoded = aggcalls[1].map((hex, i) =>
         (i >= aggcalls[1].length-allabis[contract.currentContract].N_COINS*2) ? web3.eth.abi.decodeParameter('address', hex) : web3.eth.abi.decodeParameter('uint256', hex)
     )
+    contract.oldBalance = 0
     if(initContracts) {
         contract.virtual_price = decoded[0] / 1e18;
         contract.A = decoded[1] / 1e18;
