@@ -131,8 +131,8 @@
 
             async setCustomGas(event) {
                 let value = event.target.value
-                if(event.target.value > this.gasPriceFastest * 1.5)
-                    value = this.gasPriceFastest * 1.5
+                if(event.target.value > this.gasPriceFastest * 2)
+                    value = this.gasPriceFastest * 2
                 this.gasPrice = value
             },
         },

@@ -196,8 +196,10 @@
   }
   .blue.window.Events + .info-message.gentle-message {
     width: 730px;
+    max-width: 730px;
   }
   .blue.window.Trade + .info-message.gentle-message {
     width: 1000px;
+    max-width: 1000px;
   }
 </style>
