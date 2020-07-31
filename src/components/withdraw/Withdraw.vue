@@ -182,7 +182,7 @@
             >
                 Unstake
             </button>
-            <router-link v-show="['susdv2', 'sbtc'].includes(currentPool) && oldBalance > 0" class='button' to='/susd/withdraw' id='withdrawold'>Withdraw old</router-link>
+            <router-link v-show="['susdv2'].includes(currentPool) && oldBalance > 0" class='button' to='/susd/withdraw' id='withdrawold'>Withdraw old</router-link>
             <button @click='migrateUSDT' v-show="currentPool == 'usdt'">Migrate to PAX</button>
             <button id="remove-liquidity" @click='handle_remove_liquidity' v-show="currentPool == 'susd'">Withdraw old</button>
             <p v-show="['ren', 'sbtc'].includes(currentPool)">
