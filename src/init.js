@@ -127,6 +127,10 @@ if(window.web3 && window.web3.currentProvider.isStatus) {
   wallets.find(wallet => wallet.walletName == 'status').preferred = true
 }
 
+if(window.web3 && window.web3.currentProvider.isCoinbaseWallet) {
+  wallets.find(wallet => wallet.walletName == 'coinbase').preferred = true
+}
+
 export const onboard = Onboard({
   dappId: 'c68d8ec3-9b9a-4ba5-a3eb-6232eff79030',       // [String] The API key created by step one above
   networkId: 1,  // [Integer] The Ethereum network ID your Dapp uses.
@@ -181,7 +185,9 @@ async function init(init = true, name, walletlink = false) {
   window.web3provider = web3;*/
   try {
     state.contract.initializedContracts = false;
-    let userSelectedWallet = await onboard.walletSelect(localStorage.getItem('selectedWallet') || window.web3 && window.web3.currentProvider.isTrust && 'Trust');
+    let userSelectedWallet = await onboard.walletSelect(localStorage.getItem('selectedWallet') 
+      || window.web3 && window.web3.currentProvider.isTrust && 'Trust' 
+      || window.web3 && window.web3.currentProvider.isCoinbaseWallet && 'Coinbase');
     if(userSelectedWallet) await onboard.walletCheck();
     else window.web3 = new Web3(infura_url)
     state.contract.web3 = window.web3
