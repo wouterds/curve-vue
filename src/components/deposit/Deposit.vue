@@ -109,14 +109,14 @@
                     Stake unstaked <span class='loading line' v-show='loadingAction == 3'></span>
                 </button>
                 <p class='info-message gentle-message' v-show="lpCrvReceived > 0">
-                    You'll receive minimum {{ lpCrvReceivedText }} Curve {{currentPool}} LP tokens
+                    You'll receive minimum {{ lpCrvReceivedText }} Curve {{currentPool}} LP tokens <sub>{{ ((1 - getMaxSlippage) * 100).toFixed(2)}}% max slippage</sub>
                     
                     <span class='curvelpusd'> 
                         1 Curve {{currentPool}} LP token = {{ (1 * virtual_price).toFixed(6) }} 
                         {{ !['ren', 'sbtc'].includes(currentPool) ? 'USD' : 'BTC' }} 
                     </span>
                 </p>
-                <div v-show="totalShare > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)">
+                <div>
                     <button class='simplebutton advancedoptions' @click='showadvancedoptions = !showadvancedoptions'>
                         Advanced options
                         <span v-show='!showadvancedoptions'>▼</span>
@@ -125,7 +125,7 @@
                     <div v-show='showadvancedoptions'>
                         <fieldset>
                             <legend>Advanced options:</legend>
-                            <div v-show='hasRewards'>
+                            <div v-show="hasRewards && totalShare > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)">
                                 <label for='stakepercentage'>Stake %</label>
                                 <input id='stakepercentage' v-model='stakepercentage' :class="{'invalid': stakePercentageInvalid}">
                                 <button id='stakeunstaked' 
