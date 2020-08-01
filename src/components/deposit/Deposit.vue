@@ -417,13 +417,14 @@
                 await this.calcSlippage()
                 let calls = [...Array(currentContract.N_COINS).keys()].map(i=>[this.coins[i]._address, 
                 	this.coins[i].methods.allowance(currentContract.default_account || '0x0000000000000000000000000000000000000000', this.swap_address).encodeABI()])
-                calls.push([currentContract.curveRewards._address, currentContract.curveRewards.methods.periodFinish().encodeABI()])
+                if(['susdv2', 'sbtc', 'y', 'iearn'].includes(this.currentPool))
+                    calls.push([currentContract.curveRewards._address, currentContract.curveRewards.methods.periodFinish().encodeABI()])
                 let aggcalls = await currentContract.multicall.methods.aggregate(calls).call()
                 let decoded = aggcalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
                 if(decoded.slice(0,decoded.length-1).some(v=>BN(v).lte(currentContract.max_allowance.div(BN(2))) > 0))
                 	this.inf_approval = false
                 let now = Date.now() / 1000
-                if(+decoded[decoded.length-1] < now)
+                if(['susdv2', 'sbtc', 'y', 'iearn'].includes(this.currentPool) && +decoded[decoded.length-1] < now)
                     this.hasRewards = false
 
                 this.disabledButtons = false;
