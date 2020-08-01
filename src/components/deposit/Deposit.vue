@@ -777,35 +777,35 @@
 				if(event) {
 					this.inputs[i] = event.target.value
 				}
-                this.getLPCrvReceived()
+                var value = this.inputs[i]
+                this.highlightInputs(i)
+
+                if (this.sync_balances && !this.max_balances) {
+                    for (let j = 0; j < currentContract.N_COINS; j++)
+                        if (j != i) {
+                            var value_j = this.inputs[j]
+
+                            if (this.balances[i] * currentContract.c_rates[i] > 1) {
+                                // proportional
+                                var newval = value / currentContract.c_rates[i] * this.balances[j] / this.balances[i];
+                                newval = Math.floor(newval * currentContract.c_rates[j] * 100) / 100;
+                                setInputs && Vue.set(this.inputs, j, newval);
+
+                            } else {
+                                // same value as we type
+                                var newval = value;
+                                setInputs && Vue.set(this.inputs, j, newval);
+                            }
+
+                            // Balance not enough highlight
+                            if (newval > this.wallet_balances[j] * this.rates[j])
+                                Vue.set(this.bgColors, j, 'red');
+                            else
+                                Vue.set(this.bgColors, j, 'blue');
+                        }
+                }
+                await this.getLPCrvReceived()
 	            await this.calcSlippage()
-	            var value = this.inputs[i]
-	            this.highlightInputs(i)
-
-	            if (this.sync_balances && !this.max_balances) {
-	                for (let j = 0; j < currentContract.N_COINS; j++)
-	                    if (j != i) {
-	                        var value_j = this.inputs[j]
-
-	                        if (this.balances[i] * currentContract.c_rates[i] > 1) {
-	                            // proportional
-	                            var newval = value / currentContract.c_rates[i] * this.balances[j] / this.balances[i];
-	                            newval = Math.floor(newval * currentContract.c_rates[j] * 100) / 100;
-	                            setInputs && Vue.set(this.inputs, j, newval);
-
-	                        } else {
-	                            // same value as we type
-	                            var newval = value;
-	                            setInputs && Vue.set(this.inputs, j, newval);
-	                        }
-
-	                        // Balance not enough highlight
-	                        if (newval > this.wallet_balances[j] * this.rates[j])
-	                            Vue.set(this.bgColors, j, 'red');
-	                        else
-	                            Vue.set(this.bgColors, j, 'blue');
-	                    }
-	            }
 	        },
 	        handle_migrate_new() {
 	        	common.handle_migrate_new('new')
