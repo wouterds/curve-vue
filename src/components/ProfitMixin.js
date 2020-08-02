@@ -2,7 +2,7 @@ import * as common from '../utils/common.js'
 import { getters, contract as currentContract, allCurrencies } from '../contract'
 import { makeCancelable, interpolate } from '../utils/helpers'
 
-import allabis from '../allabis'
+import allabis, { yERC20_abi } from '../allabis'
 
 import BN from 'bignumber.js'
 
@@ -92,9 +92,24 @@ export default {
 
 	    async getAvailableAmount() {
 	    	if(!this.$route.params.address) {
+	    		let totalShare = currentContract.totalShare
+	    		let usdShare = currentContract.usdShare
 	    		if(!['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) this.btcPrice = 1
 	    		console.log(currentContract.curveStakedBalance, currentContract.virtual_price, this.btcPrice)
-	    		return [currentContract.totalShare * 100, currentContract.usdShare * this.btcPrice || 0,
+	    		if(['y', 'iearn'].includes(this.currentPool)) {
+	    			let vault = '0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c'
+	    			let vaultContract = new currentContract.web3.eth.Contract(yERC20_abi, '0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c')
+	    			let calls = [
+	    				[vaultContract._address, vaultContract.methods.balanceOf(currentContract.default_account).encodeABI()],
+	    				[vaultContract._address, vaultContract.methods.getPricePerFullShare().encodeABI()],
+	    			]
+	    			let aggcalls = await currentContract.multicall.methods.aggregate(calls).call()
+	    			let [balanceOf, rate] = aggcalls[1].map(hex => +currentContract.web3.eth.abi.decodeParameter('uint256', hex))
+
+	    			totalShare += this.getAvailableTransfer(+balanceOf * +rate, this.priceData[this.priceData.length - 1]) / 1e18
+	    			usdShare += (+balanceOf * +rate / 1e36) * currentContract.virtual_price
+	    		}
+	    		return [totalShare * 100, usdShare * this.btcPrice || 0,
     				currentContract.curveStakedBalance * currentContract.virtual_price * this.btcPrice / 1e18, currentContract.totalStake * 100]
 	    	}
 	    	return this.calcAvailable();
@@ -482,6 +497,7 @@ export default {
 	            	"0x000000000000000000000000dcb6a51ea3ca5d3fd898fd6564757c7aaec3ca92",
 	             	"0x00000000000000000000000013c1542a468319688b89e323fe9a3be3a90ebb27",
 	             	"0x0000000000000000000000000001fb050fe7312791bf6475b96569d83f695c9f",
+	             	"0x0000000000000000000000005dbcf33d8c2e976c6b560249878e6f1491bca25c",
 	             ].includes(transfer[0].topics[1])) continue;
 	            let depositsUSD = transferTokens * poolInfoPoint.virtual_price / 1e36
 	        	allDepositsUSD += depositsUSD
@@ -582,6 +598,7 @@ export default {
             			"0x000000000000000000000000dcb6a51ea3ca5d3fd898fd6564757c7aaec3ca92", 
             			"0x00000000000000000000000013c1542a468319688b89e323fe9a3be3a90ebb27",
             			"0x0000000000000000000000000001fb050fe7312791bf6475b96569d83f695c9f",
+            			"0x0000000000000000000000005dbcf33d8c2e976c6b560249878e6f1491bca25c",
         			].includes(transfer[0].topics[2])) continue;
             	let withdrawalsUSD = transferTokens * poolInfoPoint.virtual_price / 1e36
             	allWithdrawalsUSD += withdrawalsUSD
