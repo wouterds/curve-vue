@@ -487,15 +487,15 @@
 
 				this.snxRewards = 365 * (decoded[2] * decoded[3] / 1e18)/7*snxPrice/((+decoded[0]) * (+decoded[1])/1e36) * 100
 				let now = Date.now() / 1000
-				if(+decoded[12] < now)
+				if(+decoded[12] + 30*60 < now)
 					this.snxRewards = 0
 
 				this.sbtcRewards = (10000 * snxPrice + 25000 * renPrice) / 7 * 365 / (btcPrice * decoded[4] * decoded[5] / 1e36) * 100
-				if(+decoded[13] < now)
+				if(+decoded[13] + 30*60 < now)
 					this.sbtcRewards = 0
 
 				this.yfiRewards = 365 * (decoded[10] * decoded[11] / 1e18)/7*yfiPrice/((+decoded[8] * (+decoded[9]) / 1e36)) * 100
-				if(+decoded[14] < now)
+				if(+decoded[14] + 30*60 < now)
 					this.yfiRewards = 0
 
 				console.log(this.sbtcRewards, "SBTC REWARDS")
