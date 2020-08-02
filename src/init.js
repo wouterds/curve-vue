@@ -68,7 +68,7 @@ export function notifyNotification(message, type = 'pending') {
   return notify.notification(notificationObject)
 }
 
-const wallets = [
+let wallets = [
   { walletName: "metamask" },
   {
     walletName: "trezor",
@@ -114,6 +114,31 @@ const wallets = [
   { walletName: "unilogin" },
   { walletName: "imToken", rpcUrl: "https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b" },
 ]
+
+let isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+if(isMobile && !window.web3) {
+  wallets = wallets.filter(wallet => !['trust', 'imToken', 'status', 'coinbase'].includes(wallet.walletName))
+}
+
+if(isMobile && window.web3) {
+  if(!window.web3.currentProvider.isTrust) {
+    wallets = wallets.filter(wallet => wallet.walletName != 'trust')
+  }
+
+  if(!window.web3.currentProvider.isImToken) {
+    wallets = wallets.filter(wallet => wallet.walletName != 'imToken')
+  }
+
+  if(!window.web3.currentProvider.isStatus) {
+    wallets = wallets.filter(wallet => wallet.walletName != 'status')
+  }
+
+  if(!window.web3.currentProvider.isCoinbaseWallet) {
+    wallets = wallets.filter(wallet => wallet.walletName != 'coinbase')
+  }
+}
+
 
 if(window.web3 && window.web3.currentProvider.isTrust) {
   wallets.find(wallet => wallet.walletName == 'trust').preferred = true
