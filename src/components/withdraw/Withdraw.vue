@@ -894,7 +894,7 @@
                         var { dismiss } = notifyNotification(this.waitingMessage)
                         try {
                             this.estimateGas = gas / (['compound', 'usdt'].includes(currentContract.currentContract) ? 1.5 : 2.5)
-                            if(!['tbtc','ren','sbtc'].includes(currentContract.currentContract)) await common.ensure_allowance_zap_out(token_, undefined, undefined, this.inf_approvalamount)
+                            if(!['tbtc','ren','sbtc'].includes(currentContract.currentContract)) await common.ensure_allowance_zap_out(token_amount, undefined, undefined, this.inf_approvalamount)
                             dismiss()
                             this.waitingMessage = 'Please confirm withdrawal transaction'
                             var { dismiss } = notifyNotification(this.waitingMessage)
