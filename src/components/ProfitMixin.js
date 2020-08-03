@@ -106,6 +106,9 @@ export default {
 	    			let aggcalls = await currentContract.multicall.methods.aggregate(calls).call()
 	    			let [balanceOf, rate] = aggcalls[1].map(hex => +currentContract.web3.eth.abi.decodeParameter('uint256', hex))
 
+	    			if(balanceOf > 0)
+	    				this.isInVault = true
+
 	    			totalShare += this.getAvailableTransfer(+balanceOf * +rate, this.priceData[this.priceData.length - 1]) / 1e18
 	    			usdShare += (+balanceOf * +rate / 1e36) * currentContract.virtual_price
 	    		}

@@ -46,10 +46,10 @@
             </li>
             <li>
             	<b>
-                    Pool Profit
+                    Pool Profit {{ isInVault ? '+ yVault profit' : ''}}
                     <span class='tooltip'>[?]
                         <span class='tooltiptext long inverse'>
-                            Profit from Pool trading fees
+                            Profit from Pool trading fees {{ isInVault ? '+ yVault profit' : ''}}
                         </span>
                     </span>:
                 </b>
