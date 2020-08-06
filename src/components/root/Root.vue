@@ -519,14 +519,13 @@
 						fetch('https://api.coinpaprika.com/v1/tickers/hav-havven'), 
 						fetch('https://api.coinpaprika.com/v1/tickers/ren-republic-protocol'),
 						fetch('https://api.coinpaprika.com/v1/tickers/btc-bitcoin'),
-						fetch('https://ftx.com/api/markets/BAL/USD'),
 						fetch('https://poloniex.com/public?command=returnTicker'),
 					])
 					let prices = await Promise.all(requests.map(request => request.status == 'fulfilled' && request.value.json()))
 					snxPrice = prices[0] && prices[0].quotes.USD.price;
 					renPrice = prices[1] && prices[1].quotes.USD.price;
 					btcPrice = prices[2] && prices[2].quotes.USD.price;
-					balPrice = prices[3] && prices[3].result.last
+					balPrice = prices[3] && prices[3]['USDT_BAL'].last
 					yfiPrice = prices[4] && prices[4]['USDT_YFI'].last
 				}
 				return [snxPrice, renPrice, btcPrice, balPrice, balancerTVL, yfiPrice]
