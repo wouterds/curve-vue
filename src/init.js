@@ -113,6 +113,7 @@ let wallets = [
   { walletName: "operaTouch" },
   { walletName: "unilogin" },
   { walletName: "imToken", rpcUrl: "https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b" },
+  { walletName: "meetone" },
 ]
 
 let isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -154,6 +155,10 @@ if(window.web3 && window.web3.currentProvider.isStatus) {
 
 if(window.web3 && window.web3.currentProvider.isCoinbaseWallet) {
   wallets.find(wallet => wallet.walletName == 'coinbase').preferred = true
+}
+
+if(window.web3 && window.web3.currentProvider.wallet == "MEETONE") {
+  wallets.find(wallet => wallet.walletName == 'meetone').preferred = true
 }
 
 export const onboard = Onboard({
