@@ -209,7 +209,7 @@
           },
           calcFee() {
             let N_COINS = allabis[currentContract.currentContract].N_COINS
-            return this.fee * N_COINS / (4 * (N_COINS -1))
+            return this.fee / 100 * N_COINS / (4 * (N_COINS -1))
           },
           amountAfterBTC() {
             return (BN(this.inputs[0]).times(1e8).times(1-state.mintFee/10000).minus(state.minersLockFee)).div(1e8).toFixed(8)
