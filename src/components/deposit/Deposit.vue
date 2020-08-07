@@ -180,12 +180,12 @@
                 <div class='info-message gentle-message' v-show='estimateGas'>
                     Estimated tx cost: {{ (estimateGas * gasPrice / 1e9 * ethPrice).toFixed(2) }}$
                 </div>
-                <div class='simple-error' v-show="justDeposit && ['susdv2','sbtc','y','iearn'].includes(currentPool)">
+                <!-- <div class='simple-error' v-show="justDeposit && ['susdv2','sbtc','y','iearn'].includes(currentPool)">
                     Your tokens are being deposited into the {{ ['y', 'iearn'].includes(currentPool) ? 'y' : 'susd'}} pool without staking.
                     You can do that manually later on here or on 
                     <a href = 'https://mintr.synthetix.io/' v-show="['susdv2', 'sbtc'].includes(currentPool)" target='_blank' rel="noopener noreferrer"> Mintr. </a> 
                     <a href = 'https://ygov.finance/' v-show="['y', 'iearn'].includes(currentPool)" target='_blank' rel="noopener noreferrer"> yGov. </a> 
-                </div>
+                </div> -->
                 <div class='simple-error' v-show='errorStaking'>
                     There was an error in staking your tokens. You can manually stake them on 
                     <a href = 'https://mintr.synthetix.io/' v-show="['susdv2', 'sbtc'].includes(currentPool)" target='_blank' rel="noopener noreferrer"> Mintr. </a>
