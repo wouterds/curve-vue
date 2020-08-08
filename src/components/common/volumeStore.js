@@ -34,8 +34,8 @@ export const state = Vue.observable({
 })
 
 export function findClosestPrice(timestamp, data) {
-	let result = data.find(d=>Date.parse(d.timestamp)/1000 - timestamp > 0);
-	if(result === undefined) return data[data.length - 1].price
+	let result = data.find(d=>Date.parse(d[0])/1000 - timestamp > 0);
+	if(result === undefined) return data[data.length - 1][1]
 	return result.price
 }
 
@@ -53,7 +53,7 @@ export async function fetchVolumeData(pools, refresh = false, period = 5) {
 	//will work for 17 days on 5 minutes chart
 	if(pools.includes('tbtc') || pools.includes('ren') || pools.includes('sbtc'))
 		requests.push(fetch(`
-			https://api.coinpaprika.com/v1/tickers/btc-bitcoin/historical?start=1589587198&interval=${period == '1440' ? '1d' : period + 'm'}&limit=5000`
+			https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=1589587198&to=${(Date.now() / 1000) | 0}`
 			))
 	requests = await Promise.all(requests)
 	let jsons = await Promise.all(requests.map(r => r.json()))
@@ -63,7 +63,7 @@ export async function fetchVolumeData(pools, refresh = false, period = 5) {
 		let pool = pools[i]
 		if(['tbtc', 'ren', 'sbtc'].includes(pool)) {
 			data = data.map(d => {
-				d.volume = Object.fromEntries(Object.entries(d.volume).map(([k, v]) => [k, v.map(vol => vol * findClosestPrice(d.timestamp, btcPrices))]))
+				d.volume = Object.fromEntries(Object.entries(d.volume).map(([k, v]) => [k, v.map(vol => vol * findClosestPrice(d.timestamp, btcPrices.prices))]))
 				return d;
 			})
 		}
@@ -75,9 +75,9 @@ export async function getVolumes(pools, refresh = false) {
 	if(!Array.isArray(pools)) pools = [pools]
 	pools = pools.map(p => p == 'iearn' ? 'y' : p == 'susdv2' ? 'susd' : p == 'ren' ? 'ren2' : p == 'sbtc' ? 'rens' : p)
 	if(Object.values(state.volumes).filter(v=>v[0]!=-1).length == pools.length && !refresh) return;
-	let req = await Promise.all([fetch(`${window.domain}/raw-stats/apys.json`), fetch(`https://api.coinpaprika.com/v1/tickers/btc-bitcoin`)])
+	let req = await Promise.all([fetch(`${window.domain}/raw-stats/apys.json`), fetch(`https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd`)])
 	let [stats, btcPrice] = await Promise.all(req.map(r => r.json()))
-    btcPrice = btcPrice.quotes.USD.price
+    btcPrice = btcPrice.bitcoin.usd
     for(let [pool, volume] of Object.entries(state.volumes)) {
     	if(volume[0] == -1) {
     		let volume = pool == 'ren' ? stats.volume.ren2 : pool == 'sbtc' ? stats.volume.rens : stats.volume[pool]

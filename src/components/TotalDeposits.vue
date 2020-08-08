@@ -431,17 +431,19 @@
 			let pools = Object.keys(allabis).filter(pool => pool != 'susd' && pool != 'y' && pool != 'tbtc')
 			await volumeStore.fetchVolumeData(pools, true, 1440)
 			let data = volumeStore.state.volumeData[1440]
-			let btcPrices = await helpers.retry(fetch(`https://api.coinpaprika.com/v1/tickers/btc-bitcoin/historical?start=1589587198&interval=1d&limit=5000`))
+			let btcPrices = await helpers.retry(fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=1589587198&to=${(Date.now() / 1000) | 0}`))
 			btcPrices = await btcPrices.json()
 			for(let btcPool of ['ren', 'sbtc']) {
 				data[btcPool] = data[btcPool].map(d => {
-					d.balances = d.balances.map(bal => bal * volumeStore.findClosestPrice(d.timestamp, btcPrices))
+					d.balances = d.balances.map(bal => bal * volumeStore.findClosestPrice(d.timestamp, btcPrices.prices))
 					return d;
 				})
 			}
 			data = Object.keys(data).reduce((obj, key) => {
 				return {...obj, [key]: (new Array(Math.max(...Object.values(data).map(arr=>arr.length))-data[key].length).fill({})).concat(data[key])}
 			}, {})
+
+			console.log(data, "THE DATA")
 
 			let volumes = {}
 
