@@ -583,11 +583,11 @@
 			},
 			async getAPY() {
 				let pools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc','ren2','rens']
-	            let requests = await Promise.all([fetch(`${window.domain}/raw-stats/apys.json`), helpers.retry(fetch(`https://api.coinpaprika.com/v1/tickers/btc-bitcoin`), 300)])
+	            let requests = await Promise.all([fetch(`${window.domain}/raw-stats/apys.json`), helpers.retry(fetch(`https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd`), 300)])
 	            let res = await Promise.all(requests.map(request => request.json()))
 	            let stats = res[0]
 	            this.btcPrice = res[1]
-	            this.btcPrice = this.btcPrice.quotes.USD.price
+	            this.btcPrice = this.btcPrice.bitcoin.usd
                 for(let [key, value] of Object.entries(volumeStore.state.volumes)) {
                 	if(volumeStore.state.volumes[key] && volumeStore.state.volumes[key][0] == -1) {
                 		let volume = key == 'ren' ? stats.volume.ren2 : key == 'sbtc' ? stats.volume.rens : stats.volume[key]
