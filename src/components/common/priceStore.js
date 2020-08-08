@@ -5,8 +5,8 @@ export let state = {
 }
 
 export async function getBTCPrice() {
-	let req = await helpers.retry(fetch(`https://api.coinpaprika.com/v1/tickers/btc-bitcoin`), 300);
+	let req = await helpers.retry(fetch(`https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd`), 300);
     let res = await req.json();
-    state.btcPrice = res.quotes.USD.price;
+    state.btcPrice = res.bitcoin.usd;
     return res.quotes.USD.price
 }
