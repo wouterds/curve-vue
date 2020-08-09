@@ -42,6 +42,8 @@ const Registry = () => import('../components/test/Registry.vue')
 
 const Gateway = () => import('../components/ren/Gateway.vue')
 
+const earlyCRV = () => import('../components/earlyCRV.vue')
+
 import Index from '../components/Index.vue'
 
 import init from '../init'
@@ -165,6 +167,11 @@ let routes = [
         path: 'devdocs',
         name: 'DeveloperDocs',
         component: DeveloperDocs,
+      },
+      {
+        path: 'earlyCRV',
+        name: 'earlyCRV',
+        component: earlyCRV,
       },
     ]
   },

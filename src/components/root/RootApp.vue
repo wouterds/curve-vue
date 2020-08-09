@@ -30,6 +30,7 @@
       </div>
 
       <router-link to="/">Home</router-link>
+      <router-link to='/earlyCRV'>Community CRV pre-allocation</router-link>
       <router-link to="/trade">Trade</router-link>
       <div class='poolsdropdown'>
         <router-link to="/combinedstats">Stats</router-link>
