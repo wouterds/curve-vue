@@ -23,11 +23,11 @@
 			let data = await Promise.all(pools.map(pool => fetch(`https://beta.curve.fi/raw-stats/${pool}-30m.json`)))
 			this.data = await Promise.all(data.map(d => d.json()))
 
-			let btcPrices = await fetch(`https://api.coinpaprika.com/v1/tickers/btc-bitcoin/historical?start=1589587198&interval=1d&limit=5000`)
+			let btcPrices = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=1589587198&to=${(Date.now() / 1000) | 0}`)
 			btcPrices = await btcPrices.json()
 
 			Vue.set(this.data, 6, this.data[6].map(d => {
-				d.volume = Object.fromEntries(Object.entries(d.volume).map(([k, v]) => [k, v.map(vol => vol * volumeStore.findClosestPrice(d.timestamp, btcPrices))]))
+				d.volume = Object.fromEntries(Object.entries(d.volume).map(([k, v]) => [k, v.map(vol => vol * volumeStore.findClosestPrice(d.timestamp, btcPrices.prices))]))
 				return d;
 			}))
 

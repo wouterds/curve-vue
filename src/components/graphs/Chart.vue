@@ -398,8 +398,7 @@
 				if(tradeStore.pools.includes('tbtc') || tradeStore.pools.includes('ren') || tradeStore.pools.includes('sbtc'))
 					urls.push(
 						fetch(`
-						https://api.coinpaprika.com/v1/tickers/btc-bitcoin/historical?
-							start=1589587198&interval=${jsonInterval == '1440m' ? '1d' : jsonInterval}&limit=5000`
+						https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=1589587198&to=${(Date.now() / 1000) | 0}`
 					))
 				let requests = await Promise.all(urls)
 				if(tradeStore.pools.includes('tbtc') || tradeStore.pools.includes('ren') || tradeStore.pools.includes('sbtc')) {
@@ -412,7 +411,7 @@
 					if(res.url.includes('tbtc') || res.url.includes('ren') || res.url.includes('sbtc')) {
 						json = json.map(d => {
 							d.volume = Object.fromEntries(Object.entries(d.volume).map(([k, v]) => 
-								[k, v.map(vol => vol * volumeStore.findClosestPrice(d.timestamp, this.btcPrices))]))
+								[k, v.map(vol => vol * volumeStore.findClosestPrice(d.timestamp, this.btcPrices.prices))]))
 							return d;
 						})
 					}

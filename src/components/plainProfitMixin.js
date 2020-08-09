@@ -97,19 +97,18 @@ export default {
 		},
 
 		async getBTCPrice() {
-			let req = await fetch(`https://api.coinpaprika.com/v1/tickers/btc-bitcoin`);
+			let req = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd`);
         	let res = await req.json();
-        	this.btcPrice = res.quotes.USD.price
+        	this.btcPrice = res.bitcoin.usd
 		},
 
 		async getSNXRewards() {
 			let requests = await Promise.all([
-				fetch('https://api.coinpaprika.com/v1/tickers/hav-havven'),
-				fetch('https://api.coinpaprika.com/v1/tickers/ren-republic-protocol'),
+				fetch('https://api.coingecko.com/api/v3/simple/price?ids=havven,republic-protocol&vs_currencies=usd'),
 			])
 			let prices = await Promise.all(requests.map(request => request.json()));
-			this.snxPrice = prices[0].quotes.USD.price;
-			this.renPrice = prices[1].quotes.USD.price
+			this.snxPrice = prices[0].havven.usd;
+			this.renPrice = prices[0]['republic-protocol'].usd
 
 			let curveRewards = currentContract.curveRewards
 			let calls = [

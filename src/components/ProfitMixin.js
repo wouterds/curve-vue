@@ -252,9 +252,9 @@ export default {
 		async getClosestBTCPrice(timestamp) {
 			while(true) {
 				try {
-					let req = await fetch(`https://api.coinpaprika.com/v1/coins/btc-bitcoin/ohlcv/historical?start=${timestamp}`)
+					let req = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${timestamp}&to=${(Date.now() / 1000) | 0}`)
 					let res = await req.json()
-					if(res.length) return res[0].close
+					if(res.length) return res[0][1]
 					await helpers.setTimeoutPromise(300)
 					timestamp -= 1000
 				}

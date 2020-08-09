@@ -277,13 +277,13 @@
 		        	let pricereqs = await Promise.all([
 		        		fetch(`https://api.coingecko.com/api/v3/coins/havven/market_chart/range?vs_currency=usd&from=${startTime}&to=${endTime}`),
 		        		fetch(`https://api.coingecko.com/api/v3/coins/republic-protocol/market_chart/range?vs_currency=usd&from=${startTime}&to=${endTime}`),
-		        		fetch('https://api.coinpaprika.com/v1/tickers/btc-bitcoin'),
+		        		fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'),
 		        		])
 		        	let prices = await Promise.all(pricereqs.map(req => req.json()))
 		        	console.log(prices, "PRICES")
 		        	let SNXprices = prices[0].prices
 		        	let RENprices = prices[1].prices
-		        	let btcPrice = prices[2].quotes.USD.price
+		        	let btcPrice = prices[2].bitcoin.usd
 
 		        	let curveRewards = new web3.eth.Contract(abis.sbtc.sCurveRewards_abi, abis.sbtc.sCurveRewards_address)
 		        	let sbtcPeriodFinish = await curveRewards.methods.periodFinish().call()
