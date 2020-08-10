@@ -20,7 +20,7 @@
 				<a href='https://guides.curve.fi/everything-you-need-to-know-about-crv/'>Everything known about the CRV token article</a>
 			</div>
 			<div class='info-message gentle-message'>
-				If you find inconsistencies, please contract us on 
+				If you find inconsistencies, please contact us on
 				<a href="https://twitter.com/CurveFinance" rel='noopener noreferrer'>#Twitter</a>,
       			<a href="https://t.me/curvefi" rel='noopener noreferrer'>@Telegram</a>,
 				<a href="https://discord.gg/9uEHakc" rel='noopener noreferrer'>@Discord</a>
