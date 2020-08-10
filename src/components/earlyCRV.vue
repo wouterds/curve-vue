@@ -71,10 +71,11 @@
 				data = await data.json()
 				this.data = data
 
-				this.submit()
+				if(this.address)
+					this.submit()
 			},
 			submit() {
-				console.log(this.data)
+				if(!this.address) return;
 				let crv = this.data[this.address.toLowerCase()] || 0
 				this.crv = crv * 151515151
 			},
