@@ -36,8 +36,6 @@
 		data: () => ({
 			address: '',
 
-			data: {},
-
 			crv: null,
 		}),
 
@@ -67,16 +65,14 @@
 			async mounted() {
 				this.address = currentContract.default_account
 
-				let data = await fetch('https://www.curve.fi/raw-stats/early-users.json')
-				data = await data.json()
-				this.data = data
-
 				if(this.address)
 					this.submit()
 			},
-			submit() {
+			async submit() {
 				if(!this.address) return;
-				let crv = this.data[this.address.toLowerCase()] || 0
+				let crv = await fetch('https://pushservice.curve.fi/earlyCRV/' + this.address)
+				crv = await crv.json()
+				crv = crv.CRV
 				this.crv = crv * 151515151
 			},
 		},
